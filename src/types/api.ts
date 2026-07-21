@@ -138,7 +138,9 @@ export interface MobilePoolLoc {
 export interface PoolDeviceFunction {
   id: number;
   PoolID: string;
-  FunctionType: string;
+  function_type: "KANTIN" | "BUKAN_KANTIN";
+  created_at: string;
+  updated_at: string;
 }
 
 export interface AttendanceLog {
