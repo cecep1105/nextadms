@@ -160,6 +160,54 @@ export interface AttendanceLog {
   Function: string | null;
 }
 
+export interface RecapDateColumn {
+  date: string;
+  day_name: string;
+}
+
+export interface RecapCell {
+  date: string;
+  in_first: string | null;
+  in_count: number;
+  out_last: string | null;
+  out_count: number;
+}
+
+export interface RecapRow {
+  no: number;
+  pin: string;
+  name: string;
+  cells: RecapCell[];
+}
+
+export interface AttendanceRecapResponse {
+  count: number;
+  page: number;
+  page_size: number;
+  date_columns: RecapDateColumn[];
+  results: RecapRow[];
+}
+
+export interface EmployeeSearchResult {
+  pin: string;
+  name: string;
+}
+
+export interface AttendanceRecapCardRow {
+  date: string;
+  time: string;
+  device: string | null;
+  type: "IN" | "OUT";
+}
+
+export interface AttendanceRecapCardResponse {
+  pin: string;
+  name: string | null;
+  year: number;
+  month: number;
+  rows: AttendanceRecapCardRow[];
+}
+
 export interface DjangoApiUser {
   id: number;
   username: string;
