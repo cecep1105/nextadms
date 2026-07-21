@@ -15,12 +15,12 @@ const PAGE_SIZE = 20;
 export default async function MobilePoolsPage({
   searchParams,
 }: {
-  searchParams: { page?: string; search?: string };
+  searchParams: { page?: string; q?: string };
 }) {
   const page = searchParams.page ?? "1";
-  const search = searchParams.search ?? "";
+  const search = searchParams.q ?? "";
   const query = new URLSearchParams({ page });
-  if (search) query.set("search", search);
+  if (search) query.set("q", search);
 
   const data = await apiServerFetch<Paginated<MobilePool>>(`/mclock/mobile-pool/?${query.toString()}`);
 
@@ -74,7 +74,7 @@ export default async function MobilePoolsPage({
             )}
           </TableBody>
         </Table>
-        <PaginationBar count={data.count} pageSize={PAGE_SIZE} currentPage={Number(page)} basePath="/mclock/mobile-pools" searchParams={{ search }} />
+        <PaginationBar count={data.count} pageSize={PAGE_SIZE} currentPage={Number(page)} basePath="/mclock/mobile-pools" searchParams={{ q: search }} />
       </Card>
     </div>
   );

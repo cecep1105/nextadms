@@ -22,13 +22,13 @@ function isRecentlyActive(lastActivity: string | null): boolean {
 export default async function ActiveDevicesPage({
   searchParams,
 }: {
-  searchParams: { page?: string; search?: string };
+  searchParams: { page?: string; q?: string };
 }) {
   const page = searchParams.page ?? "1";
-  const search = searchParams.search ?? "";
+  const search = searchParams.q ?? "";
 
   const query = new URLSearchParams({ page });
-  if (search) query.set("search", search);
+  if (search) query.set("q", search);
 
   const [devicesData, departmentsData] = await Promise.all([
     apiServerFetch<Paginated<ActiveDevice>>(`/iclock/active-device/?${query.toString()}`),
@@ -114,7 +114,7 @@ export default async function ActiveDevicesPage({
           pageSize={PAGE_SIZE}
           currentPage={Number(page)}
           basePath="/iclock/active-devices"
-          searchParams={{ search }}
+          searchParams={{ q: search }}
         />
       </Card>
     </div>
