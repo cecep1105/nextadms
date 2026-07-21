@@ -99,12 +99,22 @@ export interface OperationLog {
   SN: string | null;
   admin: number;
   OP: number;
-  OPDisplay: string;
+  OpName: string;
   OPTime: string;
   Object: number | null;
   Param1: number | null;
   Param2: number | null;
   Param3: number | null;
+}
+
+export interface DeviceLog {
+  id: number;
+  SN: string;
+  OP: string;
+  Object: string | null;
+  Cnt: number;
+  ECnt: number;
+  OpTime: string;
 }
 
 export interface DeviceCommand {
@@ -115,6 +125,8 @@ export interface DeviceCommand {
   CmdTransTime: string | null;
   CmdOverTime: string | null;
   CmdReturn: string | null;
+  User: number | null;
+  Username: string | null;
 }
 
 export interface MobilePool {

@@ -2,7 +2,7 @@ import type { LucideIcon } from "lucide-react";
 import {
   LayoutDashboard, Users, Building2, Cpu, ClipboardList, Fingerprint,
   ScrollText, FileClock, Terminal, CalendarClock, MapPinned, Route,
-  ToggleLeft, ScanFace, Smartphone,
+  ToggleLeft, ScanFace, Smartphone, History,
 } from "lucide-react";
 
 export interface NavItem {
@@ -35,6 +35,7 @@ export const navGroups: NavGroup[] = [
       { title: "Transaction", href: "/iclock/transactions", icon: ScrollText },
       { title: "Attendance Recap", href: "/iclock/attendance-recap", icon: CalendarClock },
       { title: "Operation Log", href: "/iclock/operation-logs", icon: FileClock },
+      { title: "Device Log", href: "/iclock/device-logs", icon: History },
       { title: "Device Command", href: "/iclock/device-commands", icon: Terminal },
     ],
   },
