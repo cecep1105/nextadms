@@ -1,6 +1,7 @@
 import { PageHeader } from "@/components/shared/page-header";
 import { SearchBar } from "@/components/shared/search-bar";
 import { PaginationBar } from "@/components/shared/pagination-bar";
+import { SortableHeader } from "@/components/shared/sortable-header";
 import { DeleteConfirmButton } from "@/components/shared/delete-confirm-button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
@@ -12,16 +13,19 @@ import type { Paginated, FaceProfile } from "@/types/api";
 import { ToggleLockButton } from "./_components/toggle-lock-button";
 
 const PAGE_SIZE = 20;
+const BASE_PATH = "/mattendance/face-profiles";
 
 export default async function FaceProfilesPage({
   searchParams,
 }: {
-  searchParams: { page?: string; q?: string };
+  searchParams: { page?: string; q?: string; ordering?: string };
 }) {
   const page = searchParams.page ?? "1";
   const search = searchParams.q ?? "";
+  const ordering = searchParams.ordering ?? "";
   const query = new URLSearchParams({ page });
   if (search) query.set("q", search);
+  if (ordering) query.set("ordering", ordering);
 
   const data = await apiServerFetch<Paginated<FaceProfile>>(`/mattendance/admin/face-profiles/?${query.toString()}`);
 
@@ -40,9 +44,9 @@ export default async function FaceProfilesPage({
             <TableRow>
               <TableHead>PIN</TableHead>
               <TableHead>Nama</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Didaftarkan</TableHead>
-              <TableHead>Diperbarui</TableHead>
+              <TableHead><SortableHeader label="Status" sortKey="is_locked" currentSort={ordering} basePath={BASE_PATH} searchParams={{ q: search }} /></TableHead>
+              <TableHead><SortableHeader label="Didaftarkan" sortKey="enrolled_at" currentSort={ordering} basePath={BASE_PATH} searchParams={{ q: search }} /></TableHead>
+              <TableHead><SortableHeader label="Diperbarui" sortKey="updated_at" currentSort={ordering} basePath={BASE_PATH} searchParams={{ q: search }} /></TableHead>
               <TableHead className="text-right">Aksi</TableHead>
             </TableRow>
           </TableHeader>
@@ -74,7 +78,7 @@ export default async function FaceProfilesPage({
             )}
           </TableBody>
         </Table>
-        <PaginationBar count={data.count} pageSize={PAGE_SIZE} currentPage={Number(page)} basePath="/mattendance/face-profiles" searchParams={{ q: search }} />
+        <PaginationBar count={data.count} pageSize={PAGE_SIZE} currentPage={Number(page)} basePath={BASE_PATH} searchParams={{ q: search, ordering }} />
       </Card>
     </div>
   );

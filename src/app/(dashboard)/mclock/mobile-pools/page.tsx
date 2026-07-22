@@ -1,6 +1,7 @@
 import { PageHeader } from "@/components/shared/page-header";
 import { SearchBar } from "@/components/shared/search-bar";
 import { PaginationBar } from "@/components/shared/pagination-bar";
+import { SortableHeader } from "@/components/shared/sortable-header";
 import { DeleteConfirmButton } from "@/components/shared/delete-confirm-button";
 import { Card } from "@/components/ui/card";
 import {
@@ -11,16 +12,19 @@ import type { Paginated, MobilePool } from "@/types/api";
 import { MobilePoolFormDialog } from "./_components/mobile-pool-form-dialog";
 
 const PAGE_SIZE = 20;
+const BASE_PATH = "/mclock/mobile-pools";
 
 export default async function MobilePoolsPage({
   searchParams,
 }: {
-  searchParams: { page?: string; q?: string };
+  searchParams: { page?: string; q?: string; ordering?: string };
 }) {
   const page = searchParams.page ?? "1";
   const search = searchParams.q ?? "";
+  const ordering = searchParams.ordering ?? "";
   const query = new URLSearchParams({ page });
   if (search) query.set("q", search);
+  if (ordering) query.set("ordering", ordering);
 
   const data = await apiServerFetch<Paginated<MobilePool>>(`/mclock/mobile-pool/?${query.toString()}`);
 
@@ -38,12 +42,12 @@ export default async function MobilePoolsPage({
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Pool ID</TableHead>
-              <TableHead>Pool Code</TableHead>
-              <TableHead>Nama</TableHead>
+              <TableHead><SortableHeader label="Pool ID" sortKey="PoolID" currentSort={ordering} basePath={BASE_PATH} searchParams={{ q: search }} /></TableHead>
+              <TableHead><SortableHeader label="Pool Code" sortKey="PoolCode" currentSort={ordering} basePath={BASE_PATH} searchParams={{ q: search }} /></TableHead>
+              <TableHead><SortableHeader label="Nama" sortKey="PoolName" currentSort={ordering} basePath={BASE_PATH} searchParams={{ q: search }} /></TableHead>
               <TableHead>Koordinat</TableHead>
               <TableHead>Radius</TableHead>
-              <TableHead>Synced</TableHead>
+              <TableHead><SortableHeader label="Synced" sortKey="SyncedAt" currentSort={ordering} basePath={BASE_PATH} searchParams={{ q: search }} /></TableHead>
               <TableHead className="text-right">Aksi</TableHead>
             </TableRow>
           </TableHeader>
@@ -74,7 +78,7 @@ export default async function MobilePoolsPage({
             )}
           </TableBody>
         </Table>
-        <PaginationBar count={data.count} pageSize={PAGE_SIZE} currentPage={Number(page)} basePath="/mclock/mobile-pools" searchParams={{ q: search }} />
+        <PaginationBar count={data.count} pageSize={PAGE_SIZE} currentPage={Number(page)} basePath={BASE_PATH} searchParams={{ q: search, ordering }} />
       </Card>
     </div>
   );

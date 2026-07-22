@@ -1,6 +1,7 @@
 import { PageHeader } from "@/components/shared/page-header";
 import { SearchBar } from "@/components/shared/search-bar";
 import { PaginationBar } from "@/components/shared/pagination-bar";
+import { SortableHeader } from "@/components/shared/sortable-header";
 import { DeleteConfirmButton } from "@/components/shared/delete-confirm-button";
 import { Card } from "@/components/ui/card";
 import {
@@ -11,16 +12,19 @@ import type { Paginated, Department } from "@/types/api";
 import { DepartmentFormDialog } from "./_components/department-form-dialog";
 
 const PAGE_SIZE = 20;
+const BASE_PATH = "/iclock/departments";
 
 export default async function DepartmentsPage({
   searchParams,
 }: {
-  searchParams: { page?: string; q?: string };
+  searchParams: { page?: string; q?: string; ordering?: string };
 }) {
   const page = searchParams.page ?? "1";
   const search = searchParams.q ?? "";
+  const ordering = searchParams.ordering ?? "";
   const query = new URLSearchParams({ page });
   if (search) query.set("q", search);
+  if (ordering) query.set("ordering", ordering);
 
   const data = await apiServerFetch<Paginated<Department>>(`/iclock/department/?${query.toString()}`);
 
@@ -38,8 +42,8 @@ export default async function DepartmentsPage({
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Pool ID</TableHead>
-              <TableHead>Nama Pool</TableHead>
+              <TableHead><SortableHeader label="Pool ID" sortKey="DeptID" currentSort={ordering} basePath={BASE_PATH} searchParams={{ q: search }} /></TableHead>
+              <TableHead><SortableHeader label="Nama Pool" sortKey="DeptName" currentSort={ordering} basePath={BASE_PATH} searchParams={{ q: search }} /></TableHead>
               <TableHead>Net ID</TableHead>
               <TableHead>Router</TableHead>
               <TableHead>Subnet</TableHead>
@@ -68,7 +72,7 @@ export default async function DepartmentsPage({
             )}
           </TableBody>
         </Table>
-        <PaginationBar count={data.count} pageSize={PAGE_SIZE} currentPage={Number(page)} basePath="/iclock/departments" searchParams={{ q: search }} />
+        <PaginationBar count={data.count} pageSize={PAGE_SIZE} currentPage={Number(page)} basePath={BASE_PATH} searchParams={{ q: search, ordering }} />
       </Card>
     </div>
   );

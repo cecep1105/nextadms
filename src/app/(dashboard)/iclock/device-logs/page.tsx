@@ -1,6 +1,7 @@
 import { PageHeader } from "@/components/shared/page-header";
 import { SearchBar } from "@/components/shared/search-bar";
 import { PaginationBar } from "@/components/shared/pagination-bar";
+import { SortableHeader } from "@/components/shared/sortable-header";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import {
@@ -10,16 +11,19 @@ import { apiServerFetch } from "@/lib/api-server";
 import type { Paginated, DeviceLog } from "@/types/api";
 
 const PAGE_SIZE = 20;
+const BASE_PATH = "/iclock/device-logs";
 
 export default async function DeviceLogsPage({
   searchParams,
 }: {
-  searchParams: { page?: string; q?: string };
+  searchParams: { page?: string; q?: string; ordering?: string };
 }) {
   const page = searchParams.page ?? "1";
   const search = searchParams.q ?? "";
+  const ordering = searchParams.ordering ?? "";
   const query = new URLSearchParams({ page });
   if (search) query.set("q", search);
+  if (ordering) query.set("ordering", ordering);
 
   const data = await apiServerFetch<Paginated<DeviceLog>>(`/iclock/device-log/?${query.toString()}`);
 
@@ -36,11 +40,11 @@ export default async function DeviceLogsPage({
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Waktu Upload</TableHead>
+              <TableHead><SortableHeader label="Waktu Upload" sortKey="OpTime" currentSort={ordering} basePath={BASE_PATH} searchParams={{ q: search }} /></TableHead>
               <TableHead>Device</TableHead>
               <TableHead>Tipe Data</TableHead>
               <TableHead>Object</TableHead>
-              <TableHead>Jumlah Record</TableHead>
+              <TableHead><SortableHeader label="Jumlah Record" sortKey="Cnt" currentSort={ordering} basePath={BASE_PATH} searchParams={{ q: search }} /></TableHead>
               <TableHead>Error</TableHead>
             </TableRow>
           </TableHeader>
@@ -63,7 +67,7 @@ export default async function DeviceLogsPage({
             )}
           </TableBody>
         </Table>
-        <PaginationBar count={data.count} pageSize={PAGE_SIZE} currentPage={Number(page)} basePath="/iclock/device-logs" searchParams={{ q: search }} />
+        <PaginationBar count={data.count} pageSize={PAGE_SIZE} currentPage={Number(page)} basePath={BASE_PATH} searchParams={{ q: search, ordering }} />
       </Card>
     </div>
   );

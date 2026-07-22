@@ -1,6 +1,7 @@
 import { PageHeader } from "@/components/shared/page-header";
 import { SearchBar } from "@/components/shared/search-bar";
 import { PaginationBar } from "@/components/shared/pagination-bar";
+import { SortableHeader } from "@/components/shared/sortable-header";
 import { Card } from "@/components/ui/card";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
@@ -9,16 +10,19 @@ import { apiServerFetch } from "@/lib/api-server";
 import type { Paginated, OperationLog } from "@/types/api";
 
 const PAGE_SIZE = 20;
+const BASE_PATH = "/iclock/operation-logs";
 
 export default async function OperationLogsPage({
   searchParams,
 }: {
-  searchParams: { page?: string; q?: string };
+  searchParams: { page?: string; q?: string; ordering?: string };
 }) {
   const page = searchParams.page ?? "1";
   const search = searchParams.q ?? "";
+  const ordering = searchParams.ordering ?? "";
   const query = new URLSearchParams({ page });
   if (search) query.set("q", search);
+  if (ordering) query.set("ordering", ordering);
 
   const data = await apiServerFetch<Paginated<OperationLog>>(`/iclock/operation-log/?${query.toString()}`);
 
@@ -35,10 +39,10 @@ export default async function OperationLogsPage({
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Waktu</TableHead>
+              <TableHead><SortableHeader label="Waktu" sortKey="OPTime" currentSort={ordering} basePath={BASE_PATH} searchParams={{ q: search }} /></TableHead>
               <TableHead>Device</TableHead>
               <TableHead>Operasi</TableHead>
-              <TableHead>Admin</TableHead>
+              <TableHead><SortableHeader label="Admin" sortKey="admin" currentSort={ordering} basePath={BASE_PATH} searchParams={{ q: search }} /></TableHead>
               <TableHead>Object</TableHead>
               <TableHead>Param 1/2/3</TableHead>
             </TableRow>
@@ -62,7 +66,7 @@ export default async function OperationLogsPage({
             )}
           </TableBody>
         </Table>
-        <PaginationBar count={data.count} pageSize={PAGE_SIZE} currentPage={Number(page)} basePath="/iclock/operation-logs" searchParams={{ q: search }} />
+        <PaginationBar count={data.count} pageSize={PAGE_SIZE} currentPage={Number(page)} basePath={BASE_PATH} searchParams={{ q: search, ordering }} />
       </Card>
     </div>
   );

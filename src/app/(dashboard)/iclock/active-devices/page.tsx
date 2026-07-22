@@ -2,6 +2,7 @@ import { Cpu, Wifi, WifiOff } from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
 import { SearchBar } from "@/components/shared/search-bar";
 import { PaginationBar } from "@/components/shared/pagination-bar";
+import { SortableHeader } from "@/components/shared/sortable-header";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import {
@@ -13,6 +14,7 @@ import { DeviceFormDialog } from "./_components/device-form-dialog";
 import { DeleteDeviceButton } from "./_components/delete-device-button";
 
 const PAGE_SIZE = 20;
+const BASE_PATH = "/iclock/active-devices";
 
 function isRecentlyActive(lastActivity: string | null): boolean {
   if (!lastActivity) return false;
@@ -22,13 +24,15 @@ function isRecentlyActive(lastActivity: string | null): boolean {
 export default async function ActiveDevicesPage({
   searchParams,
 }: {
-  searchParams: { page?: string; q?: string };
+  searchParams: { page?: string; q?: string; ordering?: string };
 }) {
   const page = searchParams.page ?? "1";
   const search = searchParams.q ?? "";
+  const ordering = searchParams.ordering ?? "";
 
   const query = new URLSearchParams({ page });
   if (search) query.set("q", search);
+  if (ordering) query.set("ordering", ordering);
 
   const [devicesData, departmentsData] = await Promise.all([
     apiServerFetch<Paginated<ActiveDevice>>(`/iclock/active-device/?${query.toString()}`),
@@ -52,13 +56,13 @@ export default async function ActiveDevicesPage({
           <TableHeader>
             <TableRow>
               <TableHead>Status</TableHead>
-              <TableHead>SN</TableHead>
-              <TableHead>Alias</TableHead>
+              <TableHead><SortableHeader label="SN" sortKey="SN" currentSort={ordering} basePath={BASE_PATH} searchParams={{ q: search }} /></TableHead>
+              <TableHead><SortableHeader label="Alias" sortKey="Alias" currentSort={ordering} basePath={BASE_PATH} searchParams={{ q: search }} /></TableHead>
               <TableHead>Pool</TableHead>
-              <TableHead>IP Address</TableHead>
+              <TableHead><SortableHeader label="IP Address" sortKey="IPAddress" currentSort={ordering} basePath={BASE_PATH} searchParams={{ q: search }} /></TableHead>
               <TableHead>Push Ver</TableHead>
               <TableHead>Realtime</TableHead>
-              <TableHead>Last Activity</TableHead>
+              <TableHead><SortableHeader label="Last Activity" sortKey="LastActivity" currentSort={ordering} basePath={BASE_PATH} searchParams={{ q: search }} /></TableHead>
               <TableHead className="text-right">Aksi</TableHead>
             </TableRow>
           </TableHeader>
@@ -113,8 +117,8 @@ export default async function ActiveDevicesPage({
           count={devicesData.count}
           pageSize={PAGE_SIZE}
           currentPage={Number(page)}
-          basePath="/iclock/active-devices"
-          searchParams={{ q: search }}
+          basePath={BASE_PATH}
+          searchParams={{ q: search, ordering }}
         />
       </Card>
     </div>

@@ -2,6 +2,7 @@ import { Smartphone, Fingerprint as FingerprintIcon } from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
 import { SearchBar } from "@/components/shared/search-bar";
 import { PaginationBar } from "@/components/shared/pagination-bar";
+import { SortableHeader } from "@/components/shared/sortable-header";
 import { DeleteConfirmButton } from "@/components/shared/delete-confirm-button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
@@ -13,17 +14,20 @@ import type { Paginated, Employee, Department } from "@/types/api";
 import { EmployeeFormDialog } from "./_components/employee-form-dialog";
 
 const PAGE_SIZE = 20;
+const BASE_PATH = "/iclock/employees";
 
 export default async function EmployeesPage({
   searchParams,
 }: {
-  searchParams: { page?: string; q?: string };
+  searchParams: { page?: string; q?: string; ordering?: string };
 }) {
   const page = searchParams.page ?? "1";
   const search = searchParams.q ?? "";
+  const ordering = searchParams.ordering ?? "";
 
   const query = new URLSearchParams({ page });
   if (search) query.set("q", search);
+  if (ordering) query.set("ordering", ordering);
 
   const [employeesData, departmentsData] = await Promise.all([
     apiServerFetch<Paginated<Employee>>(`/iclock/device-user/?${query.toString()}`),
@@ -46,12 +50,12 @@ export default async function EmployeesPage({
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>PIN</TableHead>
-              <TableHead>Nama</TableHead>
+              <TableHead><SortableHeader label="PIN" sortKey="PIN" currentSort={ordering} basePath={BASE_PATH} searchParams={{ q: search }} /></TableHead>
+              <TableHead><SortableHeader label="Nama" sortKey="EName" currentSort={ordering} basePath={BASE_PATH} searchParams={{ q: search }} /></TableHead>
               <TableHead>Pool</TableHead>
               <TableHead>Last Pool</TableHead>
               <TableHead>Last Device</TableHead>
-              <TableHead>Last Seen</TableHead>
+              <TableHead><SortableHeader label="Last Seen" sortKey="UTime" currentSort={ordering} basePath={BASE_PATH} searchParams={{ q: search }} /></TableHead>
               <TableHead className="text-right">Aksi</TableHead>
             </TableRow>
           </TableHeader>
@@ -102,8 +106,8 @@ export default async function EmployeesPage({
           count={employeesData.count}
           pageSize={PAGE_SIZE}
           currentPage={Number(page)}
-          basePath="/iclock/employees"
-          searchParams={{ q: search }}
+          basePath={BASE_PATH}
+          searchParams={{ q: search, ordering }}
         />
       </Card>
     </div>

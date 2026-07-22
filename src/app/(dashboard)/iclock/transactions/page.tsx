@@ -2,6 +2,7 @@ import { Smartphone } from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
 import { SearchBar } from "@/components/shared/search-bar";
 import { PaginationBar } from "@/components/shared/pagination-bar";
+import { SortableHeader } from "@/components/shared/sortable-header";
 import { DeleteConfirmButton } from "@/components/shared/delete-confirm-button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
@@ -12,16 +13,19 @@ import { apiServerFetch } from "@/lib/api-server";
 import type { Paginated, Transaction } from "@/types/api";
 
 const PAGE_SIZE = 20;
+const BASE_PATH = "/iclock/transactions";
 
 export default async function TransactionsPage({
   searchParams,
 }: {
-  searchParams: { page?: string; q?: string };
+  searchParams: { page?: string; q?: string; ordering?: string };
 }) {
   const page = searchParams.page ?? "1";
   const search = searchParams.q ?? "";
+  const ordering = searchParams.ordering ?? "";
   const query = new URLSearchParams({ page });
   if (search) query.set("q", search);
+  if (ordering) query.set("ordering", ordering);
 
   const data = await apiServerFetch<Paginated<Transaction>>(`/iclock/transaction/?${query.toString()}`);
 
@@ -38,12 +42,12 @@ export default async function TransactionsPage({
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Waktu</TableHead>
+              <TableHead><SortableHeader label="Waktu" sortKey="TTime" currentSort={ordering} basePath={BASE_PATH} searchParams={{ q: search }} /></TableHead>
               <TableHead>Employee</TableHead>
               <TableHead>Device / Sumber</TableHead>
               <TableHead>Tipe</TableHead>
               <TableHead>Verify</TableHead>
-              <TableHead>Function</TableHead>
+              <TableHead><SortableHeader label="Function" sortKey="Function" currentSort={ordering} basePath={BASE_PATH} searchParams={{ q: search }} /></TableHead>
               <TableHead className="text-right">Aksi</TableHead>
             </TableRow>
           </TableHeader>
@@ -83,7 +87,7 @@ export default async function TransactionsPage({
             )}
           </TableBody>
         </Table>
-        <PaginationBar count={data.count} pageSize={PAGE_SIZE} currentPage={Number(page)} basePath="/iclock/transactions" searchParams={{ q: search }} />
+        <PaginationBar count={data.count} pageSize={PAGE_SIZE} currentPage={Number(page)} basePath={BASE_PATH} searchParams={{ q: search, ordering }} />
       </Card>
     </div>
   );
