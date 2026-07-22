@@ -13,7 +13,7 @@ import { useApiClient } from "@/lib/api-client";
 import { extractErrorMessage } from "@/lib/error-utils";
 import type { DjangoApiUser } from "@/types/api";
 
-export function UserFormDialog({ mode, user }: { mode: "create" | "edit"; user?: DjangoApiUser }) {
+export function UserFormDialog({ mode, user, isSuperuser }: { mode: "create" | "edit"; user?: DjangoApiUser; isSuperuser?: boolean }) {
   const router = useRouter();
   const { request } = useApiClient();
   const [open, setOpen] = useState(false);
@@ -145,7 +145,7 @@ export function UserFormDialog({ mode, user }: { mode: "create" | "edit"; user?:
             </>
           )}
 
-          {mode === "create" && (
+          {mode === "create" && isSuperuser && (
             <label className="flex items-center gap-2 text-xs">
               <Switch checked={form.is_staff} onCheckedChange={(v) => setForm((f) => ({ ...f, is_staff: v }))} />
               Jadikan Staff (akses dashboard admin)

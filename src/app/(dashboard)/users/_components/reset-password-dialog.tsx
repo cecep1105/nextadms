@@ -9,12 +9,14 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
 } from "@/components/ui/dialog";
 import { useApiClient } from "@/lib/api-client";
+import { extractErrorMessage } from "@/lib/error-utils";
 
 export function ResetPasswordDialog({ userId, username }: { userId: number; username: string }) {
   const router = useRouter();
   const { request } = useApiClient();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [newPassword, setNewPassword] = useState("");
   const [generatedPassword, setGeneratedPassword] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
@@ -24,6 +26,7 @@ export function ResetPasswordDialog({ userId, username }: { userId: number; user
     if (!next) {
       setNewPassword("");
       setGeneratedPassword(null);
+      setError(null);
       setCopied(false);
     }
   }
@@ -31,6 +34,7 @@ export function ResetPasswordDialog({ userId, username }: { userId: number; user
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
+    setError(null);
     try {
       const result = await request<{ detail: string; generated_password?: string }>(
         `/users/${userId}/reset-password/`,
@@ -42,6 +46,8 @@ export function ResetPasswordDialog({ userId, username }: { userId: number; user
         setOpen(false);
         router.refresh();
       }
+    } catch (err) {
+      setError(extractErrorMessage(err, "Gagal mereset password."));
     } finally {
       setLoading(false);
     }
@@ -84,6 +90,7 @@ export function ResetPasswordDialog({ userId, username }: { userId: number; user
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
+            {error && <div className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-xs text-destructive">{error}</div>}
             <div className="space-y-1.5">
               <Label htmlFor="newpw">Password Baru (opsional)</Label>
               <Input id="newpw" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder="Kosongkan untuk auto-generate" />

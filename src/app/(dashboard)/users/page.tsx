@@ -31,13 +31,14 @@ export default async function UsersPage({
     auth(),
   ]);
   const isSuperuser = session?.user?.is_superuser ?? false;
+  const currentUserId = session?.user?.id;
 
   return (
     <div>
       <PageHeader
         title="Manajemen User"
         description="Kelola akun staff yang punya akses ke dashboard ini (LDAP & lokal)."
-        action={<UserFormDialog mode="create" />}
+        action={<UserFormDialog mode="create" isSuperuser={isSuperuser} />}
       />
       <Card>
         <div className="flex items-center justify-between border-b border-border p-3">
@@ -59,7 +60,9 @@ export default async function UsersPage({
             {data.results.length === 0 ? (
               <TableRow><TableCell colSpan={7} className="py-8 text-center text-muted-foreground">Tidak ada user ditemukan.</TableCell></TableRow>
             ) : (
-              data.results.map((u) => (
+              data.results.map((u) => {
+                const isSelf = u.id === currentUserId;
+                return (
                 <TableRow key={u.id}>
                   <TableCell className="font-mono font-medium">{u.username}</TableCell>
                   <TableCell>{u.full_name || "-"}</TableCell>
@@ -80,13 +83,28 @@ export default async function UsersPage({
                     <div className="flex justify-end gap-0.5">
                       <UserFormDialog mode="edit" user={u} />
                       {u.auth_source === "local" && <ResetPasswordDialog userId={u.id} username={u.username} />}
-                      <ToggleActiveButton userId={u.id} isActive={u.is_active} />
-                      {isSuperuser && <SetStaffButton userId={u.id} isStaff={u.is_staff} />}
-                      {!u.is_superuser && <DeleteConfirmButton endpoint={`/users/${u.id}/`} label={`User '${u.username}'`} />}
+                      <ToggleActiveButton
+                        userId={u.id} isActive={u.is_active}
+                        disabled={isSelf} disabledReason={isSelf ? "Tidak dapat mengubah status akun sendiri" : undefined}
+                      />
+                      {isSuperuser && (
+                        <SetStaffButton
+                          userId={u.id} isStaff={u.is_staff}
+                          disabled={isSelf} disabledReason={isSelf ? "Tidak dapat mengubah role sendiri" : undefined}
+                        />
+                      )}
+                      {/* Hapus user CUMA boleh superuser (accounts/services.py::delete_user), TIDAK CUKUP staff biasa -- sebelumnya cuma cek target bukan superuser, jadi staff non-superuser bisa klik & dapat 403 tanpa penjelasan. */}
+                      {isSuperuser && !u.is_superuser && (
+                        <DeleteConfirmButton
+                          endpoint={`/users/${u.id}/`} label={`User '${u.username}'`}
+                          disabled={isSelf} disabledReason={isSelf ? "Tidak dapat menghapus akun sendiri" : undefined}
+                        />
+                      )}
                     </div>
                   </TableCell>
                 </TableRow>
-              ))
+                );
+              })
             )}
           </TableBody>
         </Table>
