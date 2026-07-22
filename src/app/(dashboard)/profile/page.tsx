@@ -15,7 +15,7 @@ import type { DjangoApiUser } from "@/types/api";
 
 export default function ProfilePage() {
   const { update: updateSession } = useSession();
-  const { request } = useApiClient();
+  const { request, session } = useApiClient();
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -24,6 +24,11 @@ export default function ProfilePage() {
   const [form, setForm] = useState({ email: "", first_name: "", last_name: "", phone_number: "", department: "", title: "" });
 
   useEffect(() => {
+    // Sama seperti bug di use-device-function-choices.ts: HARUS tunggu
+    // accessToken tersedia dulu, jangan fetch begitu komponen mount
+    // (session NextAuth bisa saja masih 'loading' saat itu, request
+    // terkirim tanpa header Authorization -> 401).
+    if (!session?.accessToken) return;
     setLoading(true);
     request<DjangoApiUser>("/me/")
       .then((data) => {
@@ -34,8 +39,7 @@ export default function ProfilePage() {
         });
       })
       .finally(() => setLoading(false));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [session?.accessToken]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();

@@ -33,6 +33,7 @@ export interface ActiveDevice {
   TZAdj: number | null;
   State: number;
   LastActivity: string | null;
+  LastData: string | null;
   PushVersion: string | null;
   LogStamp: string | null;
   OpLogStamp: string | null;
