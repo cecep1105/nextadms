@@ -2,7 +2,7 @@ import type { LucideIcon } from "lucide-react";
 import {
   LayoutDashboard, Users, Building2, Cpu, ClipboardList, Fingerprint,
   ScrollText, FileClock, Terminal, CalendarClock, MapPinned, Route,
-  ToggleLeft, ScanFace, Smartphone, History,
+  ToggleLeft, ScanFace, Smartphone, History, UserCircle, KeyRound,
 } from "lucide-react";
 
 export interface NavItem {
@@ -47,6 +47,23 @@ export const navGroups: NavGroup[] = [
       { title: "Pool Device Function", href: "/mclock/pool-device-functions", icon: ToggleLeft },
       { title: "Log Absensi GPS", href: "/mattendance/logs", icon: Smartphone },
       { title: "Face Profile", href: "/mattendance/face-profiles", icon: ScanFace },
+    ],
+  },
+];
+
+/**
+ * Nav utk akun BUKAN staff/superuser (cuma login biasa, tanpa akses
+ * dashboard admin) -- lihat middleware.ts, akun begini di-redirect ke
+ * /profile & TIDAK bisa akses halaman lain sama sekali. Sidebar-nya JUGA
+ * cuma nampilin ini (bukan seluruh `navGroups` di atas yang isinya
+ * semua akan 403 kalau diklik).
+ */
+export const nonStaffNavGroups: NavGroup[] = [
+  {
+    label: "Akun Saya",
+    items: [
+      { title: "Profil Saya", href: "/profile", icon: UserCircle },
+      { title: "Ganti Password", href: "/profile/password", icon: KeyRound },
     ],
   },
 ];

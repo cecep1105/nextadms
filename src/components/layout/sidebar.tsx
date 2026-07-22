@@ -1,8 +1,9 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { Fingerprint, ChevronsLeft, ChevronsRight } from "lucide-react";
-import { navGroups } from "./nav-config";
+import { navGroups, nonStaffNavGroups } from "./nav-config";
 import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
@@ -18,6 +19,13 @@ export function SidebarContent({
   collapsed?: boolean;
 }) {
   const pathname = usePathname();
+  const { data: session } = useSession();
+  const isStaff = session?.user?.is_staff || session?.user?.is_superuser;
+  // Akun non-staff CUMA lihat menu Akun Saya -- sisanya (Active Device dkk)
+  // akan 403 kalau dipaksa akses, jadi jangan ditampilkan sama sekali
+  // (middleware.ts JUGA sudah block navigasi langsungnya, ini cuma
+  // memastikan UI-nya tidak menyesatkan dgn nawarin menu yg toh ditolak).
+  const groups = isStaff ? navGroups : nonStaffNavGroups;
 
   return (
     <div className="flex h-full flex-col bg-card">
@@ -30,7 +38,7 @@ export function SidebarContent({
 
       <ScrollArea className="flex-1 px-2 py-3">
         <nav className="space-y-4">
-          {navGroups.map((group) => (
+          {groups.map((group) => (
             <div key={group.label}>
               {!collapsed && (
                 <p className="px-2 pb-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/70">
