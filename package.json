@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev -H 0.0.0.0 -p 3000",
     "build": "next build",
-    "start": "next start",
+    "start": "cross-env MODE_ENV=production next start",
     "lint": "next lint"
   },
   "dependencies": {
@@ -24,6 +24,7 @@
     "@radix-ui/react-tooltip": "^1.2.13",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "cross-env": "^10.1.0",
     "lucide-react": "^1.25.0",
     "next": "14.2.35",
     "next-auth": "^5.0.0-beta.32",

@@ -52,7 +52,7 @@ export function RecapFilterBar({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-3 rounded-lg border border-border bg-card p-3 sm:grid-cols-2 lg:grid-cols-6">
+    <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-3 rounded-lg border border-border bg-card p-3 sm:grid-cols-2 lg:grid-cols-4">
       <div className="space-y-1.5 lg:col-span-2">
         <Label>PIN / Nama</Label>
         <PinAutocomplete value={pin} onChange={setPin} />
