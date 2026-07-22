@@ -9,6 +9,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { PinAutocomplete } from "./pin-autocomplete";
+import { useDeviceFunctionChoices } from "@/lib/use-device-function-choices";
 import type { Department, ActiveDevice } from "@/types/api";
 
 function todayIso() {
@@ -29,6 +30,7 @@ export function RecapFilterBar({
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const { choices: functionChoices } = useDeviceFunctionChoices();
 
   const [pin, setPin] = useState(searchParams.get("pin") ?? "");
   const [func, setFunc] = useState(searchParams.get("function") ?? "");
@@ -57,7 +59,14 @@ export function RecapFilterBar({
       </div>
       <div className="space-y-1.5">
         <Label>Function Code</Label>
-        <Input value={func} onChange={(e) => setFunc(e.target.value)} placeholder="mis. 89, X" className="font-mono" />
+        <Select value={func} onValueChange={setFunc}>
+          <SelectTrigger><SelectValue placeholder="Semua Function" /></SelectTrigger>
+          <SelectContent>
+            {functionChoices.map((c) => (
+              <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
       <div className="space-y-1.5">
         <Label>Pool</Label>
