@@ -10,8 +10,10 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import { apiServerFetch } from "@/lib/api-server";
-import type { Paginated, Employee, Department } from "@/types/api";
+import type { Paginated, Employee, Department, ActiveDevice } from "@/types/api";
 import { EmployeeFormDialog } from "./_components/employee-form-dialog";
+import { SetAdminButton } from "./_components/set-admin-button";
+import { TransferFingerDialog } from "./_components/transfer-finger-dialog";
 
 const PAGE_SIZE = 20;
 const BASE_PATH = "/iclock/employees";
@@ -29,9 +31,10 @@ export default async function EmployeesPage({
   if (search) query.set("q", search);
   if (ordering) query.set("ordering", ordering);
 
-  const [employeesData, departmentsData] = await Promise.all([
+  const [employeesData, departmentsData, devicesData] = await Promise.all([
     apiServerFetch<Paginated<Employee>>(`/iclock/device-user/?${query.toString()}`),
     apiServerFetch<Paginated<Department>>("/iclock/department/?page_size=200"),
+    apiServerFetch<Paginated<ActiveDevice>>("/iclock/active-device/?page_size=500"),
   ]);
 
   return (
@@ -90,6 +93,8 @@ export default async function EmployeesPage({
                   <TableCell>
                     <div className="flex justify-end gap-0.5">
                       <EmployeeFormDialog mode="edit" employee={emp} departments={departmentsData.results} />
+                      <SetAdminButton employeeId={emp.id} privilege={emp.Privilege} />
+                      <TransferFingerDialog employee={emp} departments={departmentsData.results} devices={devicesData.results} />
                       <DeleteConfirmButton
                         endpoint={`/iclock/device-user/${emp.id}/`}
                         label={`Employee '${emp.PIN} — ${emp.EName?.trim() || "tanpa nama"}'`}

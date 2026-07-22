@@ -12,6 +12,7 @@ import { apiServerFetch } from "@/lib/api-server";
 import type { Paginated, ActiveDevice, Department } from "@/types/api";
 import { DeviceFormDialog } from "./_components/device-form-dialog";
 import { DeleteDeviceButton } from "./_components/delete-device-button";
+import { DeviceActionsMenu } from "./_components/device-actions-menu";
 
 const PAGE_SIZE = 20;
 const BASE_PATH = "/iclock/active-devices";
@@ -103,6 +104,7 @@ export default async function ActiveDevicesPage({
                     <TableCell>
                       <div className="flex justify-end gap-0.5">
                         <DeviceFormDialog mode="edit" device={device} departments={departmentsData.results} />
+                        <DeviceActionsMenu sn={device.SN} alias={device.Alias} />
                         <DeleteDeviceButton sn={device.SN} alias={device.Alias} />
                       </div>
                     </TableCell>

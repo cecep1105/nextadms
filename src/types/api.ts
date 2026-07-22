@@ -13,6 +13,15 @@ export interface Department {
   DeptSubnet: string;
 }
 
+export interface DeviceLiveUser {
+  user_id: string;
+  name: string;
+  privilege: number;
+  password?: string;
+  group_id?: string;
+  card?: number;
+}
+
 export interface ActiveDevice {
   SN: string;
   Alias: string;
