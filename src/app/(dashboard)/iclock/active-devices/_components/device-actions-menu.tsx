@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   MoreVertical, Power, Clock, HardDriveDownload, Users, Loader2,
+  Network, Settings2, Fingerprint,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,8 +17,19 @@ import { useApiClient } from "@/lib/api-client";
 import { extractErrorMessage } from "@/lib/error-utils";
 import { BackupFingerprintsDialog } from "./backup-fingerprints-dialog";
 import { LiveUsersDialog } from "./live-users-dialog";
+import { NetworkParamsDialog } from "./network-params-dialog";
+import { GenericParamDialog } from "./generic-param-dialog";
+import { DeviceTransferFingerDialog } from "./device-transfer-finger-dialog";
+import type { Department, ActiveDevice } from "@/types/api";
 
-export function DeviceActionsMenu({ sn, alias }: { sn: string; alias: string }) {
+export function DeviceActionsMenu({
+  sn, alias, departments, devices,
+}: {
+  sn: string;
+  alias: string;
+  departments: Department[];
+  devices: ActiveDevice[];
+}) {
   const router = useRouter();
   const { request } = useApiClient();
 
@@ -27,6 +39,9 @@ export function DeviceActionsMenu({ sn, alias }: { sn: string; alias: string }) 
   const [actionResult, setActionResult] = useState<{ success: boolean; message: string } | null>(null);
   const [backupOpen, setBackupOpen] = useState(false);
   const [liveUsersOpen, setLiveUsersOpen] = useState(false);
+  const [networkParamsOpen, setNetworkParamsOpen] = useState(false);
+  const [genericParamOpen, setGenericParamOpen] = useState(false);
+  const [transferFingerOpen, setTransferFingerOpen] = useState(false);
 
   async function handleReboot() {
     setRebootLoading(true);
@@ -76,6 +91,16 @@ export function DeviceActionsMenu({ sn, alias }: { sn: string; alias: string }) 
               <DropdownMenuItem onClick={() => setBackupOpen(true)}>
                 <HardDriveDownload className="h-3.5 w-3.5" /> Backup Fingerprint
               </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setTransferFingerOpen(true)}>
+                <Fingerprint className="h-3.5 w-3.5" /> Transfer Finger dari Device Ini
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => setNetworkParamsOpen(true)}>
+                <Network className="h-3.5 w-3.5" /> Network Params
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setGenericParamOpen(true)}>
+                <Settings2 className="h-3.5 w-3.5" /> Generic Param
+              </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={() => setRebootConfirmOpen(true)} className="text-destructive focus:text-destructive">
                 <Power className="h-3.5 w-3.5" /> Reboot Device
@@ -110,6 +135,12 @@ export function DeviceActionsMenu({ sn, alias }: { sn: string; alias: string }) 
 
       <BackupFingerprintsDialog sn={sn} alias={alias} open={backupOpen} onOpenChange={setBackupOpen} />
       <LiveUsersDialog sn={sn} alias={alias} open={liveUsersOpen} onOpenChange={setLiveUsersOpen} />
+      <NetworkParamsDialog sn={sn} alias={alias} open={networkParamsOpen} onOpenChange={setNetworkParamsOpen} />
+      <GenericParamDialog sn={sn} alias={alias} open={genericParamOpen} onOpenChange={setGenericParamOpen} />
+      <DeviceTransferFingerDialog
+        sn={sn} alias={alias} departments={departments} devices={devices}
+        open={transferFingerOpen} onOpenChange={setTransferFingerOpen}
+      />
     </>
   );
 }

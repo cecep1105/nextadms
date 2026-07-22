@@ -35,9 +35,13 @@ export default async function ActiveDevicesPage({
   if (search) query.set("q", search);
   if (ordering) query.set("ordering", ordering);
 
-  const [devicesData, departmentsData] = await Promise.all([
+  const [devicesData, departmentsData, allDevicesData] = await Promise.all([
     apiServerFetch<Paginated<ActiveDevice>>(`/iclock/active-device/?${query.toString()}`),
     apiServerFetch<Paginated<Department>>("/iclock/department/?page_size=200"),
+    // Terpisah dari `devicesData` (list terpaginasi di atas, cuma ~20/halaman)
+    // -- ini KHUSUS utk isi dropdown "Device Spesifik" di dialog Transfer
+    // Finger, butuh SEMUA device tanpa terpotong halaman.
+    apiServerFetch<Paginated<ActiveDevice>>("/iclock/active-device/?page_size=500"),
   ]);
 
   return (
@@ -104,7 +108,7 @@ export default async function ActiveDevicesPage({
                     <TableCell>
                       <div className="flex justify-end gap-0.5">
                         <DeviceFormDialog mode="edit" device={device} departments={departmentsData.results} />
-                        <DeviceActionsMenu sn={device.SN} alias={device.Alias} />
+                        <DeviceActionsMenu sn={device.SN} alias={device.Alias} departments={departmentsData.results} devices={allDevicesData.results} />
                         <DeleteDeviceButton sn={device.SN} alias={device.Alias} />
                       </div>
                     </TableCell>
