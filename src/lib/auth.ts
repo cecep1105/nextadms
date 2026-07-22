@@ -93,7 +93,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session }) {
       const t = token as AppJWT;
 
       // Login pertama -- `user` cuma ada di request INI (dari authorize()).
@@ -103,6 +103,15 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         t.accessTokenExpires = user.accessTokenExpires;
         const { accessToken: _a, refreshToken: _r, accessTokenExpires: _e, ...rest } = user;
         t.user = { ...rest, id: Number(user.id) } as DjangoUser;
+        return t;
+      }
+
+      // Client panggil `update(data)` (mis. setelah edit profil di /profile)
+      // -- `session` di sini adalah `data` yang dikirim, BUKAN session penuh.
+      // Timpa field yang dikirim ke token.user supaya topbar dkk langsung
+      // lihat data terbaru TANPA perlu re-login/nunggu access token expire.
+      if (trigger === "update" && session) {
+        t.user = { ...t.user, ...session } as DjangoUser;
         return t;
       }
 

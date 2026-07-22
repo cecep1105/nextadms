@@ -157,19 +157,26 @@ export interface PoolDeviceFunction {
 
 export interface AttendanceLog {
   id: number;
-  user: number;
   username: string;
-  PoolID: string | null;
-  PoolName: string | null;
+  timestamp: string;
   check_type: string;
   check_type_display: string;
-  latitude: string;
-  longitude: string;
-  timestamp: string;
+  pool_id: string | null;
+  pool_name: string | null;
   location_verified: boolean;
   face_verified: boolean;
   face_distance: number | null;
+  qr_content: string | null;
   Function: string | null;
+}
+
+export interface FaceProfile {
+  id: number;
+  pin: string;
+  employee_name: string | null;
+  is_locked: boolean;
+  enrolled_at: string;
+  updated_at: string;
 }
 
 export interface RecapDateColumn {
@@ -218,6 +225,14 @@ export interface AttendanceRecapCardResponse {
   year: number;
   month: number;
   rows: AttendanceRecapCardRow[];
+}
+
+/** Bentuk pagination KHUSUS UserViewSet -- BEDA dari Paginated<T> standar (num_pages/current_page, bukan next/previous). */
+export interface UserListPaginated<T> {
+  count: number;
+  num_pages: number;
+  current_page: number;
+  results: T[];
 }
 
 export interface DjangoApiUser {
