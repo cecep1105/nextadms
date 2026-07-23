@@ -89,7 +89,7 @@ export function WsConsolePanel() {
 
   return (
     <div
-      className="fixed z-50 w-[28rem] overflow-hidden rounded-lg border border-border shadow-2xl"
+      className="fixed z-50 w-[40rem] overflow-hidden rounded-lg border border-border shadow-2xl"
       style={{ left: position.x, top: position.y }}
     >
       <div
