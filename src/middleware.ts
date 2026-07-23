@@ -1,19 +1,22 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 
+// Path yang boleh diakses SIAPA SAJA yang sudah login (staff maupun non-staff)
+// -- portal khusus non-staff (card button, BUKAN sidebar dashboard admin).
+// Staff BOLEH juga buka ini manual kalau mau, tapi tidak di-redirect ke sini.
+const PORTAL_PREFIX = "/portal";
+
 export default auth((req) => {
   // PENTING: token BISA "ada" (`req.auth` truthy) TAPI rusak (refresh
   // token sudah invalid/expired, ditandai `error: "RefreshTokenError"` --
-  // lihat lib/auth.ts). SEBELUMNYA middleware cuma cek `!!req.auth`, jadi
-  // token rusak TETAP dianggap "logged in" di sini -- lolos ke halaman
-  // dashboard, TAPI SessionErrorHandler (client-side, providers.tsx)
-  // langsung signOut() begitu lihat error itu -> balik ke /login -> token
-  // rusak yg SAMA (belum sempat ke-clear penuh) bikin middleware LOLOSKAN
-  // lagi -> signOut lagi -> LOOP. Sekarang middleware treat error state
-  // sbg TIDAK logged in, redirect ke /login LANGSUNG di sini -- tidak
-  // perlu round-trip lewat client-side signOut lagi.
+  // lihat lib/auth.ts). Middleware treat error state sbg TIDAK logged in,
+  // redirect ke /login LANGSUNG di sini -- lihat catatan lengkap di
+  // providers.tsx::SessionErrorHandler soal kenapa ini penting (hindari
+  // loop signout).
   const isLoggedIn = !!req.auth && !req.auth.error;
   const isLoginPage = req.nextUrl.pathname === "/login";
+  const isStaff = req.auth?.user?.is_staff || req.auth?.user?.is_superuser;
+  const isPortalPath = req.nextUrl.pathname === PORTAL_PREFIX || req.nextUrl.pathname.startsWith(`${PORTAL_PREFIX}/`);
 
   if (!isLoggedIn && !isLoginPage) {
     const loginUrl = new URL("/login", req.url);
@@ -22,7 +25,20 @@ export default auth((req) => {
   }
 
   if (isLoggedIn && isLoginPage) {
-    return NextResponse.redirect(new URL("/", req.url));
+    // User non-staff tidak punya dashboard admin utk dilihat -- langsung
+    // ke Portal (card button), BUKAN ke "/" yg isinya stat cards Active
+    // Device dkk yang dia toh tidak berhak lihat.
+    return NextResponse.redirect(new URL(isStaff ? "/" : PORTAL_PREFIX, req.url));
+  }
+
+  // Akun BUKAN staff/superuser coba akses halaman dashboard admin (Active
+  // Device, Employee, Manajemen User, dst) -- block DI SINI, jangan
+  // biarkan sampai ke halaman & baru gagal per-API-call. Portal (+
+  // sub-halamannya) TETAP boleh -- akses granular per-fitur (Transfer
+  // Finger/Attendance Recap) diatur backend (HasFeaturePermission), bukan
+  // di middleware ini.
+  if (isLoggedIn && !isStaff && !isPortalPath) {
+    return NextResponse.redirect(new URL(PORTAL_PREFIX, req.url));
   }
 
   return NextResponse.next();

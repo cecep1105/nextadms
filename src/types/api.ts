@@ -218,8 +218,14 @@ export interface AttendanceRecapResponse {
 }
 
 export interface EmployeeSearchResult {
+  id: number;
   pin: string;
   name: string;
+}
+
+export interface PoolDeviceChoicesResponse {
+  pools: { id: number; name: string }[];
+  devices?: { sn: string; name: string }[];
 }
 
 export interface AttendanceRecapCardRow {
@@ -262,4 +268,6 @@ export interface DjangoApiUser {
   must_change_password: boolean;
   created_at: string;
   updated_at: string;
+  can_transfer_finger: boolean;
+  can_view_attendance_recap: boolean;
 }
