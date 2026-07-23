@@ -263,3 +263,21 @@ export interface DjangoApiUser {
   created_at: string;
   updated_at: string;
 }
+
+export interface MikrotikDhcpLease {
+  id: string,
+  address: string,
+  mac_address: string,
+  client_id: string,
+  address_lists: string,
+  server: string,
+  dhcp_option: string,
+  status: string,
+  last_seen: string,
+  host_name: string,
+  active_server: string,
+  radius: string,
+  dynamic: string,
+  blocked: boolean,
+  disabled: boolean
+}
