@@ -2,7 +2,17 @@
 import { useSession } from "next-auth/react";
 import { useCallback } from "react";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://127.0.0.1:8000/api/v1";
+// Default PATH RELATIF ("/api/v1", TANPA scheme/host) -- browser otomatis
+// resolve ini terhadap origin App INI SENDIRI SAAT ITU, apa pun IP/domain
+// yang dipakai user utk buka halamannya (nginx menyatukan Next.js & API
+// Django jadi 1 origin yang sama, lihat docker/nginx/nginx.conf) --
+// TIDAK PERLU tahu/set IP spesifik & TIDAK PERLU rebuild kalau ganti cara
+// akses (beda dari sebelumnya, yang WAJIB di-bake absolut saat build).
+//
+// `NEXT_PUBLIC_API_BASE_URL` TETAP bisa di-set eksplisit sbg override
+// kalau memang butuh API di origin BERBEDA (mis. Next.js & Django
+// sungguhan dipisah domain, bukan disatukan nginx spt setup default ini).
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "/api/v1";
 
 export class ApiError extends Error {
   status: number;
@@ -25,9 +35,10 @@ export class NetworkError extends Error {
   url: string;
   constructor(url: string, cause: unknown) {
     super(
-      `Tidak bisa terhubung ke API di '${url}'. Kemungkinan penyebab: (1) NEXT_PUBLIC_API_BASE_URL ` +
-      `salah/server Django belum jalan, (2) origin frontend ini TIDAK ada di CORS_ALLOWED_ORIGINS Django ` +
-      `-- cek tab Network/Console browser utk pesan CORS spesifik.`
+      `Tidak bisa terhubung ke API di '${url}'. Kemungkinan penyebab: (1) server Django/nginx belum ` +
+      `jalan atau path proxy nginx salah (cek docker/nginx/nginx.conf), (2) kalau ` +
+      `NEXT_PUBLIC_API_BASE_URL di-override manual ke origin BERBEDA, origin frontend ini mungkin ` +
+      `TIDAK ada di CORS_ALLOWED_ORIGINS Django -- cek tab Network/Console browser utk pesan spesifik.`
     );
     this.url = url;
     this.cause = cause;

@@ -3,7 +3,10 @@ import {
   createContext, useCallback, useContext, useEffect, useRef, useState,
 } from "react";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://127.0.0.1:8000/api/v1";
+// Sama seperti lib/api-client.ts -- default RELATIF, ikut origin browser
+// SAAT ITU (HP karyawan bisa saja akses lewat IP/domain BEDA-BEDA
+// tergantung jaringan, tidak perlu tahu/set spesifik).
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "/api/v1";
 const STORAGE_KEY = "ccpadms_mobile_auth";
 
 interface MobileAuthState {

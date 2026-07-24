@@ -4,7 +4,30 @@ import {
 } from "react";
 import { useSession } from "next-auth/react";
 
-const WS_BASE_URL = process.env.NEXT_PUBLIC_WS_BASE_URL ?? "ws://127.0.0.1:8000";
+/**
+ * Bangun URL WebSocket DINAMIS dari origin browser SAAT ITU (protokol +
+ * host yang SEDANG dipakai buka halaman ini) -- BEDA dari HTTP fetch biasa
+ * (yang bisa pakai path relatif polos, browser otomatis resolve), koneksi
+ * WebSocket WAJIB URL LENGKAP (ws://host atau wss://host, tidak bisa
+ * "relatif" spt fetch()) -- jadi harus DIHITUNG manual di sini, TIDAK BISA
+ * cuma string relatif spt api-client.ts.
+ *
+ * ws: kalau halaman dibuka via http:, wss: kalau via https: -- otomatis
+ * ikut, SAMA seperti browser sendiri menentukan skema WebSocket yang
+ * cocok (mixed-content http+wss / https+ws browser TOLAK, jadi HARUS
+ * selalu sepasang dgn skema halamannya).
+ *
+ * `NEXT_PUBLIC_WS_BASE_URL` TETAP bisa di-set eksplisit sbg override
+ * kalau memang WebSocket-nya di origin/port BEDA dari halaman Next.js-nya
+ * sendiri (skenario tidak-disatukan-nginx).
+ */
+function getWsBaseUrl(): string {
+  const override = process.env.NEXT_PUBLIC_WS_BASE_URL;
+  if (override) return override;
+  if (typeof window === "undefined") return ""; // SSR -- tidak relevan, WebSocket cuma jalan di browser
+  const scheme = window.location.protocol === "https:" ? "wss:" : "ws:";
+  return `${scheme}//${window.location.host}`;
+}
 
 export interface IclockWsMessage {
   section: string;
@@ -47,7 +70,7 @@ export function IclockWsProvider({ children }: { children: React.ReactNode }) {
 
     function connect() {
       setStatus("connecting");
-      ws = new WebSocket(`${WS_BASE_URL}/ws/iclock?token=${token}`);
+      ws = new WebSocket(`${getWsBaseUrl()}/ws/iclock?token=${token}`);
 
       ws.onopen = () => setStatus("connected");
 

@@ -4,7 +4,12 @@ import Credentials from "next-auth/providers/credentials";
 import type { JWT } from "next-auth/jwt";
 import type { DjangoUser } from "@/types/next-auth";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://127.0.0.1:8000/api/v1";
+// NextAuth callbacks (authorize/jwt) SEMUANYA jalan SERVER-SIDE (di dalam
+// container `nextjs`) -- SAMA seperti lib/api-server.ts, fetch ke Django
+// di sini TIDAK lewat nginx/IP publik, langsung ke jaringan internal
+// Docker Compose. Env var BUKAN `NEXT_PUBLIC_*` (itu khusus browser),
+// dibaca saat runtime, ganti nilainya TIDAK PERLU rebuild image.
+const API_BASE_URL = process.env.DJANGO_INTERNAL_URL || "http://127.0.0.1:8000/api/v1";
 
 /**
  * Base `JWT` (dari @auth/core) extends `Record<string, unknown>`, yang
