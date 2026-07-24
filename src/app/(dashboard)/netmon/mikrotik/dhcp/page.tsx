@@ -15,11 +15,12 @@ const BASE_PATH = "/netmon/mikrotik/10.100.202.254/ip-dhcp_server-lease/";
 
 export default async function  MikrotikDhcpPage({ searchParams }: { searchParams: { page?: string, sort_by?: string, order?: string } }) {
   const page = searchParams.page || '1';
-  const sortBy = searchParams.sort_by || 'mac-address';
+  const sortBy = searchParams.sort_by || 'id';
   const order = searchParams.order || 'asc';
+  const perPage = 10;
 
-  const data = await apiServerFetch<Paginated<MikrotikDhcpLease>>(`/netmon/mikrotik/10.100.202.254/ip-dhcp_server-lease/`);
-//   const data = await apiServerFetch(`/netmon/mikrotik/10.100.202.254/ip-dhcp_server-lease/?limit=10&sort_by=${sortBy}&order=${order}`);
+  const data = await apiServerFetch<Paginated<MikrotikDhcpLease>>(`/netmon/mikrotik/10.100.202.254/ip-dhcp_server-lease?_limit=${perPage}`);
+  // const data = await apiServerFetch(`/netmon/mikrotik/10.100.202.254/ip-dhcp_server-lease/?limit=10&sort_by=${sortBy}&order=${order}`);
   return (
     <div>
       <PageHeader
@@ -27,7 +28,8 @@ export default async function  MikrotikDhcpPage({ searchParams }: { searchParams
         description="Daftar lease dhcp-server"
         // action={<DepartmentFormDialog mode="create" />}
       />
-      <Card>cd <div className="g"></div>
+      <Card>
+        <div className="g"></div>
         <div className="flex items-center justify-between border-b border-border p-3">
           <SearchBar placeholder="Cari Pool ID / Code / Nama..." />
         </div>

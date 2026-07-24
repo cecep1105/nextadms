@@ -264,7 +264,7 @@ export interface DjangoApiUser {
   updated_at: string;
 }
 
-export interface MikrotikDchpLease {
+export interface MikrotikDhcpLease {
   id: string,
   address: string,
   mac_address: string,
