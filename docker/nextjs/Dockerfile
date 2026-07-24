@@ -20,6 +20,11 @@ FROM node:20-slim AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+# Next.js TIDAK mewajibkan folder `public/` ada -- tapi COPY di stage
+# `runner` (di bawah) MEWAJIBKAN source-nya ada, jadi jamin folder ini
+# ADA di sini (walau kosong) supaya build TIDAK gagal kalau project belum
+# punya asset statis apa pun (favicon, dst) di public/.
+RUN mkdir -p public
 
 # Build-time args -- WAJIB utk NEXT_PUBLIC_* (lihat catatan di atas).
 ARG NEXT_PUBLIC_API_BASE_URL
