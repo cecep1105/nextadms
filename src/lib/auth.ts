@@ -61,6 +61,17 @@ async function refreshAccessToken(refreshToken: string) {
 }
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
+  // WAJIB true kalau app ini diakses lewat BEBERAPA host/IP berbeda
+  // (mis. http://localhost DAN http://172.16.10.36:8036 sekaligus, lewat
+  // reverse proxy nginx) -- TANPA ini, NextAuth SELALU pakai NEXTAUTH_URL
+  // yang di-hardcode di .env utk bikin redirect URL absolut (makanya
+  // sebelumnya SELALU muncul "localhost" di address bar meski diakses
+  // dari IP lain). Dengan trustHost=true, NextAuth ikut header
+  // Host/X-Forwarded-Host dari request YANG SEBENARNYA masuk (nginx
+  // SUDAH benar forward ini via `proxy_set_header Host $host`, lihat
+  // docker/nginx/nginx.conf) -- jadi redirect-nya otomatis konsisten
+  // dgn URL yang benar-benar dipakai user, dari host manapun.
+  trustHost: true,
   session: { strategy: "jwt" },
   pages: { signIn: "/login" },
   providers: [
