@@ -45,6 +45,14 @@ export default auth((req) => {
 });
 
 export const config = {
-  // Semua path KECUALI asset statis, gambar, & endpoint NextAuth sendiri.
-  matcher: ["/((?!api/auth|_next/static|_next/image|favicon.ico).*)"],
+  // Semua path KECUALI: asset statis, gambar, endpoint NextAuth sendiri,
+  // DAN seluruh "/mobile" -- itu punya sistem auth SENDIRI (PIN + JWT
+  // tersimpan di localStorage, lib/mobile-auth-context.tsx), TIDAK lewat
+  // NextAuth/session sama sekali. Middleware ini (server-side) tidak bisa
+  // baca localStorage (browser-only), jadi kalau /mobile TIDAK dikecualikan
+  // di sini, auth() akan selalu anggap user mobile "belum login" (tidak
+  // ada sesi NextAuth) & paksa redirect ke /login (halaman staff) --
+  // pengecekan login utk /mobile sepenuhnya ditangani client-side lewat
+  // MobileAuthProvider (lihat src/app/mobile/layout.tsx).
+  matcher: ["/((?!api/auth|_next/static|_next/image|favicon.ico|mobile).*)"],
 };
