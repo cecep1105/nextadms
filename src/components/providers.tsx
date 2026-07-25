@@ -28,7 +28,14 @@ function SessionErrorHandler({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (session?.error === "RefreshTokenError" && pathname !== "/login" && !firedRef.current) {
       firedRef.current = true;
-      signOut({ callbackUrl: "/login" });
+      // redirect:false + window.location manual (BUKAN callbackUrl) --
+      // signOut() dgn callbackUrl bikin NextAuth membangun URL redirect
+      // SENDIRI secara internal, yang TERBUKTI (spt middleware.ts, kasus
+      // sama) tidak selalu akurat di balik reverse proxy (nginx) -- bisa
+      // balik ke NEXTAUTH_URL/localhost, bukan host yg BENERAN diakses.
+      // window.location.href SELALU akurat (relatif thd halaman SAAT INI
+      // di browser, tidak ada ambiguitas server/proxy sama sekali).
+      signOut({ redirect: false }).then(() => { window.location.href = "/login"; });
     }
   }, [session?.error, pathname]);
 

@@ -89,7 +89,7 @@ export function Topbar() {
             </a>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => signOut({ callbackUrl: "/login" })} className="cursor-pointer text-destructive focus:text-destructive">
+          <DropdownMenuItem onClick={() => signOut({ redirect: false }).then(() => { window.location.href = "/login"; })} className="cursor-pointer text-destructive focus:text-destructive">
             <LogOut className="h-3.5 w-3.5" /> Keluar
           </DropdownMenuItem>
         </DropdownMenuContent>

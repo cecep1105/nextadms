@@ -48,7 +48,7 @@ export function PortalHeader() {
             <p className="text-[11px] text-muted-foreground">{session?.user?.email}</p>
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => signOut({ callbackUrl: "/login" })} className="cursor-pointer text-destructive focus:text-destructive">
+          <DropdownMenuItem onClick={() => signOut({ redirect: false }).then(() => { window.location.href = "/login"; })} className="cursor-pointer text-destructive focus:text-destructive">
             <LogOut className="h-3.5 w-3.5" /> Keluar
           </DropdownMenuItem>
         </DropdownMenuContent>
