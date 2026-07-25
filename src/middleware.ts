@@ -6,6 +6,32 @@ import { auth } from "@/lib/auth";
 // Staff BOLEH juga buka ini manual kalau mau, tapi tidak di-redirect ke sini.
 const PORTAL_PREFIX = "/portal";
 
+/**
+ * Bangun URL ABSOLUT (utk NextResponse.redirect) dari HEADER REQUEST YANG
+ * BENERAN MASUK -- BUKAN dari `req.url`/`new URL(path, req.url)`.
+ *
+ * KENAPA: `req.url` di Next.js middleware TERBUKTI (diuji langsung, bukan
+ * asumsi) TIDAK SELALU ikut header Host yang SEBENARNYA diteruskan nginx
+ * (`proxy_set_header Host $host`) -- walau `trustHost: true` sudah aktif
+ * di NextAuth (lib/auth.ts). `trustHost` cuma mempengaruhi NextAuth punya
+ * SENDIRI (session/JWT callback dkk), TIDAK mempengaruhi bagaimana Next.js
+ * (frameworknya sendiri, terlepas dari NextAuth) mengisi `req.url` di
+ * konteks middleware -- akibatnya redirect PERNAH balik ke NEXTAUTH_URL
+ * (mis. "localhost:8443") meski diakses lewat domain LAIN (mis.
+ * "namadomain:8443"), reproducible via test langsung.
+ *
+ * Fix: baca `Host` (atau `X-Forwarded-Host` kalau proxy set itu) &
+ * `X-Forwarded-Proto` LANGSUNG dari header request -- INI SELALU akurat
+ * krn nginx MEMANG meneruskan header asli si browser apa adanya (lihat
+ * `proxy_set_header Host $host;` & `proxy_set_header X-Forwarded-Proto
+ * $scheme;` di docker/nginx/nginx.conf).
+ */
+function buildAbsoluteUrl(req: Parameters<Parameters<typeof auth>[0]>[0], path: string): URL {
+  const host = req.headers.get("x-forwarded-host") ?? req.headers.get("host") ?? req.nextUrl.host;
+  const proto = req.headers.get("x-forwarded-proto") ?? req.nextUrl.protocol.replace(":", "");
+  return new URL(path, `${proto}://${host}`);
+}
+
 export default auth((req) => {
   // PENTING: token BISA "ada" (`req.auth` truthy) TAPI rusak (refresh
   // token sudah invalid/expired, ditandai `error: "RefreshTokenError"` --
@@ -19,7 +45,7 @@ export default auth((req) => {
   const isPortalPath = req.nextUrl.pathname === PORTAL_PREFIX || req.nextUrl.pathname.startsWith(`${PORTAL_PREFIX}/`);
 
   if (!isLoggedIn && !isLoginPage) {
-    const loginUrl = new URL("/login", req.url);
+    const loginUrl = buildAbsoluteUrl(req, "/login");
     loginUrl.searchParams.set("callbackUrl", req.nextUrl.pathname);
     return NextResponse.redirect(loginUrl);
   }
@@ -28,7 +54,7 @@ export default auth((req) => {
     // User non-staff tidak punya dashboard admin utk dilihat -- langsung
     // ke Portal (card button), BUKAN ke "/" yg isinya stat cards Active
     // Device dkk yang dia toh tidak berhak lihat.
-    return NextResponse.redirect(new URL(isStaff ? "/" : PORTAL_PREFIX, req.url));
+    return NextResponse.redirect(buildAbsoluteUrl(req, isStaff ? "/" : PORTAL_PREFIX));
   }
 
   // Akun BUKAN staff/superuser coba akses halaman dashboard admin (Active
@@ -38,7 +64,7 @@ export default auth((req) => {
   // Finger/Attendance Recap) diatur backend (HasFeaturePermission), bukan
   // di middleware ini.
   if (isLoggedIn && !isStaff && !isPortalPath) {
-    return NextResponse.redirect(new URL(PORTAL_PREFIX, req.url));
+    return NextResponse.redirect(buildAbsoluteUrl(req, PORTAL_PREFIX));
   }
 
   return NextResponse.next();
