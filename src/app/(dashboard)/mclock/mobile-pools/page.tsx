@@ -11,7 +11,7 @@ import { apiServerFetch } from "@/lib/api-server";
 import type { Paginated, MobilePool } from "@/types/api";
 import { MobilePoolFormDialog } from "./_components/mobile-pool-form-dialog";
 
-const PAGE_SIZE = 20;
+const PAGE_SIZE = 10;
 const BASE_PATH = "/mclock/mobile-pools";
 
 export default async function MobilePoolsPage({

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { MapPin } from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
 import { PaginationBar } from "@/components/shared/pagination-bar";
+import { SortableHeader } from "@/components/shared/sortable-header";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -12,15 +13,16 @@ import { apiServerFetch } from "@/lib/api-server";
 import type { Paginated, MobilePoolLoc, MobilePool } from "@/types/api";
 import { AddPointDialog } from "./_components/add-point-dialog";
 
-const PAGE_SIZE = 20;
+const PAGE_SIZE = 10;
 const BASE_PATH = "/mclock/mobile-pool-locations";
 
 export default async function MobilePoolLocationsPage({
   searchParams,
 }: {
-  searchParams: { page?: string };
+  searchParams: { page?: string; ordering?: string };
 }) {
   const page = Number(searchParams.page ?? "1");
+  const ordering = searchParams.ordering ?? "";
 
   // Data ini biasanya tidak besar (jumlah pool x rata2 titik polygon) --
   // ambil semua sekaligus (page_size besar) & kelompokkan per PoolID di sini,
@@ -39,12 +41,27 @@ export default async function MobilePoolLocationsPage({
     list.push(point);
     grouped.set(point.PoolID, list);
   }
-  const allPools = Array.from(grouped.entries())
-    .map(([poolId, points]) => ({
-      poolId,
-      points: points.sort((a, b) => a.Urut - b.Urut),
-    }))
-    .sort((a, b) => a.poolId.localeCompare(b.poolId));
+  const allPools = Array.from(grouped.entries()).map(([poolId, points]) => ({
+    poolId,
+    points: points.sort((a, b) => a.Urut - b.Urut),
+  }));
+
+  // Sorting DIHITUNG DI SINI (bukan ?ordering= ke API Django spt tabel
+  // lain) -- data halaman ini SUDAH dikelompokkan per Pool di server
+  // component (API sumbernya per-titik/flat, tidak tahu konsep "per
+  // pool"), jadi field yg bisa di-sort (poolId, pointCount, status) itu
+  // HASIL KOMPUTASI lokal, bukan field asli di Django. Komponen
+  // SortableHeader tetap dipakai apa adanya (cuma generate link
+  // ?ordering=, tidak peduli field-nya "asli" Django atau lokal spt ini).
+  const sortKey = ordering.replace(/^-/, "");
+  const sortDesc = ordering.startsWith("-");
+  const compareFns: Record<string, (a: typeof allPools[number], b: typeof allPools[number]) => number> = {
+    poolId: (a, b) => a.poolId.localeCompare(b.poolId),
+    pointCount: (a, b) => a.points.length - b.points.length,
+    status: (a, b) => Number(a.points.length >= 3) - Number(b.points.length >= 3),
+  };
+  const compareFn = compareFns[sortKey] ?? compareFns.poolId;
+  allPools.sort((a, b) => (sortDesc ? -compareFn(a, b) : compareFn(a, b)));
 
   const totalPools = allPools.length;
   const pools = allPools.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
@@ -70,9 +87,9 @@ export default async function MobilePoolLocationsPage({
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Pool ID</TableHead>
-              <TableHead>Jumlah Titik</TableHead>
-              <TableHead>Status</TableHead>
+              <TableHead><SortableHeader label="Pool ID" sortKey="poolId" currentSort={ordering} basePath={BASE_PATH} searchParams={{}} /></TableHead>
+              <TableHead><SortableHeader label="Jumlah Titik" sortKey="pointCount" currentSort={ordering} basePath={BASE_PATH} searchParams={{}} /></TableHead>
+              <TableHead><SortableHeader label="Status" sortKey="status" currentSort={ordering} basePath={BASE_PATH} searchParams={{}} /></TableHead>
               <TableHead>Titik Pertama</TableHead>
               <TableHead className="text-right">Aksi</TableHead>
             </TableRow>
@@ -115,7 +132,7 @@ export default async function MobilePoolLocationsPage({
           pageSize={PAGE_SIZE}
           currentPage={page}
           basePath={BASE_PATH}
-          searchParams={{}}
+          searchParams={{ ordering }}
         />
       </Card>
     </div>
