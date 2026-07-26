@@ -1,7 +1,7 @@
 import { PageHeader } from "@/components/shared/page-header";
 import { SearchBar } from "@/components/shared/search-bar";
-import { PaginationBar } from "@/components/shared/pagination-bar";
-import { SortableHeader } from  "./_components/sortable-header";
+import { PaginationBar } from "./_components/pagination-bar";
+import SortableHeader from  "./_components/sortable-header";
 import { DeleteConfirmButton } from "@/components/shared/delete-confirm-button";
 import { Card } from "@/components/ui/card";
 import {
@@ -12,22 +12,44 @@ import type { Paginated, MikrotikDhcpLease } from "@/types/api";
 
 const PAGE_SIZE = 20;
 const BASE_PATH = "/netmon/mikrotik/10.100.202.254/ip-dhcp_server-lease/";
+
+// Next.js page components receive searchParams as a prop automatically
 interface PageProps {
-  searchParams: Promise<{ _order?: string}>;
+  searchParams: Promise<{ sortBy?: string; sortDir?: string; page?: string }>;
 }
 
+
+async function getDhcpLease(sortBy?: string, sortDir?: string, page?: string): Promise<Paginated<MikrotikDhcpLease>> {
+  const queryParams = new URLSearchParams();
+  if (sortBy) queryParams.set('_sort_by', sortBy);
+  if (sortDir) queryParams.set('_order', sortDir);
+  if (page) queryParams.set('_page', page);
+
+  // Call your Django RouterOS backend endpoint
+  const data = await apiServerFetch<Paginated<MikrotikDhcpLease>>(
+    `/netmon/mikrotik/10.100.202.254/ip-dhcp_server-lease/?${queryParams.toString()}`,
+    {
+      cache: 'no-store',
+    },
+  );
+
+  return data;
+}
+
+
+
+
+
+
+
+
 export default async function  MikrotikDhcpPage({ searchParams }: PageProps ) {
-  const params = await searchParams;
-  const sortOrder = params._order || 'asc';
+  const resolvedParams = await searchParams;
 
 
 
-
-  const data = await apiServerFetch(`/netmon/mikrotik/10.100.202.254/ip-dhcp_server-lease/?_order=${sortOrder}`, {
-    cache: 'no-store',
-
-  });
-
+  const data = await getDhcpLease(resolvedParams.sortBy, resolvedParams.sortDir, resolvedParams.page);
+  // const page =  '1';
 
 
 
@@ -47,13 +69,13 @@ export default async function  MikrotikDhcpPage({ searchParams }: PageProps ) {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead><SortableHeader label="Address" sortKey="address" currentSort={sortOrder} basePath={BASE_PATH} searchParams={{ q: '' }} /></TableHead>
-              <TableHead><SortableHeader label="MAC Address" sortKey="mac" currentSort={sortOrder} basePath={BASE_PATH} searchParams={{ q: '' }} /></TableHead>
+              <TableHead><SortableHeader columnKey="address" label="IP Address" /></TableHead>
+              <TableHead><SortableHeader columnKey="mac_address" label="MAC Address" /></TableHead>
 
-              <TableHead>Hostname</TableHead>
+              <TableHead><SortableHeader columnKey="server" label="Server" /></TableHead>
 
-              <TableHead>Hostname</TableHead>
-              <TableHead>Last Seen</TableHead>
+              <TableHead><SortableHeader columnKey="host_name" label="Hostname" /></TableHead>
+              <TableHead><SortableHeader columnKey="last_seen" label="Last Seen" /></TableHead>
               <TableHead>Dynamic</TableHead>
               <TableHead className="text-right">Aksi</TableHead>
             </TableRow>
@@ -64,9 +86,9 @@ export default async function  MikrotikDhcpPage({ searchParams }: PageProps ) {
             ) : (
               data.results.map((dhcp) => (
                 <TableRow key={dhcp.id}>
-                  <TableCell className="font-mono">{dhcp['address']}</TableCell>
+                  <TableCell className="font-mono">{dhcp.address}</TableCell>
                   <TableCell className="font-mono text-muted-foreground">{dhcp['mac-address'] ?? "-"}</TableCell>
-                  <TableCell className="font-medium">{dhcp['server'] ?? "-"}</TableCell>
+                  <TableCell className="font-medium">{dhcp.server ?? "-"}</TableCell>
                   <TableCell className="font-medium">{dhcp['host-name'] ?? "-"}</TableCell>
                   <TableCell className="text-muted-foreground">{dhcp['last-seen'] ?? "-"}</TableCell>
                   <TableCell className="font-medium">{dhcp.dynamic ?? "-"}</TableCell>
@@ -76,7 +98,8 @@ export default async function  MikrotikDhcpPage({ searchParams }: PageProps ) {
             )}
           </TableBody>
         </Table>
-        {/* <PaginationBar count={data.count} pageSize={PAGE_SIZE} currentPage={Number(page)} basePath={BASE_PATH} searchParams={{ q: 'searc' }} /> */}
+        {data.count}|{data.previous}|{data.next}
+        <PaginationBar count={data.count} pageSize={PAGE_SIZE} currentPage={Number(resolvedParams.page ?? "1")} basePath={BASE_PATH} />
       </Card>
     </div>
   );
