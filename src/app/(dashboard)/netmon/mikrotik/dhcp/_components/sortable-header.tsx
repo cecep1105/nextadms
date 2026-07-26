@@ -2,7 +2,7 @@
 'use client';
 
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
-
+import { ChevronUp, ChevronDown, ChevronsUpDown } from "lucide-react";
 interface SortableHeaderProps {
   columnKey: string;
   label: string;
@@ -39,15 +39,29 @@ export default function SortableHeader({ columnKey, label }: SortableHeaderProps
     return currentDir === 'asc' ? '🔼' : '🔽';
   };
 
+
+  const isActive = currentSort === columnKey || currentSort === `-${columnKey}`;
+  const isDesc = currentSort === `-${columnKey}`;
+
+
   return (
-    <th 
-      onClick={handleSort} 
-      className="cursor-pointer select-none p-4 text-left font-semibold border-b hover:bg-gray-100"
-    >
-      <div className="flex items-center gap-2">
-        {label}
-        <span className="text-xs text-gray-500">{getSortIndicator()}</span>
-      </div>
-    </th>
+    <span className="inline-flex items-center gap-1 hover:text-foreground" onClick={handleSort} >
+      {label}
+      {isActive ? (
+        isDesc ? <ChevronDown className="h-3 w-3" /> : <ChevronUp className="h-3 w-3" />
+      ) : (
+        <ChevronsUpDown className="h-3 w-3 opacity-40" />
+      )}
+    </span>
+
+
+
+
+
+
+
+
+
+
   );
 }

@@ -86,19 +86,18 @@ export default async function  MikrotikDhcpPage({ searchParams }: PageProps ) {
             ) : (
               data.results.map((dhcp) => (
                 <TableRow key={dhcp.id}>
-                  <TableCell className="font-mono">{dhcp.address}</TableCell>
-                  <TableCell className="font-mono text-muted-foreground">{dhcp['mac-address'] ?? "-"}</TableCell>
-                  <TableCell className="font-medium">{dhcp.server ?? "-"}</TableCell>
-                  <TableCell className="font-medium">{dhcp['host-name'] ?? "-"}</TableCell>
+                  <TableCell className="text-muted-foreground">{dhcp.address}</TableCell>
+                  <TableCell className="text-muted-foreground">{dhcp['mac-address'] ?? "-"}</TableCell>
+                  <TableCell className="text-muted-foreground">{dhcp.server ?? "-"}</TableCell>
+                  <TableCell className="text-muted-foreground">{dhcp['host-name'] ?? "-"}</TableCell>
                   <TableCell className="text-muted-foreground">{dhcp['last-seen'] ?? "-"}</TableCell>
-                  <TableCell className="font-medium">{dhcp.dynamic ?? "-"}</TableCell>
+                  <TableCell className="text-muted-foreground">{dhcp.dynamic ?? "-"}</TableCell>
 
                 </TableRow>
               ))
             )}
           </TableBody>
         </Table>
-        {data.count}|{data.previous}|{data.next}
         <PaginationBar count={data.count} pageSize={PAGE_SIZE} currentPage={Number(resolvedParams.page ?? "1")} basePath={BASE_PATH} />
       </Card>
     </div>
