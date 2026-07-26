@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { MapPin } from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
+import { PaginationBar } from "@/components/shared/pagination-bar";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -8,13 +9,29 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import { apiServerFetch } from "@/lib/api-server";
-import type { Paginated, MobilePoolLoc } from "@/types/api";
+import type { Paginated, MobilePoolLoc, MobilePool } from "@/types/api";
+import { AddPointDialog } from "./_components/add-point-dialog";
 
-export default async function MobilePoolLocationsPage() {
+const PAGE_SIZE = 20;
+const BASE_PATH = "/mclock/mobile-pool-locations";
+
+export default async function MobilePoolLocationsPage({
+  searchParams,
+}: {
+  searchParams: { page?: string };
+}) {
+  const page = Number(searchParams.page ?? "1");
+
   // Data ini biasanya tidak besar (jumlah pool x rata2 titik polygon) --
   // ambil semua sekaligus (page_size besar) & kelompokkan per PoolID di sini,
   // krn API mengembalikan baris per-titik (flat), bukan sudah dikelompokkan.
-  const data = await apiServerFetch<Paginated<MobilePoolLoc>>("/mclock/mobile-pool-loc/?page_size=1000");
+  // Pagination diterapkan DI SINI (server component) atas HASIL kelompokan
+  // (per Pool, bukan per titik) -- bukan lewat ?page= ke API langsung, krn
+  // API-nya cuma tahu baris titik individual, tidak tahu konsep "per pool".
+  const [data, poolsData] = await Promise.all([
+    apiServerFetch<Paginated<MobilePoolLoc>>("/mclock/mobile-pool-loc/?page_size=2000"),
+    apiServerFetch<Paginated<MobilePool>>("/mclock/mobile-pool/?page_size=200"),
+  ]);
 
   const grouped = new Map<string, MobilePoolLoc[]>();
   for (const point of data.results) {
@@ -22,10 +39,15 @@ export default async function MobilePoolLocationsPage() {
     list.push(point);
     grouped.set(point.PoolID, list);
   }
-  const pools = Array.from(grouped.entries()).map(([poolId, points]) => ({
-    poolId,
-    points: points.sort((a, b) => a.Urut - b.Urut),
-  }));
+  const allPools = Array.from(grouped.entries())
+    .map(([poolId, points]) => ({
+      poolId,
+      points: points.sort((a, b) => a.Urut - b.Urut),
+    }))
+    .sort((a, b) => a.poolId.localeCompare(b.poolId));
+
+  const totalPools = allPools.length;
+  const pools = allPools.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   return (
     <div>
@@ -33,11 +55,14 @@ export default async function MobilePoolLocationsPage() {
         title="Mobile Pool Location (Geofence)"
         description="Titik polygon geofence per Pool -- klik 'Gambar di Peta' untuk menggambar/mengedit visual."
         action={
-          <Button size="sm" asChild>
-            <Link href="/mclock/mobile-pool-locations/draw">
-              <MapPin className="h-3.5 w-3.5" /> Gambar Polygon Baru
-            </Link>
-          </Button>
+          <div className="flex gap-2">
+            <AddPointDialog pools={poolsData.results} />
+            <Button size="sm" asChild>
+              <Link href="/mclock/mobile-pool-locations/draw">
+                <MapPin className="h-3.5 w-3.5" /> Gambar Polygon Baru
+              </Link>
+            </Button>
+          </div>
         }
       />
 
@@ -84,6 +109,14 @@ export default async function MobilePoolLocationsPage() {
             )}
           </TableBody>
         </Table>
+
+        <PaginationBar
+          count={totalPools}
+          pageSize={PAGE_SIZE}
+          currentPage={page}
+          basePath={BASE_PATH}
+          searchParams={{}}
+        />
       </Card>
     </div>
   );
