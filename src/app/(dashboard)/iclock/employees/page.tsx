@@ -21,13 +21,14 @@ const BASE_PATH = "/iclock/employees";
 export default async function EmployeesPage({
   searchParams,
 }: {
-  searchParams: { page?: string; q?: string; ordering?: string };
+  searchParams: { page?: string; q?: string; ordering?: string; page_size?: string };
 }) {
   const page = searchParams.page ?? "1";
+  const pageSize = Number(searchParams.page_size ?? PAGE_SIZE);
   const search = searchParams.q ?? "";
   const ordering = searchParams.ordering ?? "";
 
-  const query = new URLSearchParams({ page });
+  const query = new URLSearchParams({ page, page_size: String(pageSize) });
   if (search) query.set("q", search);
   if (ordering) query.set("ordering", ordering);
 
@@ -109,7 +110,7 @@ export default async function EmployeesPage({
 
         <PaginationBar
           count={employeesData.count}
-          pageSize={PAGE_SIZE}
+          pageSize={pageSize}
           currentPage={Number(page)}
           basePath={BASE_PATH}
           searchParams={{ q: search, ordering }}

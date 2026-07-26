@@ -21,8 +21,9 @@ function formatTime(iso: string | null): string {
 export default async function PortalAttendanceRecapPage({
   searchParams,
 }: {
-  searchParams: { pin?: string; date_from?: string; date_to?: string; page?: string };
+  searchParams: { pin?: string; date_from?: string; date_to?: string; page?: string; page_size?: string };
 }) {
+  const pageSize = Number(searchParams.page_size ?? PAGE_SIZE);
   const queried = Boolean(searchParams.date_from && searchParams.date_to);
   let recap: AttendanceRecapResponse | null = null;
 
@@ -31,7 +32,7 @@ export default async function PortalAttendanceRecapPage({
       date_from: searchParams.date_from!,
       date_to: searchParams.date_to!,
       page: searchParams.page ?? "1",
-      page_size: String(PAGE_SIZE),
+      page_size: String(pageSize),
     });
     if (searchParams.pin) query.set("pin", searchParams.pin);
     recap = await apiServerFetch<AttendanceRecapResponse>(`/iclock/attendance-recap/?${query.toString()}`);
@@ -102,7 +103,7 @@ export default async function PortalAttendanceRecapPage({
             </Table>
             <PaginationBar
               count={recap!.count}
-              pageSize={PAGE_SIZE}
+              pageSize={pageSize}
               currentPage={recap!.page}
               basePath={BASE_PATH}
               searchParams={{ pin: searchParams.pin, date_from: searchParams.date_from, date_to: searchParams.date_to }}

@@ -19,10 +19,11 @@ const BASE_PATH = "/mclock/mobile-pool-locations";
 export default async function MobilePoolLocationsPage({
   searchParams,
 }: {
-  searchParams: { page?: string; ordering?: string };
+  searchParams: { page?: string; ordering?: string; page_size?: string };
 }) {
   const page = Number(searchParams.page ?? "1");
   const ordering = searchParams.ordering ?? "";
+  const pageSize = Number(searchParams.page_size ?? PAGE_SIZE);
 
   // Data ini biasanya tidak besar (jumlah pool x rata2 titik polygon) --
   // ambil semua sekaligus (page_size besar) & kelompokkan per PoolID di sini,
@@ -64,7 +65,7 @@ export default async function MobilePoolLocationsPage({
   allPools.sort((a, b) => (sortDesc ? -compareFn(a, b) : compareFn(a, b)));
 
   const totalPools = allPools.length;
-  const pools = allPools.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const pools = allPools.slice((page - 1) * pageSize, page * pageSize);
 
   return (
     <div>
@@ -129,7 +130,7 @@ export default async function MobilePoolLocationsPage({
 
         <PaginationBar
           count={totalPools}
-          pageSize={PAGE_SIZE}
+          pageSize={pageSize}
           currentPage={page}
           basePath={BASE_PATH}
           searchParams={{ ordering }}

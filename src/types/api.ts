@@ -53,6 +53,7 @@ export interface RegisteredDevice {
   Alias: string | null;
   DeviceName: string | null;
   DeptID: number | null;
+  DeptName: string | null;
   Function: string | null;
   IPAddress: string | null;
   MAC: string | null;
