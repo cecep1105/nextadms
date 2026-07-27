@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
+import { PageSizeSelect } from "./page-size-select";
 export function PaginationBar({
   count,
   pageSize,
@@ -45,11 +46,17 @@ export function PaginationBar({
 
   return (
     <div className="flex flex-col gap-2 border-t border-border px-3 py-2.5 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5">
       <span>
         Menampilkan <span className="font-medium text-foreground">{from}</span>–
         <span className="font-medium text-foreground">{to}</span> dari{" "}
         <span className="font-medium text-foreground">{count}</span> data
       </span>
+      <PageSizeSelect pageSize={pageSize} basePath={pathname} searchParams={Object.fromEntries(searchParams.entries())} />
+      </div>
+
+
+
       <div className="flex items-center gap-1.5">
         <button
           onClick={() => handlePageChange(currentPage - 1)}
