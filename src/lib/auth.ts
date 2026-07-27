@@ -4,7 +4,12 @@ import Credentials from "next-auth/providers/credentials";
 import type { JWT } from "next-auth/jwt";
 import type { DjangoUser } from "@/types/next-auth";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://127.0.0.1:8000/api/v1";
+// NextAuth callbacks (authorize/jwt) SEMUANYA jalan SERVER-SIDE (di dalam
+// container `nextjs`) -- SAMA seperti lib/api-server.ts, fetch ke Django
+// di sini TIDAK lewat nginx/IP publik, langsung ke jaringan internal
+// Docker Compose. Env var BUKAN `NEXT_PUBLIC_*` (itu khusus browser),
+// dibaca saat runtime, ganti nilainya TIDAK PERLU rebuild image.
+const API_BASE_URL = process.env.DJANGO_INTERNAL_URL || "http://127.0.0.1:8000/api/v1";
 
 /**
  * Base `JWT` (dari @auth/core) extends `Record<string, unknown>`, yang
@@ -61,6 +66,17 @@ async function refreshAccessToken(refreshToken: string) {
 }
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
+  // WAJIB true kalau app ini diakses lewat BEBERAPA host/IP berbeda
+  // (mis. http://localhost DAN http://172.16.10.36:8036 sekaligus, lewat
+  // reverse proxy nginx) -- TANPA ini, NextAuth SELALU pakai NEXTAUTH_URL
+  // yang di-hardcode di .env utk bikin redirect URL absolut (makanya
+  // sebelumnya SELALU muncul "localhost" di address bar meski diakses
+  // dari IP lain). Dengan trustHost=true, NextAuth ikut header
+  // Host/X-Forwarded-Host dari request YANG SEBENARNYA masuk (nginx
+  // SUDAH benar forward ini via `proxy_set_header Host $host`, lihat
+  // docker/nginx/nginx.conf) -- jadi redirect-nya otomatis konsisten
+  // dgn URL yang benar-benar dipakai user, dari host manapun.
+  trustHost: true,
   session: { strategy: "jwt" },
   pages: { signIn: "/login" },
   providers: [

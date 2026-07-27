@@ -53,6 +53,7 @@ export interface RegisteredDevice {
   Alias: string | null;
   DeviceName: string | null;
   DeptID: number | null;
+  DeptName: string | null;
   Function: string | null;
   IPAddress: string | null;
   MAC: string | null;
@@ -218,8 +219,14 @@ export interface AttendanceRecapResponse {
 }
 
 export interface EmployeeSearchResult {
+  id: number;
   pin: string;
   name: string;
+}
+
+export interface PoolDeviceChoicesResponse {
+  pools: { id: number; name: string }[];
+  devices?: { sn: string; name: string }[];
 }
 
 export interface AttendanceRecapCardRow {

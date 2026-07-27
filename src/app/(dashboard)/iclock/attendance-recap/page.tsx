@@ -21,9 +21,10 @@ export default async function AttendanceRecapPage({
 }: {
   searchParams: {
     pin?: string; function?: string; pool?: string; device?: string;
-    date_from?: string; date_to?: string; page?: string;
+    date_from?: string; date_to?: string; page?: string; page_size?: string;
   };
 }) {
+  const pageSize = Number(searchParams.page_size ?? PAGE_SIZE);
   const [departmentsData, devicesData] = await Promise.all([
     apiServerFetch<Paginated<Department>>("/iclock/department/?page_size=200"),
     apiServerFetch<Paginated<ActiveDevice>>("/iclock/active-device/?page_size=500"),
@@ -37,7 +38,7 @@ export default async function AttendanceRecapPage({
       date_from: searchParams.date_from!,
       date_to: searchParams.date_to!,
       page: searchParams.page ?? "1",
-      page_size: String(PAGE_SIZE),
+      page_size: String(pageSize),
     });
     if (searchParams.pin) query.set("pin", searchParams.pin);
     if (searchParams.function) query.set("function", searchParams.function);
@@ -109,7 +110,7 @@ export default async function AttendanceRecapPage({
             </Table>
             <PaginationBar
               count={recap!.count}
-              pageSize={PAGE_SIZE}
+              pageSize={pageSize}
               currentPage={recap!.page}
               basePath="/iclock/attendance-recap"
               searchParams={{

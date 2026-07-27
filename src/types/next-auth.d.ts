@@ -17,6 +17,10 @@ export interface DjangoUser {
   must_change_password: boolean;
   created_at: string;
   updated_at: string;
+  // Izin fitur granular utk user NON-staff (lihat iclock/models.py::FeaturePermission
+  // & dashboard Django "Kelola Izin User") -- staff/superuser SELALU true.
+  can_transfer_finger: boolean;
+  can_view_attendance_recap: boolean;
 }
 
 declare module "next-auth" {

@@ -7,7 +7,7 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import { SortableHeader } from "@/components/shared/sortable-header";
-import { useIclockWebSocket, type IclockWsMessage } from "@/lib/use-iclock-websocket";
+import { useIclockWsMessage, type IclockWsMessage } from "@/lib/iclock-ws-context";
 import type { ActiveDevice, Department } from "@/types/api";
 import { DeviceFormDialog } from "./device-form-dialog";
 import { DeleteDeviceButton } from "./delete-device-button";
@@ -85,7 +85,7 @@ export function LiveDeviceTable({
     });
   }, []);
 
-  const { status } = useIclockWebSocket(handleMessage);
+  const { status } = useIclockWsMessage(handleMessage);
 
   return (
     <>

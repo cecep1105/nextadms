@@ -13,6 +13,8 @@ export interface NavItem {
 
 export interface NavGroup {
   label: string;
+  /** Ikon GRUP -- cuma dipakai kalau grup ini jadi dropdown collapsible (items.length > 1). */
+  icon?: LucideIcon;
   items: NavItem[];
 }
 
@@ -27,6 +29,7 @@ export const navGroups: NavGroup[] = [
   },
   {
     label: "iClock — Device & Absensi",
+    icon: Cpu,
     items: [
       { title: "Pool / Department", href: "/iclock/departments", icon: Building2 },
       { title: "Active Device", href: "/iclock/active-devices", icon: Cpu },
@@ -41,6 +44,7 @@ export const navGroups: NavGroup[] = [
   },
   {
     label: "Mobile Attendance",
+    icon: Smartphone,
     items: [
       { title: "Mobile Pool", href: "/mclock/mobile-pools", icon: MapPinned },
       { title: "Pool Location (Geofence)", href: "/mclock/mobile-pool-locations", icon: Route },
