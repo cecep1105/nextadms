@@ -269,6 +269,35 @@ export interface DjangoApiUser {
   must_change_password: boolean;
   created_at: string;
   updated_at: string;
-  can_transfer_finger: boolean;
-  can_view_attendance_recap: boolean;
+}
+
+export interface MikrotikDhcpLease {
+  id?: string;
+  address: string;
+  'mac-address': string;
+  server: string;
+  status: 'bound' | 'waiting' | 'testing';
+  'last-seen': string;
+  'host-name'?: string;
+  dynamic: 'true' | 'false';
+  disabled: 'true' | 'false';
+}
+
+export type MikrotikFirewallChain = 'input' | 'forward' | 'output';
+export type MikrotikFirewallAction = 'accept' | 'drop' | 'reject' | 'jump' | 'passthrough';
+
+export interface MikrotikFirewallFilterRule {
+  id?: string;
+  chain: MikrotikFirewallChain;
+  action: MikrotikFirewallAction;
+  'in-interface'?: string;
+  'out-interface'?: string;
+  'src-mac-address'?: string;
+  'in-interface-list'?: string;
+  'out-interface-list'?: string;
+  protocol?: string;
+  'dst-port'?: string;
+  src?: string;
+  comment?: string;
+  disabled?: 'true' | 'false';
 }
