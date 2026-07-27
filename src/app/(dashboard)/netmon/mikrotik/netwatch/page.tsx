@@ -27,8 +27,6 @@ async function getDhcpLease(sortBy?: string, sortDir?: string, page?: string, q?
   if (page) queryParams.set('_page', page);
   if (page_size) queryParams.set('_limit', page_size);
 
-  queryParams.set('_search_fields','address,mac-address,host-name');
-
   const data = await apiServerFetch<Paginated<MikrotikDhcpLease>>(
     `/netmon/mikrotik/10.100.202.254/ip-dhcp_server-lease/?${queryParams.toString()}`,
     {
@@ -73,7 +71,7 @@ export default async function  MikrotikDhcpPage({ searchParams }: PageProps ) {
               <TableRow><TableCell colSpan={7} className="py-8 text-center text-muted-foreground">Tidak ada pool ditemukan.</TableCell></TableRow>
             ) : (
               data.results.map((dhcp) => (
-                <TableRow key={dhcp['.id']} className="py-1">
+                <TableRow key={dhcp.id} className="py-1">
                   <TableCell className="text-muted-foreground">{dhcp.address}</TableCell>
                   <TableCell className="text-muted-foreground">{dhcp['mac-address'] ?? "-"}</TableCell>
                   <TableCell className="text-muted-foreground">{dhcp.server ?? "-"}</TableCell>
