@@ -4,7 +4,14 @@ import { useEffect, useState, useTransition } from "react";
 import { Search, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
-export function SearchBar({ placeholder = "Cari..." }: { placeholder?: string }) {
+/**
+ * Search box KHUSUS halaman Mikrotik/netmgmt -- fungsinya IDENTIK dgn
+ * `components/shared/search-bar.tsx`, tapi disalin terpisah krn dulu
+ * SETIAP halaman Mikrotik (dhcp/fwfilter/netwatch) punya folder
+ * `_components/` masing2 (duplikasi 3x PERSIS byte-demi-byte).
+ * Dikonsolidasikan ke sini supaya cuma 1 lokasi dipelihara.
+ */
+export function RouterOSSearchBar({ placeholder = "Cari..." }: { placeholder?: string }) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -14,11 +21,8 @@ export function SearchBar({ placeholder = "Cari..." }: { placeholder?: string })
   useEffect(() => {
     const handle = setTimeout(() => {
       const params = new URLSearchParams(searchParams.toString());
-      if (value) {
-        params.set("q", value);
-      } else {
-        params.delete("q");
-      }
+      if (value) params.set("q", value);
+      else params.delete("q");
       params.delete("page"); // reset ke halaman 1 tiap kali pencarian berubah
       startTransition(() => router.push(`${pathname}?${params.toString()}`));
       // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -26,7 +30,6 @@ export function SearchBar({ placeholder = "Cari..." }: { placeholder?: string })
     return () => clearTimeout(handle);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
-
 
   return (
     <div className="relative w-full sm:w-64">

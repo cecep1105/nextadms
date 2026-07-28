@@ -143,7 +143,7 @@ export function DhcpActionsMenu({
           <DialogFooter>
             <Button variant="outline" onClick={() => setRemoveStaticConfirmOpen(false)}>Batal</Button>
             <Button variant="destructive" onClick={handleRemoveStatic} disabled={removeStaticLoading}>
-              {makeStaticLoading && <Loader2 className="h-3.5 w-3.5 animate-spin" />} Hapus
+              {removeStaticLoading && <Loader2 className="h-3.5 w-3.5 animate-spin" />} Hapus
             </Button>
           </DialogFooter>
         </DialogContent>

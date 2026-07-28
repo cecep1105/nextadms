@@ -132,7 +132,7 @@ export function FwFilterActionsMenu({
           <DialogFooter>
             <Button variant="outline" onClick={() => setDisableFwFilterConfirmOpen(false)}>Batal</Button>
             <Button variant="destructive" onClick={handleDisableFwFilter} disabled={disableFwFilterLoading}>
-              {enableFwFilterLoading && <Loader2 className="h-3.5 w-3.5 animate-spin" />} Disable
+              {disableFwFilterLoading && <Loader2 className="h-3.5 w-3.5 animate-spin" />} Disable
             </Button>
           </DialogFooter>
         </DialogContent>

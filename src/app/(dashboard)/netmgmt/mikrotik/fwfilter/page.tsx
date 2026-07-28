@@ -1,8 +1,7 @@
 import { PageHeader } from "@/components/shared/page-header";
-import { SearchBar } from "./_components/search-bar";
-import { PaginationBar } from "./_components/pagination-bar";
-import SortableHeader from  "./_components/sortable-header";
-
+import { RouterOSSearchBar } from "@/components/netmgmt/routeros-search-bar";
+import { RouterOSPaginationBar } from "@/components/netmgmt/routeros-pagination-bar";
+import { RouterOSSortableHeader } from "@/components/netmgmt/routeros-sortable-header";
 import { Card } from "@/components/ui/card";
 import { FwFilterActionsMenu } from "./_components/fwfilter-actions-menu";
 import {
@@ -13,79 +12,66 @@ import type { Paginated, MikrotikFirewallFilterRule } from "@/types/api";
 import { cn } from "@/lib/utils";
 
 const PAGE_SIZE = 10;
-const ROUTER_IP = '10.100.202.254'
+// Sama seperti dhcp/page.tsx -- env var server-only, default = nilai lama.
+const ROUTER_IP = process.env.MIKROTIK_FWFILTER_ROUTER_IP || "10.100.202.254";
 const BASE_PATH = `/netmgmt/routeros/${ROUTER_IP}/ip-firewall-filter`;
 
 interface PageProps {
   searchParams: Promise<{ sortBy?: string; sortDir?: string; page?: string; q?: string; page_size?: string }>;
 }
 
-
 async function getFwFilter(sortBy?: string, sortDir?: string, page?: string, q?: string, page_size?: string): Promise<Paginated<MikrotikFirewallFilterRule>> {
   const queryParams = new URLSearchParams();
-  if (sortBy) queryParams.set('_sort_by', sortBy);
-  if (sortDir) queryParams.set('_order', sortDir);
-  if (q) queryParams.set('_q',q)
-  if (page) queryParams.set('_page', page);
-  if (page_size) queryParams.set('_limit', page_size);
+  if (sortBy) queryParams.set("_sort_by", sortBy);
+  if (sortDir) queryParams.set("_order", sortDir);
+  if (q) queryParams.set("_q", q);
+  if (page) queryParams.set("_page", page);
+  if (page_size) queryParams.set("_limit", page_size);
+  queryParams.set("_search_fields", "src-mac-address,comment");
 
-  queryParams.set('_search_fields','src-mac-address,comment');
-
-  const data = await apiServerFetch<Paginated<MikrotikFirewallFilterRule>>(
-    `${BASE_PATH}/?${queryParams.toString()}`,
-    {
-      cache: 'no-store',
-    },
-  );
-
-  return data;
+  return apiServerFetch<Paginated<MikrotikFirewallFilterRule>>(`${BASE_PATH}/?${queryParams.toString()}`);
 }
 
-export default async function  MikrotikDhcpPage({ searchParams }: PageProps ) {
+export default async function MikrotikFwFilterPage({ searchParams }: PageProps) {
   const resolvedParams = await searchParams;
   const pageSize = Number(resolvedParams.page_size ?? PAGE_SIZE);
-
   const data = await getFwFilter(resolvedParams.sortBy, resolvedParams.sortDir, resolvedParams.page, resolvedParams.q, resolvedParams.page_size);
+
   return (
     <div>
-      <PageHeader
-        title="NetMgmt / Mikrotik FWFILTER"
-        description="Daftar firewall filter"
-        // action={<DepartmentFormDialog mode="create" />}
-      />
+      <PageHeader title="NetMgmt / Mikrotik Firewall Filter" description="Daftar firewall filter" />
       <Card>
-        <div className="g"></div>
         <div className="flex items-center justify-between border-b border-border p-3">
-          <SearchBar placeholder="Cari MAC / Comment" />
+          <RouterOSSearchBar placeholder="Cari MAC / Comment" />
         </div>
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead><SortableHeader columnKey="id" label="id" /></TableHead>
-              <TableHead><SortableHeader columnKey="chain" label="Chain" /></TableHead>
-              <TableHead><SortableHeader columnKey="action" label="Action" /></TableHead>
-              <TableHead><SortableHeader columnKey="src-mac-address" label="Source Mac" /></TableHead>
-              <TableHead><SortableHeader columnKey="out-interface" label="Out Interface" /></TableHead>
-              <TableHead><SortableHeader columnKey="disabled" label="Disable?" /></TableHead>      
-              <TableHead><SortableHeader columnKey="bytes" label="Bytes" /></TableHead>                         
-              <TableHead><SortableHeader columnKey="comment" label="Comment" /></TableHead>
+              <TableHead><RouterOSSortableHeader columnKey="id" label="id" /></TableHead>
+              <TableHead><RouterOSSortableHeader columnKey="chain" label="Chain" /></TableHead>
+              <TableHead><RouterOSSortableHeader columnKey="action" label="Action" /></TableHead>
+              <TableHead><RouterOSSortableHeader columnKey="src-mac-address" label="Source Mac" /></TableHead>
+              <TableHead><RouterOSSortableHeader columnKey="out-interface" label="Out Interface" /></TableHead>
+              <TableHead><RouterOSSortableHeader columnKey="disabled" label="Disable?" /></TableHead>
+              <TableHead><RouterOSSortableHeader columnKey="bytes" label="Bytes" /></TableHead>
+              <TableHead><RouterOSSortableHeader columnKey="comment" label="Comment" /></TableHead>
               <TableHead className="text-right">Aksi</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {data.results.length === 0 ? (
-              <TableRow><TableCell colSpan={7} className="py-8 text-center text-muted-foreground">Tidak ada pool ditemukan.</TableCell></TableRow>
+              <TableRow><TableCell colSpan={9} className="py-8 text-center text-muted-foreground">Tidak ada rule ditemukan.</TableCell></TableRow>
             ) : (
               data.results.map((fwfilter) => (
-                <TableRow key={fwfilter.id} className="py-1">
+                <TableRow key={fwfilter.id}>
                   <TableCell className="text-muted-foreground">{fwfilter.id}</TableCell>
                   <TableCell className="text-muted-foreground">{fwfilter.chain}</TableCell>
                   <TableCell className="text-muted-foreground">{fwfilter.action ?? "-"}</TableCell>
-                  <TableCell className="text-muted-foreground">{fwfilter['src-mac-address'] ?? "-"}</TableCell>
-                  <TableCell className="text-muted-foreground">{fwfilter['out-interface'] ?? "-"}</TableCell>
-                  <TableCell className="text-muted-foreground">{fwfilter['disabled'] === 'true'? 'yes' : 'no'}</TableCell>     
-                  <TableCell className="text-muted-foreground">{ fwfilter.bytes? parseInt(fwfilter.bytes, 10) : "0"}</TableCell>                               
-                  <TableCell className={cn("text-muted-foreground",{"text-destructive": fwfilter['disabled'] === 'true'})}>{fwfilter['comment'] ?? "-"}</TableCell>
+                  <TableCell className="text-muted-foreground">{fwfilter["src-mac-address"] ?? "-"}</TableCell>
+                  <TableCell className="text-muted-foreground">{fwfilter["out-interface"] ?? "-"}</TableCell>
+                  <TableCell className="text-muted-foreground">{fwfilter["disabled"] === "true" ? "yes" : "no"}</TableCell>
+                  <TableCell className="text-muted-foreground">{fwfilter.bytes ? parseInt(fwfilter.bytes, 10) : "0"}</TableCell>
+                  <TableCell className={cn("text-muted-foreground", { "text-destructive": fwfilter["disabled"] === "true" })}>{fwfilter["comment"] ?? "-"}</TableCell>
                   <TableCell>
                     <div className="flex justify-end gap-0.5">
                       <FwFilterActionsMenu hostdata={fwfilter} basepath={BASE_PATH} />
@@ -96,7 +82,7 @@ export default async function  MikrotikDhcpPage({ searchParams }: PageProps ) {
             )}
           </TableBody>
         </Table>
-        <PaginationBar count={data.count} pageSize={pageSize} currentPage={Number(resolvedParams.page ?? "1")} basePath={BASE_PATH} />
+        <RouterOSPaginationBar count={data.count} pageSize={pageSize} currentPage={Number(resolvedParams.page ?? "1")} />
       </Card>
     </div>
   );
