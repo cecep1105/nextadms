@@ -319,3 +319,33 @@ export interface MikrotikNetwatchItem {
   comment?: string;
   disabled: 'true' | 'false';
 }
+
+// --- netmgmt: Active Directory & Zentyal LDAP -- bentuk data KONSISTEN
+// (dirancang sengaja begitu di Django, lihat netmgmt/active_directory_view.py
+// & netmgmt/zentyal_view.py) supaya BISA pakai komponen frontend yang SAMA
+// utk keduanya (lihat components/netmgmt/directory-*.tsx), parameterized
+// oleh source 'ad'|'zentyal', bukan bikin 2 set halaman terpisah.
+
+export interface DirectoryUser {
+  dn: string;
+  username: string;
+  display_name: string;
+  email: string;
+  // Cuma ADA di AD (userAccountControl decoded) -- undefined utk Zentyal
+  // (Zentyal/posixAccount tidak py konsep "disabled" spt AD).
+  is_enabled?: boolean;
+  // Cuma ADA di Zentyal (posixAccount) -- undefined utk AD.
+  uid_number?: string;
+  gid_number?: string;
+  home_directory?: string;
+}
+
+export interface DirectoryGroup {
+  dn: string;
+  name: string;
+  description: string;
+  member_count: number;
+  // Cuma ADA di Zentyal ('posix'|'distribution', lihat netmgmt/zentyal_view.py)
+  // -- undefined utk AD (semua group AD diperlakukan sama, gaya 'member'/DN).
+  kind?: 'posix' | 'distribution';
+}

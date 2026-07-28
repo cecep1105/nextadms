@@ -67,21 +67,19 @@ export const navGroups: NavGroup[] = [
     ],
   },
   {
-    label: "Mail Server",
+    label: "Mail Server (Zentyal)",
     icon: Server,
     items: [
-      { title: "Mail Users", href: "/netmgmt/mail/users", icon: Users },
-      { title: "Mail Queue", href: "/netmgmt/mail/queue", icon: MailQueueIcon },
-      { title: "Postfix Transport", href: "/netmgmt/mail/transport", icon: Network },      
+      { title: "Zentyal Users", href: "/netmgmt/zentyal/users", icon: Users },
+      { title: "Zentyal Groups", href: "/netmgmt/zentyal/groups", icon: MailQueueIcon },
     ],
   },
   {
     label: "Active Directory",
     icon: Server,
     items: [
-      { title: "AD Users", href: "/netmon/mail/users", icon: Users },
-      { title: "AD Groups", href: "/netmon/mail/queue", icon: MailQueueIcon },
-      { title: "AD Lock", href: "/netmon/mail/transport", icon: Network },      
+      { title: "AD Users", href: "/netmgmt/active-directory/users", icon: Users },
+      { title: "AD Groups", href: "/netmgmt/active-directory/groups", icon: Network },
     ],
   },
 
