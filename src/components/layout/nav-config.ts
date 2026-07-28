@@ -3,17 +3,23 @@ import type { LucideProps } from "lucide-react";
 import {
   LayoutDashboard, Users, Building2, Cpu, ClipboardList, Fingerprint,
   ScrollText, FileClock, Terminal, CalendarClock, MapPinned, Route,
-  ToggleLeft, ScanFace, Smartphone, History, UserCircle, KeyRound, Network, Server, Mail, Router,Shield,
+  ToggleLeft, ScanFace, Smartphone, History, UserCircle, KeyRound, Network, Server, Router, Shield,
 } from "lucide-react";
 
 import MailQueueIcon from "../icons/mailqueue";
 
 export interface NavItem {
   title: string;
-  href: string;
+  /** Opsional -- item TANPA href jadi "folder" (dropdown bertingkat), tidak
+   * navigasi ke mana pun sendiri, cuma buka/tutup `children`-nya (lihat
+   * "Mikrotik"/"Mail Server (Zentyal)"/"Active Directory" di bawah, sub-menu
+   * dari grup "Network Management"). */
+  href?: string;
   icon: ComponentType<LucideProps>;
+  /** Sub-item, BISA BERSARANG (item ini sendiri jadi collapsible di dalam
+   * grup) -- lihat komponen Sidebar utk cara render bertingkatnya. */
+  children?: NavItem[];
 }
-
 
 export interface NavGroup {
   label: string;
@@ -58,31 +64,38 @@ export const navGroups: NavGroup[] = [
     ],
   },
   {
+    // SEBELUMNYA "Network Management"/"Mail Server"/"Active Directory" adalah
+    // 3 GRUP TERPISAH di level teratas -- sekarang digabung jadi 1 grup,
+    // masing2 (Mikrotik/Mail Server/Active Directory) jadi SUB-MENU
+    // bertingkat DI DALAMNYA (item tanpa href, py children -- lihat
+    // NavItem.children di atas).
     label: "Network Management",
     icon: Router,
-    items: [ 
-      { title: "Mikrotik DHCP Leases", href: "/netmgmt/mikrotik/dhcp", icon: Server },
-      { title: "Mikrotik Firewall Filter", href: "/netmgmt/mikrotik/fwfilter", icon: Shield },
-      { title: "Mikrotik Netwatch", href: "/netmgmt/mikrotik/netwatch", icon: Network },      
-    ],
-  },
-  {
-    label: "Mail Server (Zentyal)",
-    icon: Server,
     items: [
-      { title: "Zentyal Users", href: "/netmgmt/zentyal/users", icon: Users },
-      { title: "Zentyal Groups", href: "/netmgmt/zentyal/groups", icon: MailQueueIcon },
+      {
+        title: "Mikrotik", icon: Server,
+        children: [
+          { title: "DHCP Leases", href: "/netmgmt/mikrotik/dhcp", icon: Server },
+          { title: "Firewall Filter", href: "/netmgmt/mikrotik/fwfilter", icon: Shield },
+          { title: "Netwatch", href: "/netmgmt/mikrotik/netwatch", icon: Network },
+        ],
+      },
+      {
+        title: "Mail Server (Zentyal)", icon: MailQueueIcon,
+        children: [
+          { title: "Users", href: "/netmgmt/zentyal/users", icon: Users },
+          { title: "Groups", href: "/netmgmt/zentyal/groups", icon: Users },
+        ],
+      },
+      {
+        title: "Active Directory", icon: Server,
+        children: [
+          { title: "Users", href: "/netmgmt/active-directory/users", icon: Users },
+          { title: "Groups", href: "/netmgmt/active-directory/groups", icon: Network },
+        ],
+      },
     ],
   },
-  {
-    label: "Active Directory",
-    icon: Server,
-    items: [
-      { title: "AD Users", href: "/netmgmt/active-directory/users", icon: Users },
-      { title: "AD Groups", href: "/netmgmt/active-directory/groups", icon: Network },
-    ],
-  },
-
 ];
 
 /**

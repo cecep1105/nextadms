@@ -1,6 +1,5 @@
 "use client";
 import { useState } from "react";
-import { usePathname } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
 import { Menu, LogOut, User as UserIcon, KeyRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -12,19 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ThemeToggle } from "./theme-toggle";
 import { SidebarContent } from "./sidebar";
-import { navGroups } from "./nav-config";
-
-function useBreadcrumb() {
-  const pathname = usePathname();
-  for (const group of navGroups) {
-    for (const item of group.items) {
-      if (pathname === item.href || pathname.startsWith(`${item.href}/`)) {
-        return { group: group.label, page: item.title };
-      }
-    }
-  }
-  return { group: "Utama", page: "Dashboard" };
-}
+import { InteractiveBreadcrumb } from "./interactive-breadcrumb";
 
 function initials(name: string) {
   return name
@@ -38,7 +25,6 @@ function initials(name: string) {
 export function Topbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { data: session } = useSession();
-  const breadcrumb = useBreadcrumb();
   const displayName = session?.user?.full_name || session?.user?.username || "";
 
   return (
@@ -53,11 +39,7 @@ export function Topbar() {
         <Menu className="h-4 w-4" />
       </Button>
 
-      <div className="flex min-w-0 flex-1 items-baseline gap-1.5 text-sm">
-        <span className="truncate text-muted-foreground">{breadcrumb.group}</span>
-        <span className="text-muted-foreground/50">/</span>
-        <span className="truncate font-medium text-foreground">{breadcrumb.page}</span>
-      </div>
+      <InteractiveBreadcrumb />
 
       <ThemeToggle />
 

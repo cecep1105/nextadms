@@ -331,8 +331,7 @@ export interface DirectoryUser {
   username: string;
   display_name: string;
   email: string;
-  // Cuma ADA di AD (userAccountControl decoded) -- undefined utk Zentyal
-  // (Zentyal/posixAccount tidak py konsep "disabled" spt AD).
+  // Cuma ADA di AD (userAccountControl decoded) -- undefined utk Zentyal.
   is_enabled?: boolean;
   // Cuma ADA di Zentyal (posixAccount) -- undefined utk AD.
   uid_number?: string;
@@ -345,7 +344,6 @@ export interface DirectoryGroup {
   name: string;
   description: string;
   member_count: number;
-  // Cuma ADA di Zentyal ('posix'|'distribution', lihat netmgmt/zentyal_view.py)
-  // -- undefined utk AD (semua group AD diperlakukan sama, gaya 'member'/DN).
+  // Cuma ADA di Zentyal ('posix'|'distribution') -- undefined utk AD.
   kind?: 'posix' | 'distribution';
 }

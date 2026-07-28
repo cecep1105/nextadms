@@ -2,6 +2,7 @@ import { PageHeader } from "@/components/shared/page-header";
 import { RouterOSSearchBar } from "@/components/netmgmt/routeros-search-bar";
 import { RouterOSPaginationBar } from "@/components/netmgmt/routeros-pagination-bar";
 import { RouterOSSortableHeader } from "@/components/netmgmt/routeros-sortable-header";
+import { ResetPasswordButton } from "@/components/netmgmt/reset-password-button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -50,11 +51,12 @@ export default async function ActiveDirectoryUsersPage({ searchParams }: PagePro
               <TableHead><RouterOSSortableHeader columnKey="display_name" label="Nama" /></TableHead>
               <TableHead><RouterOSSortableHeader columnKey="email" label="Email" /></TableHead>
               <TableHead>Status</TableHead>
+              <TableHead className="text-right">Aksi</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {data.results.length === 0 ? (
-              <TableRow><TableCell colSpan={4} className="py-8 text-center text-muted-foreground">Tidak ada user ditemukan.</TableCell></TableRow>
+              <TableRow><TableCell colSpan={5} className="py-8 text-center text-muted-foreground">Tidak ada user ditemukan.</TableCell></TableRow>
             ) : (
               data.results.map((user) => (
                 <TableRow key={user.dn}>
@@ -63,6 +65,11 @@ export default async function ActiveDirectoryUsersPage({ searchParams }: PagePro
                   <TableCell className="text-muted-foreground">{user.email || "-"}</TableCell>
                   <TableCell>
                     {user.is_enabled ? <Badge variant="success">Aktif</Badge> : <Badge variant="secondary">Nonaktif</Badge>}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex justify-end">
+                      <ResetPasswordButton source="ad" userDn={user.dn} userLabel={user.display_name || user.username} />
+                    </div>
                   </TableCell>
                 </TableRow>
               ))

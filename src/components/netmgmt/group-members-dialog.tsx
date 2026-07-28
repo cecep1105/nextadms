@@ -4,7 +4,6 @@ import { useRouter } from "next/navigation";
 import { Loader2, UserPlus, UserMinus, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
 } from "@/components/ui/dialog";
@@ -75,7 +74,6 @@ export function GroupMembersDialog({
         const data = await request<{ results: DirectoryUser[] }>(
           `/netmgmt/${source}/users/?_q=${encodeURIComponent(searchQuery)}&_search_fields=username,display_name,email&_limit=8`
         );
-        // Sembunyikan user yang SUDAH jadi member -- tidak ada gunanya ditawarkan lagi.
         const memberDns = new Set((members ?? []).map((m) => m.dn));
         setSearchResults(data.results.filter((u) => !memberDns.has(u.dn)));
       } catch {
@@ -99,7 +97,7 @@ export function GroupMembersDialog({
       setSearchQuery("");
       setSearchResults([]);
       await loadMembers();
-      router.refresh(); // supaya member_count di tabel Groups di belakang dialog ikut update
+      router.refresh();
     } catch (err) {
       setError(extractErrorMessage(err, "Gagal menambah member."));
     } finally {
