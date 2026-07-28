@@ -333,6 +333,9 @@ export interface DirectoryUser {
   email: string;
   // Cuma ADA di AD (userAccountControl decoded) -- undefined utk Zentyal.
   is_enabled?: boolean;
+  // Cuma ADA di AD (lockoutTime decoded) -- TERKUNCI OTOMATIS krn salah
+  // password berkali-kali, BEDA dari is_enabled (dinonaktifkan MANUAL).
+  is_locked?: boolean;
   // Cuma ADA di Zentyal (posixAccount) -- undefined utk AD.
   uid_number?: string;
   gid_number?: string;

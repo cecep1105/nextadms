@@ -59,7 +59,7 @@ export function RecordActionsMenu({ zoneDn, record }: { zoneDn: string; record: 
             <DialogTitle>Hapus Record?</DialogTitle>
             <DialogDescription>
               Record <span className="font-mono font-medium text-foreground">{record.name} ({record.type})</span> akan dihapus permanen.
-              {record.type === "A" || record.type === "AAAA" ? " Kalau ada record lain (mis. round-robin) di nama yang sama, itu TIDAK akan ikut terhapus." : ""}
+              {record.type === "A" ? " Kalau ada record lain (mis. round-robin) di nama yang sama, itu TIDAK akan ikut terhapus." : ""}
             </DialogDescription>
           </DialogHeader>
           {error && <div className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-xs text-destructive">{error}</div>}

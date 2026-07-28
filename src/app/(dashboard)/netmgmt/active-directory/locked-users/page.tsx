@@ -2,8 +2,7 @@ import { PageHeader } from "@/components/shared/page-header";
 import { RouterOSSearchBar } from "@/components/netmgmt/routeros-search-bar";
 import { RouterOSPaginationBar } from "@/components/netmgmt/routeros-pagination-bar";
 import { RouterOSSortableHeader } from "@/components/netmgmt/routeros-sortable-header";
-import { ResetPasswordButton } from "@/components/netmgmt/reset-password-button";
-import { ToggleUserStatusButton } from "@/components/netmgmt/toggle-user-status-button";
+import { UnlockUserButton } from "@/components/netmgmt/unlock-user-button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -13,16 +12,12 @@ import { apiServerFetch } from "@/lib/api-server";
 import type { Paginated, DirectoryUser } from "@/types/api";
 
 const PAGE_SIZE = 20;
-// Sama pola dgn Mikrotik (netmgmt/routeros_api_view.py) -- data TIDAK ada
-// di database Django, jadi pagination/sort/search-nya JUGA pakai
-// konvensi param _page/_limit/_sort_by/_order/_q (lihat netmgmt/list_utils.py,
-// dipakai BERSAMA oleh Mikrotik & Active Directory & Zentyal).
 
 interface PageProps {
   searchParams: Promise<{ sortBy?: string; sortDir?: string; page?: string; q?: string; page_size?: string }>;
 }
 
-async function getAdUsers(sortBy?: string, sortDir?: string, page?: string, q?: string, page_size?: string): Promise<Paginated<DirectoryUser>> {
+async function getLockedUsers(sortBy?: string, sortDir?: string, page?: string, q?: string, page_size?: string): Promise<Paginated<DirectoryUser>> {
   const params = new URLSearchParams();
   if (sortBy) params.set("_sort_by", sortBy);
   if (sortDir) params.set("_order", sortDir);
@@ -30,17 +25,20 @@ async function getAdUsers(sortBy?: string, sortDir?: string, page?: string, q?: 
   if (page) params.set("_page", page);
   if (page_size) params.set("_limit", page_size);
   params.set("_search_fields", "username,display_name,email");
-  return apiServerFetch<Paginated<DirectoryUser>>(`/netmgmt/ad/users/?${params.toString()}`);
+  return apiServerFetch<Paginated<DirectoryUser>>(`/netmgmt/ad/users/locked/?${params.toString()}`);
 }
 
-export default async function ActiveDirectoryUsersPage({ searchParams }: PageProps) {
+export default async function ActiveDirectoryLockedUsersPage({ searchParams }: PageProps) {
   const sp = await searchParams;
   const pageSize = Number(sp.page_size ?? PAGE_SIZE);
-  const data = await getAdUsers(sp.sortBy, sp.sortDir, sp.page, sp.q, sp.page_size);
+  const data = await getLockedUsers(sp.sortBy, sp.sortDir, sp.page, sp.q, sp.page_size);
 
   return (
     <div>
-      <PageHeader title="NetMgmt / Active Directory / Users" description="Daftar user Active Directory" />
+      <PageHeader
+        title="NetMgmt / Active Directory / Locked Users"
+        description="User yang TERKUNCI OTOMATIS krn salah password berkali-kali -- beda dari user yang dinonaktifkan manual (lihat halaman Users)."
+      />
       <Card>
         <div className="flex items-center justify-between border-b border-border p-3">
           <RouterOSSearchBar placeholder="Cari username / nama / email" />
@@ -57,21 +55,17 @@ export default async function ActiveDirectoryUsersPage({ searchParams }: PagePro
           </TableHeader>
           <TableBody>
             {data.results.length === 0 ? (
-              <TableRow><TableCell colSpan={5} className="py-8 text-center text-muted-foreground">Tidak ada user ditemukan.</TableCell></TableRow>
+              <TableRow><TableCell colSpan={5} className="py-8 text-center text-muted-foreground">Tidak ada user yang terkunci saat ini.</TableCell></TableRow>
             ) : (
               data.results.map((user) => (
                 <TableRow key={user.dn}>
                   <TableCell className="font-mono">{user.username}</TableCell>
                   <TableCell className="font-medium">{user.display_name}</TableCell>
                   <TableCell className="text-muted-foreground">{user.email || "-"}</TableCell>
-                  <TableCell>
-                    {/* Sesuai permintaan -- status "Nonaktif" pakai warna destructive (merah), bukan abu-abu netral -- lebih jelas menandakan akun BERMASALAH/tidak bisa dipakai. */}
-                    {user.is_enabled ? <Badge variant="success">Aktif</Badge> : <Badge variant="destructive">Nonaktif</Badge>}
-                  </TableCell>
+                  <TableCell><Badge variant="destructive">Terkunci</Badge></TableCell>
                   <TableCell>
                     <div className="flex justify-end">
-                      <ToggleUserStatusButton userDn={user.dn} userLabel={user.display_name || user.username} isEnabled={user.is_enabled ?? true} />
-                      <ResetPasswordButton source="ad" userDn={user.dn} userLabel={user.display_name || user.username} />
+                      <UnlockUserButton userDn={user.dn} userLabel={user.display_name || user.username} />
                     </div>
                   </TableCell>
                 </TableRow>

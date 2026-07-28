@@ -3,7 +3,7 @@ import type { LucideProps } from "lucide-react";
 import {
   LayoutDashboard, Users, Building2, Cpu, ClipboardList, Fingerprint,
   ScrollText, FileClock, Terminal, CalendarClock, MapPinned, Route,
-  ToggleLeft, ScanFace, Smartphone, History, UserCircle, KeyRound, Network, Server, Router, Shield, Globe,
+  ToggleLeft, ScanFace, Smartphone, History, UserCircle, KeyRound, Network, Server, Router, Shield, Globe, Lock,
 } from "lucide-react";
 
 import MailQueueIcon from "../icons/mailqueue";
@@ -91,6 +91,7 @@ export const navGroups: NavGroup[] = [
         title: "Active Directory", icon: Server,
         children: [
           { title: "Users", href: "/netmgmt/active-directory/users", icon: Users },
+          { title: "Locked Users", href: "/netmgmt/active-directory/locked-users", icon: Lock },
           { title: "Groups", href: "/netmgmt/active-directory/groups", icon: Network },
           { title: "DNS Zones", href: "/netmgmt/active-directory/dns", icon: Globe },
         ],
