@@ -12,7 +12,8 @@ import { apiServerFetch } from "@/lib/api-server";
 import type { Paginated, MikrotikDhcpLease } from "@/types/api";
 
 const PAGE_SIZE = 10;
-const BASE_PATH = "/netmon/mikrotik/10.100.202.254/ip-dhcp_server-lease/";
+const ROUTER_IP = '10.100.202.254'
+const BASE_PATH = `/netmgmt/routeros/${ROUTER_IP}/ip-dhcp_server-lease`;
 
 interface PageProps {
   searchParams: Promise<{ sortBy?: string; sortDir?: string; page?: string; q?: string; page_size?: string }>;
@@ -27,8 +28,10 @@ async function getDhcpLease(sortBy?: string, sortDir?: string, page?: string, q?
   if (page) queryParams.set('_page', page);
   if (page_size) queryParams.set('_limit', page_size);
 
+  queryParams.set('_search_fields','address,mac-address,host-name');
+
   const data = await apiServerFetch<Paginated<MikrotikDhcpLease>>(
-    `/netmon/mikrotik/10.100.202.254/ip-dhcp_server-lease/?${queryParams.toString()}`,
+    `${BASE_PATH}/?${queryParams.toString()}`,
     {
       cache: 'no-store',
     },
@@ -80,7 +83,7 @@ export default async function  MikrotikDhcpPage({ searchParams }: PageProps ) {
                   <TableCell className="text-muted-foreground">{dhcp.dynamic ?? "-"}</TableCell>
                   <TableCell>
                     <div className="flex justify-end gap-0.5">
-                      <DhcpActionsMenu hostdata={dhcp}  />
+                      <DhcpActionsMenu hostdata={dhcp} basepath={BASE_PATH} />
                     </div>
                   </TableCell>
                 </TableRow>

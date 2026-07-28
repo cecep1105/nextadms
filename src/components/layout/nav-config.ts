@@ -1,20 +1,24 @@
-import type { LucideIcon } from "lucide-react";
+import type { ComponentType } from "react";
+import type { LucideProps } from "lucide-react";
 import {
   LayoutDashboard, Users, Building2, Cpu, ClipboardList, Fingerprint,
   ScrollText, FileClock, Terminal, CalendarClock, MapPinned, Route,
-  ToggleLeft, ScanFace, Smartphone, History, UserCircle, KeyRound,
+  ToggleLeft, ScanFace, Smartphone, History, UserCircle, KeyRound, Network, Server, Mail, Router,Shield,
 } from "lucide-react";
+
+import MailQueueIcon from "../icons/mailqueue";
 
 export interface NavItem {
   title: string;
   href: string;
-  icon: LucideIcon;
+  icon: ComponentType<LucideProps>;
 }
+
 
 export interface NavGroup {
   label: string;
   /** Ikon GRUP -- cuma dipakai kalau grup ini jadi dropdown collapsible (items.length > 1). */
-  icon?: LucideIcon;
+  icon?: ComponentType<LucideProps>;
   items: NavItem[];
 }
 
@@ -53,6 +57,34 @@ export const navGroups: NavGroup[] = [
       { title: "Face Profile", href: "/mattendance/face-profiles", icon: ScanFace },
     ],
   },
+  {
+    label: "Network Management",
+    icon: Router,
+    items: [ 
+      { title: "Mikrotik DHCP Leases", href: "/netmgmt/mikrotik/dhcp", icon: Server },
+      { title: "Mikrotik Firewall Filter", href: "/netmgmt/mikrotik/fwfilter", icon: Shield },
+      { title: "Mikrotik Netwatch", href: "/netmgmt/mikrotik/netwatch", icon: Network },      
+    ],
+  },
+  {
+    label: "Mail Server",
+    icon: Server,
+    items: [
+      { title: "Mail Users", href: "/netmgmt/mail/users", icon: Users },
+      { title: "Mail Queue", href: "/netmgmt/mail/queue", icon: MailQueueIcon },
+      { title: "Postfix Transport", href: "/netmgmt/mail/transport", icon: Network },      
+    ],
+  },
+  {
+    label: "Active Directory",
+    icon: Server,
+    items: [
+      { title: "AD Users", href: "/netmon/mail/users", icon: Users },
+      { title: "AD Groups", href: "/netmon/mail/queue", icon: MailQueueIcon },
+      { title: "AD Lock", href: "/netmon/mail/transport", icon: Network },      
+    ],
+  },
+
 ];
 
 /**

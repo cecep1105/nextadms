@@ -15,59 +15,61 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useApiClient } from "@/lib/api-client";
 import { extractErrorMessage } from "@/lib/error-utils";
-import { MikrotikDhcpLease } from "@/types/api";
+import { MikrotikNetwatchItem } from "@/types/api";
 
 
 
-export function DhcpActionsMenu({
+export function NetwatchActionsMenu({
     hostdata,
+    basepath,
 
 }:{
-    hostdata: MikrotikDhcpLease;
+    hostdata: MikrotikNetwatchItem;
+    basepath: String;
 
 }) {
 
   const router = useRouter();
   const { request } = useApiClient();
 
-  const [makeStaticConfirmOpen, setMakeStaticConfirmOpen] = useState(false);
-  const [removeStaticConfirmOpen, setRemoveStaticConfirmOpen] = useState(false);  
-  const [makeStaticLoading, setMakeStaticLoading] = useState(false);
-  const [removeStaticLoading, setRemoveStaticLoading] = useState(false);
+  const [disableHostConfirmOpen, setDisableHostConfirmOpen] = useState(false);
+  const [enableHostConfirmOpen, setEnableHostConfirmOpen] = useState(false);  
+  const [disableHostLoading, setDisableHostLoading] = useState(false);
+  const [enableHostLoading, setEnableHostLoading] = useState(false);
   const [actionResult, setActionResult] = useState<{ success: boolean; message: string } | null>(null);
 
 
-  async function handleMakeStatic() {
-    setMakeStaticLoading(true);
+  async function handleDisableHost() {
+    setDisableHostLoading(true);
     try {
-      const result = await request<{ success: boolean; message: string }>(`/netmon/mikrotik/10.100.202.254/ip-dhcp_server-lease/?postcmd=make-static`, {
+      const result = await request<{ success: boolean; message: string }>(`${basepath}/?postcmd=disable`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({id: hostdata.id}),
       });
       setActionResult(result);
-      setMakeStaticConfirmOpen(false);
+      setDisableHostConfirmOpen(false);
     } catch (err) {
       setActionResult({ success: false, message: extractErrorMessage(err, "Gagal reboot device.") });
     } finally {
-      setMakeStaticLoading(false);
+      setDisableHostLoading(false);
     }
   }
-  async function handleRemoveStatic() {
-    setRemoveStaticLoading(true);
+  async function handleEnableHost() {
+    setEnableHostLoading(true);
     try {
-      const result = await request<{ success: boolean; message: string }>(`/netmon/mikrotik/10.100.202.254/ip-dhcp_server-lease/?postcmd=remove`, {
+      const result = await request<{ success: boolean; message: string }>(`${basepath}/?postcmd=enable`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({id: hostdata.id }),
       });
       setActionResult(result);
-      setRemoveStaticConfirmOpen(false);
+      setEnableHostConfirmOpen(false);
       router.refresh();
     } catch (err) {
       setActionResult({ success: false, message: extractErrorMessage(err, "Gagal reboot device.") });
     } finally {
-      setRemoveStaticLoading(false);
+      setEnableHostLoading(false);
     }
   }
 
@@ -93,13 +95,13 @@ export function DhcpActionsMenu({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              {hostdata.dynamic === "true" ?
-              <DropdownMenuItem onClick={() => setMakeStaticConfirmOpen(true)}>
-                <Power className="h-3.5 w-3.5 mr-3" /> Make Static
+              {hostdata.disabled === "true" ?
+              <DropdownMenuItem onClick={() => setEnableHostConfirmOpen(true)}>
+                <Power className="h-3.5 w-3.5 mr-3" /> Enable Host
               </DropdownMenuItem>
               :
-              <DropdownMenuItem onClick={() => setRemoveStaticConfirmOpen(true)} className="text-destructive focus:text-destructive">
-                <Power className="h-3.5 w-3.5 mr-3" /> Delete Lease
+              <DropdownMenuItem onClick={() => setDisableHostConfirmOpen(true)} className="text-destructive focus:text-destructive">
+                <Power className="h-3.5 w-3.5 mr-3" />Disable Host
               </DropdownMenuItem>
               }
             </DropdownMenuContent>
@@ -113,34 +115,34 @@ export function DhcpActionsMenu({
       </Popover>
 
 
-      <Dialog open={makeStaticConfirmOpen} onOpenChange={setMakeStaticConfirmOpen}>
+      <Dialog open={disableHostConfirmOpen} onOpenChange={setDisableHostConfirmOpen}>
         <DialogContent className="max-w-sm">
           <DialogHeader>
-            <DialogTitle>Jadikan Static?</DialogTitle>
+            <DialogTitle>Disable this host?</DialogTitle>
             <DialogDescription>
-              Host dengan mac-address <span className="font-mono font-medium text-foreground">{hostdata["mac-address"]}</span> ({hostdata["host-name"]}) akan dijadikan static.
+              Host dengan ip-address <span className="font-mono font-medium text-foreground">{hostdata["host"]}</span> ({hostdata["comment"]}) akan di-disable.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setMakeStaticConfirmOpen(false)}>Batal</Button>
-            <Button variant="destructive" onClick={handleMakeStatic} disabled={makeStaticLoading}>
-              {makeStaticLoading && <Loader2 className="h-3.5 w-3.5 animate-spin" />} Jadikan Static
+            <Button variant="outline" onClick={() => setDisableHostConfirmOpen(false)}>Batal</Button>
+            <Button variant="destructive" onClick={handleDisableHost} disabled={disableHostLoading}>
+              {disableHostLoading && <Loader2 className="h-3.5 w-3.5 animate-spin" />} Disable Host
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      <Dialog open={removeStaticConfirmOpen} onOpenChange={setRemoveStaticConfirmOpen}>
+      <Dialog open={enableHostConfirmOpen} onOpenChange={setEnableHostConfirmOpen}>
         <DialogContent className="max-w-sm">
           <DialogHeader>
-            <DialogTitle>Hapus Static Lease?</DialogTitle>
+            <DialogTitle>Enable this host</DialogTitle>
             <DialogDescription>
-              Host dengan mac-address <span className="font-mono font-medium text-foreground">{hostdata["mac-address"]}</span> ({hostdata["host-name"]}) akan dihapus dari lease.
+              Host dengan ip address <span className="font-mono font-medium text-foreground">{hostdata["host"]}</span> ({hostdata["comment"]}) akan di-enable.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setRemoveStaticConfirmOpen(false)}>Batal</Button>
-            <Button variant="destructive" onClick={handleRemoveStatic} disabled={removeStaticLoading}>
-              {makeStaticLoading && <Loader2 className="h-3.5 w-3.5 animate-spin" />} Hapus
+            <Button variant="outline" onClick={() => setEnableHostConfirmOpen(false)}>Batal</Button>
+            <Button variant="destructive" onClick={handleEnableHost} disabled={enableHostLoading}>
+              {enableHostLoading && <Loader2 className="h-3.5 w-3.5 animate-spin" />} Enable Host
             </Button>
           </DialogFooter>
         </DialogContent>

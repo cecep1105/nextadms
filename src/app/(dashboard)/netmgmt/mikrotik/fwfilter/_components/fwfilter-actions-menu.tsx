@@ -21,9 +21,11 @@ import { MikrotikFirewallFilterRule } from "@/types/api";
 
 export function FwFilterActionsMenu({
     hostdata,
+    basepath,
 
 }:{
     hostdata: MikrotikFirewallFilterRule;
+    basepath: String;
 
 }) {
 
@@ -40,7 +42,7 @@ export function FwFilterActionsMenu({
   async function handleEnableFwFilter() {
     setEnableFwFilterLoading(true);
     try {
-      const result = await request<{ success: boolean; message: string }>(`/netmon/mikrotik/10.100.202.254/ip-firewall-filter/?postcmd=enable`, {
+      const result = await request<{ success: boolean; message: string }>(`${basepath}/?postcmd=enable`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({id: hostdata.id}),
@@ -57,7 +59,7 @@ export function FwFilterActionsMenu({
   async function handleDisableFwFilter() {
     setDisableFwFilterLoading(true);
     try {
-      const result = await request<{ success: boolean; message: string }>(`/netmon/mikrotik/10.100.202.254/ip-firewall-filter/?postcmd=disable`, {
+      const result = await request<{ success: boolean; message: string }>(`${basepath}/?postcmd=disable`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({id: hostdata.id }),

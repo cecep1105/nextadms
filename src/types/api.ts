@@ -272,7 +272,7 @@ export interface DjangoApiUser {
 }
 
 export interface MikrotikDhcpLease {
-  id?: string;
+  id: string;
   address: string;
   'mac-address': string;
   server: string;
@@ -287,7 +287,7 @@ export type MikrotikFirewallChain = 'input' | 'forward' | 'output';
 export type MikrotikFirewallAction = 'accept' | 'drop' | 'reject' | 'jump' | 'passthrough';
 
 export interface MikrotikFirewallFilterRule {
-  id?: string;
+  id: string;
   chain: MikrotikFirewallChain;
   action: MikrotikFirewallAction;
   'in-interface'?: string;
@@ -299,5 +299,17 @@ export interface MikrotikFirewallFilterRule {
   'dst-port'?: string;
   src?: string;
   comment?: string;
+  bytes?: string;
   disabled?: 'true' | 'false';
+}
+
+export interface MikrotikNetwatchItem {
+  id: string;
+  host: string;
+  status: 'up' | 'down' | 'waiting' | 'initializing';
+  since: string;
+  interval: string;
+  timeout: string;
+  comment?: string;
+  disabled: 'true' | 'false';
 }

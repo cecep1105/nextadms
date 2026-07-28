@@ -21,9 +21,11 @@ import { MikrotikDhcpLease } from "@/types/api";
 
 export function DhcpActionsMenu({
     hostdata,
+    basepath,
 
 }:{
     hostdata: MikrotikDhcpLease;
+    basepath: String;
 
 }) {
 
@@ -40,7 +42,7 @@ export function DhcpActionsMenu({
   async function handleMakeStatic() {
     setMakeStaticLoading(true);
     try {
-      const result = await request<{ success: boolean; message: string }>(`/netmon/mikrotik/10.100.202.254/ip-dhcp_server-lease/?postcmd=make-static`, {
+      const result = await request<{ success: boolean; message: string }>(`${basepath}/?postcmd=make-static`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({id: hostdata.id}),
@@ -57,7 +59,7 @@ export function DhcpActionsMenu({
   async function handleRemoveStatic() {
     setRemoveStaticLoading(true);
     try {
-      const result = await request<{ success: boolean; message: string }>(`/netmon/mikrotik/10.100.202.254/ip-dhcp_server-lease/?postcmd=remove`, {
+      const result = await request<{ success: boolean; message: string }>(`${basepath}/?postcmd=remove`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({id: hostdata.id }),

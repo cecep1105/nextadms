@@ -13,7 +13,8 @@ import type { Paginated, MikrotikFirewallFilterRule } from "@/types/api";
 import { cn } from "@/lib/utils";
 
 const PAGE_SIZE = 10;
-const BASE_PATH = "/netmon/mikrotik/10.100.202.254/ip-firewall-filter/";
+const ROUTER_IP = '10.100.202.254'
+const BASE_PATH = `/netmgmt/routeros/${ROUTER_IP}/ip-firewall-filter`;
 
 interface PageProps {
   searchParams: Promise<{ sortBy?: string; sortDir?: string; page?: string; q?: string; page_size?: string }>;
@@ -31,7 +32,7 @@ async function getFwFilter(sortBy?: string, sortDir?: string, page?: string, q?:
   queryParams.set('_search_fields','src-mac-address,comment');
 
   const data = await apiServerFetch<Paginated<MikrotikFirewallFilterRule>>(
-    `/netmon/mikrotik/10.100.202.254/ip-firewall-filter/?${queryParams.toString()}`,
+    `${BASE_PATH}/?${queryParams.toString()}`,
     {
       cache: 'no-store',
     },
@@ -48,7 +49,7 @@ export default async function  MikrotikDhcpPage({ searchParams }: PageProps ) {
   return (
     <div>
       <PageHeader
-        title="NetMon / Mikrotik FWFILTER"
+        title="NetMgmt / Mikrotik FWFILTER"
         description="Daftar firewall filter"
         // action={<DepartmentFormDialog mode="create" />}
       />
@@ -65,7 +66,8 @@ export default async function  MikrotikDhcpPage({ searchParams }: PageProps ) {
               <TableHead><SortableHeader columnKey="action" label="Action" /></TableHead>
               <TableHead><SortableHeader columnKey="src-mac-address" label="Source Mac" /></TableHead>
               <TableHead><SortableHeader columnKey="out-interface" label="Out Interface" /></TableHead>
-              <TableHead><SortableHeader columnKey="disabled" label="Disable?" /></TableHead>              
+              <TableHead><SortableHeader columnKey="disabled" label="Disable?" /></TableHead>      
+              <TableHead><SortableHeader columnKey="bytes" label="Bytes" /></TableHead>                         
               <TableHead><SortableHeader columnKey="comment" label="Comment" /></TableHead>
               <TableHead className="text-right">Aksi</TableHead>
             </TableRow>
@@ -81,11 +83,12 @@ export default async function  MikrotikDhcpPage({ searchParams }: PageProps ) {
                   <TableCell className="text-muted-foreground">{fwfilter.action ?? "-"}</TableCell>
                   <TableCell className="text-muted-foreground">{fwfilter['src-mac-address'] ?? "-"}</TableCell>
                   <TableCell className="text-muted-foreground">{fwfilter['out-interface'] ?? "-"}</TableCell>
-                  <TableCell className="text-muted-foreground">{fwfilter['disabled'] === 'true'? 'yes' : 'no'}</TableCell>                  
+                  <TableCell className="text-muted-foreground">{fwfilter['disabled'] === 'true'? 'yes' : 'no'}</TableCell>     
+                  <TableCell className="text-muted-foreground">{ fwfilter.bytes? parseInt(fwfilter.bytes, 10) : "0"}</TableCell>                               
                   <TableCell className={cn("text-muted-foreground",{"text-destructive": fwfilter['disabled'] === 'true'})}>{fwfilter['comment'] ?? "-"}</TableCell>
                   <TableCell>
                     <div className="flex justify-end gap-0.5">
-                      <FwFilterActionsMenu hostdata={fwfilter}  />
+                      <FwFilterActionsMenu hostdata={fwfilter} basepath={BASE_PATH} />
                     </div>
                   </TableCell>
                 </TableRow>

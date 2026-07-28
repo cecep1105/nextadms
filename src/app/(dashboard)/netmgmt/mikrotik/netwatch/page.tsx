@@ -4,22 +4,23 @@ import { PaginationBar } from "./_components/pagination-bar";
 import SortableHeader from  "./_components/sortable-header";
 import { DeleteConfirmButton } from "@/components/shared/delete-confirm-button";
 import { Card } from "@/components/ui/card";
-import { DhcpActionsMenu } from "./_components/dhcp-actions-menu";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import { apiServerFetch } from "@/lib/api-server";
-import type { Paginated, MikrotikDhcpLease } from "@/types/api";
+import type { Paginated, MikrotikNetwatchItem } from "@/types/api";
+import { NetwatchActionsMenu } from "./_components/netwatch-actions-menu";
 
 const PAGE_SIZE = 10;
-const BASE_PATH = "/netmon/mikrotik/10.100.202.254/ip-dhcp_server-lease/";
+const ROUTER_IP = '10.100.202.1'
+const BASE_PATH = `/netmgmt/routeros/${ROUTER_IP}/tool-netwatch`;
 
 interface PageProps {
   searchParams: Promise<{ sortBy?: string; sortDir?: string; page?: string; q?: string; page_size?: string }>;
 }
 
 
-async function getDhcpLease(sortBy?: string, sortDir?: string, page?: string, q?: string, page_size?: string): Promise<Paginated<MikrotikDhcpLease>> {
+async function getNetwatchItems(sortBy?: string, sortDir?: string, page?: string, q?: string, page_size?: string): Promise<Paginated<MikroTikNetwatchItem>> {
   const queryParams = new URLSearchParams();
   if (sortBy) queryParams.set('_sort_by', sortBy);
   if (sortDir) queryParams.set('_order', sortDir);
@@ -27,10 +28,11 @@ async function getDhcpLease(sortBy?: string, sortDir?: string, page?: string, q?
   if (page) queryParams.set('_page', page);
   if (page_size) queryParams.set('_limit', page_size);
 
-  queryParams.set('_search_fields','address,mac-address,host-name');
+  queryParams.set('_search_fields','host,comment');
 
-  const data = await apiServerFetch<Paginated<MikrotikDhcpLease>>(
-    `/netmon/mikrotik/10.100.202.254/ip-dhcp_server-lease/?${queryParams.toString()}`,
+
+  const data = await apiServerFetch<Paginated<MikrotikNetwatchItem>>(
+    `${BASE_PATH}/?${queryParams.toString()}`,
     {
       cache: 'no-store',
     },
@@ -43,12 +45,12 @@ export default async function  MikrotikDhcpPage({ searchParams }: PageProps ) {
   const resolvedParams = await searchParams;
   const pageSize = Number(resolvedParams.page_size ?? PAGE_SIZE);
 
-  const data = await getDhcpLease(resolvedParams.sortBy, resolvedParams.sortDir, resolvedParams.page, resolvedParams.q, resolvedParams.page_size);
+  const data = await getNetwatchItems(resolvedParams.sortBy, resolvedParams.sortDir, resolvedParams.page, resolvedParams.q, resolvedParams.page_size);
   return (
     <div>
       <PageHeader
-        title="NetMon / Mikrotik DHCP"
-        description="Daftar lease dhcp-server"
+        title="NetMgmt / Mikrotik Netwatch"
+        description="Mikrotik Host Monitoring"
         // action={<DepartmentFormDialog mode="create" />}
       />
       <Card>
@@ -59,12 +61,12 @@ export default async function  MikrotikDhcpPage({ searchParams }: PageProps ) {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead><SortableHeader columnKey="address" label="IP Address" /></TableHead>
-              <TableHead><SortableHeader columnKey="mac_address" label="MAC Address" /></TableHead>
-              <TableHead><SortableHeader columnKey="server" label="Server" /></TableHead>
-              <TableHead><SortableHeader columnKey="host_name" label="Hostname" /></TableHead>
-              <TableHead><SortableHeader columnKey="last_seen" label="Last Seen" /></TableHead>
-              <TableHead><SortableHeader columnKey="dynamic" label="Dynamic" /></TableHead>
+              <TableHead><SortableHeader columnKey="id" label="id" /></TableHead>
+              <TableHead><SortableHeader columnKey="host" label="Host" /></TableHead>
+              <TableHead><SortableHeader columnKey="status" label="Status" /></TableHead>
+              <TableHead><SortableHeader columnKey="since" label="Since" /></TableHead>
+              <TableHead><SortableHeader columnKey="disabled" label="Disabled?" /></TableHead>
+              <TableHead><SortableHeader columnKey="comment" label="Comment" /></TableHead>
               <TableHead className="text-right">Aksi</TableHead>
             </TableRow>
           </TableHeader>
@@ -72,17 +74,17 @@ export default async function  MikrotikDhcpPage({ searchParams }: PageProps ) {
             {data.results.length === 0 ? (
               <TableRow><TableCell colSpan={7} className="py-8 text-center text-muted-foreground">Tidak ada pool ditemukan.</TableCell></TableRow>
             ) : (
-              data.results.map((dhcp) => (
-                <TableRow key={dhcp['.id']} className="py-1">
-                  <TableCell className="text-muted-foreground">{dhcp.address}</TableCell>
-                  <TableCell className="text-muted-foreground">{dhcp['mac-address'] ?? "-"}</TableCell>
-                  <TableCell className="text-muted-foreground">{dhcp.server ?? "-"}</TableCell>
-                  <TableCell className="text-muted-foreground">{dhcp['host-name'] ?? "-"}</TableCell>
-                  <TableCell className="text-muted-foreground">{dhcp['last-seen'] ?? "-"}</TableCell>
-                  <TableCell className="text-muted-foreground">{dhcp.dynamic ?? "-"}</TableCell>
+              data.results.map((netwatch) => (
+                <TableRow key={netwatch.id} className="py-1">
+                  <TableCell className="text-muted-foreground">{netwatch.id}</TableCell>
+                  <TableCell className="text-muted-foreground">{netwatch.host}</TableCell>
+                  <TableCell className="text-muted-foreground">{netwatch.status ?? "-"}</TableCell>
+                  <TableCell className="text-muted-foreground">{netwatch.since ?? "-"}</TableCell>
+                  <TableCell className="text-muted-foreground">{netwatch.disabled ?? "-"}</TableCell>
+                  <TableCell className="text-muted-foreground">{netwatch.comment ?? "-"}</TableCell>
                   <TableCell>
                     <div className="flex justify-end gap-0.5">
-                      <DhcpActionsMenu hostdata={dhcp}  />
+                      <NetwatchActionsMenu hostdata={netwatch} basepath={BASE_PATH} />
                     </div>
                   </TableCell>
                 </TableRow>
