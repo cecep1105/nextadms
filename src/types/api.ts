@@ -347,3 +347,37 @@ export interface DirectoryGroup {
   // Cuma ADA di Zentyal ('posix'|'distribution') -- undefined utk AD.
   kind?: 'posix' | 'distribution';
 }
+
+// --- Active Directory DNS -- lihat netmgmt/active_directory_dns_view.py & netmgmt/dns_codec.py
+export type DnsZonePartition = 'forest' | 'domain' | 'legacy';
+export type DnsRecordType = 'A' | 'AAAA' | 'CNAME' | 'MX' | 'SRV' | 'TXT' | 'NS' | 'PTR';
+
+export interface DnsZone {
+  dn: string;
+  name: string;
+  partition: DnsZonePartition;
+}
+
+// `data` bentuknya beda per `type` -- lihat netmgmt/dns_codec.py utk field
+// PERSIS per tipe (A/AAAA: address, CNAME/NS/PTR: target, MX: preference+exchange,
+// SRV: priority+weight+port+target, TXT: text).
+export interface DnsRecordData {
+  address?: string;
+  target?: string;
+  preference?: number;
+  exchange?: string;
+  priority?: number;
+  weight?: number;
+  port?: number;
+  text?: string;
+}
+
+export interface DnsRecordRow {
+  node_dn: string;
+  name: string;
+  type: string; // DnsRecordType kalau `editable`, atau "TYPE<n>" kalau tipe asing/belum didukung
+  ttl_seconds: number;
+  data: DnsRecordData;
+  raw_b64: string; // identitas UNIK 1 record spesifik (bisa ada >1 record nama+tipe sama dlm 1 node) -- wajib dikirim balik utk edit/hapus
+  editable: boolean; // false utk tipe yg belum didukung ditulis (mis. SOA) -- tampilkan read-only saja
+}
