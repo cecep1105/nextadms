@@ -410,9 +410,27 @@ export interface MailImapLogEntry {
   ip: string;
 }
 
+// BENTUK RESPONS dipaginasi Django (lihat netmgmt/zentyal_mail_view.py::
+// ZentyalMailQueueView, pakai netmgmt/list_utils.py SAMA spt Mikrotik/AD/
+// Zentyal LDAP) -- next/previous di sini NOMOR HALAMAN (bukan URL string
+// spt Paginated<T> standar DRF), TAPI RouterOSPaginationBar toh tidak
+// baca field ini (hitung sendiri dari count+pageSize).
+//
+// total_count/active_count/deferred_count: dihitung dari SELURUH queue
+// SEBELUM dipaginasi/difilter -- SELALU angka GLOBAL apa pun halaman/
+// pencarian yg sedang aktif (BEDA dari `count`, yang refleksikan HASIL
+// filter/pencarian saat ini) -- dipakai indikator ringkasan di sebelah
+// search bar.
 export interface MailQueueResponse {
-  result: MailQueueItem[];
+  count: number;
+  page: number;
+  results: MailQueueItem[];
+  next: number | null;
+  previous: number | null;
   imaplogs: MailImapLogEntry[];
+  total_count: number;
+  active_count: number;
+  deferred_count: number;
 }
 
 export interface MailTodayLogEntry {

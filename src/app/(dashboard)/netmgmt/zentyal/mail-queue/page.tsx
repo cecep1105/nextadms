@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/table";
 import { apiServerFetch } from "@/lib/api-server";
 import { NetmgmtWsProvider } from "@/lib/netmgmt-ws-context";
-import type { MailQueueResponse, MailQueueItem } from "@/types/api";
+import type { MailQueueResponse } from "@/types/api";
 import { QueueItemActions } from "./_components/queue-item-actions";
 import { DeleteBySenderButton } from "./_components/delete-by-sender-button";
 import { MailQueueLiveRefresher } from "./_components/mail-queue-live-refresher";
@@ -33,24 +33,36 @@ async function getMailQueue(sortBy?: string, sortDir?: string, page?: string, q?
   return apiServerFetch<MailQueueResponse>(`/netmgmt/zentyal-mail/queue/?${params.toString()}`);
 }
 
+/** Indikator ringkas Total/Active/Deferred -- angka GLOBAL (seluruh queue, lihat catatan di types/api.ts::MailQueueResponse), TIDAK berubah walau lagi difilter/pindah halaman. */
+function QueueStatBadges({ total, active, deferred }: { total: number; active: number; deferred: number }) {
+  return (
+    <div className="flex items-center gap-2">
+      <Badge variant="secondary" className="gap-1">Total <span className="font-tabular font-semibold">{total}</span></Badge>
+      <Badge variant="success" className="gap-1">Active <span className="font-tabular font-semibold">{active}</span></Badge>
+      <Badge variant="warning" className="gap-1">Deferred <span className="font-tabular font-semibold">{deferred}</span></Badge>
+    </div>
+  );
+}
+
 export default async function ZentyalMailQueuePage({ searchParams }: PageProps) {
   const sp = await searchParams;
   const pageSize = Number(sp.page_size ?? PAGE_SIZE);
   const data = await getMailQueue(sp.sortBy, sp.sortDir, sp.page, sp.q, sp.page_size);
-  const activeCount = data.results.filter((m) => m.status === "active").length;
-  const deferredCount = data.results.filter((m) => m.status === "deferred").length;
 
   return (
     <NetmgmtWsProvider>
       <div>
         <PageHeader
           title="NetMgmt / Zentyal / Mail Queue"
-          description={`Total ${data.count} pesan di queue (${activeCount} active, ${deferredCount} deferred di halaman ini).`}
+          description="Daftar pesan di mail queue Postfix -- Requeue/Delete per pesan, atau hapus sekaligus per sender."
           action={<DeleteBySenderButton />}
         />
         <Card>
-          <div className="flex items-center justify-between border-b border-border p-3">
-            <RouterOSSearchBar placeholder="Cari Queue ID / sender / recipient" />
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border p-3">
+            <div className="flex flex-wrap items-center gap-3">
+              <RouterOSSearchBar placeholder="Cari Queue ID / sender / recipient" />
+              <QueueStatBadges total={data.total_count} active={data.active_count} deferred={data.deferred_count} />
+            </div>
             <MailQueueLiveRefresher />
           </div>
           <Table>
