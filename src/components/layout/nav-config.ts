@@ -83,6 +83,12 @@ export const navGroups: NavGroup[] = [
       {
         title: "Mail Server (Zentyal)", icon: MailQueueIcon,
         children: [
+          { title: "Mail Queue", href: "/netmgmt/zentyal/mail-queue", icon: MailQueueIcon },
+          { title: "Today's Log", href: "/netmgmt/zentyal/today-log", icon: FileClock },
+          { title: "Transport Map", href: "/netmgmt/zentyal/transport", icon: Route },
+          { title: "Blocked Senders", href: "/netmgmt/zentyal/block-senders", icon: Shield },
+          { title: "IMAP Logs", href: "/netmgmt/zentyal/imap-logs", icon: ScrollText },
+          { title: "SASL Logs", href: "/netmgmt/zentyal/sasl-logs", icon: ScrollText },
           { title: "Users", href: "/netmgmt/zentyal/users", icon: Users },
           { title: "Groups", href: "/netmgmt/zentyal/groups", icon: Users },
         ],

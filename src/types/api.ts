@@ -336,6 +336,8 @@ export interface DirectoryUser {
   // Cuma ADA di AD (lockoutTime decoded) -- TERKUNCI OTOMATIS krn salah
   // password berkali-kali, BEDA dari is_enabled (dinonaktifkan MANUAL).
   is_locked?: boolean;
+  // ISO datetime (UTC) kapan akun terkunci -- null kalau tidak terkunci.
+  locked_at?: string | null;
   // Cuma ADA di Zentyal (posixAccount) -- undefined utk AD.
   uid_number?: string;
   gid_number?: string;
@@ -383,4 +385,81 @@ export interface DnsRecordRow {
   data: DnsRecordData;
   raw_b64: string; // identitas UNIK 1 record spesifik (bisa ada >1 record nama+tipe sama dlm 1 node) -- wajib dikirim balik utk edit/hapus
   editable: boolean; // false utk tipe yg belum didukung ditulis (mis. SOA) -- tampilkan read-only saja
+}
+
+// --- Zentyal Mail API (Flask, Python 2.7, server TERPISAH) -- lihat
+// netmgmt/zentyal_mail_view.py & test/zentyalmail_v2.py. BEDA dari
+// DirectoryUser/DnsZone dkk (itu semua lewat LDAP) -- ini HTTP+JSON
+// polos ke Flask app, TIDAK ada pagination bawaan (Flask kembalikan
+// SEMUA hasil sekaligus), jadi halaman terkait TIDAK pakai
+// RouterOSPaginationBar spt Mikrotik/AD/Zentyal LDAP.
+
+export interface MailQueueItem {
+  id: string;
+  size: string;
+  rawdate: string;
+  sender: string;
+  recipient: string;
+  reason: string;
+  status: "active" | "deferred";
+}
+
+export interface MailImapLogEntry {
+  date: string;
+  email: string;
+  ip: string;
+}
+
+export interface MailQueueResponse {
+  result: MailQueueItem[];
+  imaplogs: MailImapLogEntry[];
+}
+
+export interface MailTodayLogEntry {
+  date: string;
+  qid: string;
+  sender: string;
+  total_recp: string | number;
+  size: string;
+}
+
+export interface MailLogEntry {
+  status: string;
+  client_host_ip: string;
+  from_address: string;
+  relay: string;
+  timestamp: string | null;
+  client_host_name: string;
+  event: string;
+  message_size: string;
+  qid: string;
+  to_address: string;
+  message: string;
+  message_type: string;
+  message_id: string;
+}
+
+export interface MailTransportRow {
+  domain: string;
+  target: string;
+  status: "0" | "1";
+}
+
+export interface MailBlockedSenderRow {
+  email: string;
+  action: string;
+  status: "0" | "1";
+}
+
+export interface MailAuthFailLogEntry {
+  notes: string;
+  date: string;
+  ip: string;
+  email?: string; // cuma ada di ImapLogs, tidak ada di SaslLogs
+  count?: number; // cuma ada di SaslLogs (jumlah percobaan per IP), tidak ada di ImapLogs
+}
+
+export interface MailIpViaEmailRow {
+  user: string;
+  ip: string;
 }

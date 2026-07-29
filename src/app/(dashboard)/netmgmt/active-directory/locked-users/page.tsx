@@ -9,6 +9,7 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import { apiServerFetch } from "@/lib/api-server";
+import { formatRelativeTime } from "@/lib/format-relative-time";
 import type { Paginated, DirectoryUser } from "@/types/api";
 
 const PAGE_SIZE = 20;
@@ -50,12 +51,13 @@ export default async function ActiveDirectoryLockedUsersPage({ searchParams }: P
               <TableHead><RouterOSSortableHeader columnKey="display_name" label="Nama" /></TableHead>
               <TableHead><RouterOSSortableHeader columnKey="email" label="Email" /></TableHead>
               <TableHead>Status</TableHead>
+              <TableHead><RouterOSSortableHeader columnKey="locked_at" label="Terkunci Sejak" /></TableHead>
               <TableHead className="text-right">Aksi</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {data.results.length === 0 ? (
-              <TableRow><TableCell colSpan={5} className="py-8 text-center text-muted-foreground">Tidak ada user yang terkunci saat ini.</TableCell></TableRow>
+              <TableRow><TableCell colSpan={6} className="py-8 text-center text-muted-foreground">Tidak ada user yang terkunci saat ini.</TableCell></TableRow>
             ) : (
               data.results.map((user) => (
                 <TableRow key={user.dn}>
@@ -63,6 +65,7 @@ export default async function ActiveDirectoryLockedUsersPage({ searchParams }: P
                   <TableCell className="font-medium">{user.display_name}</TableCell>
                   <TableCell className="text-muted-foreground">{user.email || "-"}</TableCell>
                   <TableCell><Badge variant="destructive">Terkunci</Badge></TableCell>
+                  <TableCell className="text-muted-foreground" title={user.locked_at ?? ""}>{formatRelativeTime(user.locked_at)}</TableCell>
                   <TableCell>
                     <div className="flex justify-end">
                       <UnlockUserButton userDn={user.dn} userLabel={user.display_name || user.username} />
