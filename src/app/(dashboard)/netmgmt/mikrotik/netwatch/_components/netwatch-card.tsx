@@ -26,7 +26,7 @@ export function NetwatchCard({ item, basePath }: { item: MikrotikNetwatchItem; b
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
           <p className="truncate font-mono text-sm font-semibold">{item.host}</p>
-          {item.comment && <p className="mt-0.5 truncate text-xs text-muted-foreground" title={item.comment}>{item.comment}</p>}
+          {item.comment && <p className="mt-0.5 truncate text-xs text-muted-foreground" title={item.comment}>{item.comment.split('|')[0]?? ''}</p>}
         </div>
         <Badge variant={cfg.variant} className="shrink-0 gap-1">
           <StatusIcon className="h-3 w-3" /> {cfg.label}
@@ -45,7 +45,8 @@ export function NetwatchCard({ item, basePath }: { item: MikrotikNetwatchItem; b
         {item.disabled === "true" && <Badge variant="secondary" className="mt-1">Disabled</Badge>}
       </div>
 
-      <div className="mt-3 flex justify-end border-t border-border pt-2">
+      <div className="mt-3 flex justify-between border-t border-border pt-2">
+        <span className="text-xs">{item.comment?.match(/(SID|CRT|CID|SN):\s*[^|]+?(?=\s*\||$)/)?.[0] || ' '}</span>
         <NetwatchActionsMenu hostdata={item} basepath={basePath} />
       </div>
     </div>
