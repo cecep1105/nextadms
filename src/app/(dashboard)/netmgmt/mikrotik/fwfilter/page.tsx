@@ -4,6 +4,7 @@ import { RouterOSPaginationBar } from "@/components/netmgmt/routeros-pagination-
 import { RouterOSSortableHeader } from "@/components/netmgmt/routeros-sortable-header";
 import { Card } from "@/components/ui/card";
 import { FwFilterActionsMenu } from "./_components/fwfilter-actions-menu";
+import { GrantAccessDialog } from "./_components/grant-access-dialog";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
@@ -39,7 +40,11 @@ export default async function MikrotikFwFilterPage({ searchParams }: PageProps) 
 
   return (
     <div>
-      <PageHeader title="NetMgmt / Mikrotik Firewall Filter" description="Daftar firewall filter" />
+      <PageHeader
+        title="NetMgmt / Mikrotik Firewall Filter"
+        description="Daftar firewall filter"
+        action={<GrantAccessDialog routerHost={ROUTER_IP} />}
+      />
       <Card>
         <div className="flex items-center justify-between border-b border-border p-3">
           <RouterOSSearchBar placeholder="Cari MAC / Comment" />
