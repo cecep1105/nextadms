@@ -11,6 +11,7 @@ const STATUS_CONFIG: Record<string, { label: string; variant: "success" | "destr
   initializing: { label: "Initializing", variant: "secondary", icon: CircleDashed },
 };
 
+
 export function NetwatchCard({ item, basePath }: { item: MikrotikNetwatchItem; basePath: string }) {
   const cfg = STATUS_CONFIG[item.status] ?? STATUS_CONFIG.waiting;
   const StatusIcon = cfg.icon;
