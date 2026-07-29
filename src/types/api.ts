@@ -318,6 +318,8 @@ export interface MikrotikNetwatchItem {
   timeout: string;
   comment?: string;
   disabled: 'true' | 'false';
+  'up-script'?: string;
+  'down-script'?: string;
 }
 
 // --- netmgmt: Active Directory & Zentyal LDAP -- bentuk data KONSISTEN

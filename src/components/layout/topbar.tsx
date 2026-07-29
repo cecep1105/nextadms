@@ -12,6 +12,7 @@ import {
 import { ThemeToggle } from "./theme-toggle";
 import { SidebarContent } from "./sidebar";
 import { InteractiveBreadcrumb } from "./interactive-breadcrumb";
+import { GlobalNetmgmtIndicators } from "./global-netmgmt-indicators";
 
 function initials(name: string) {
   return name
@@ -40,6 +41,8 @@ export function Topbar() {
       </Button>
 
       <InteractiveBreadcrumb />
+
+      <GlobalNetmgmtIndicators />
 
       <ThemeToggle />
 
