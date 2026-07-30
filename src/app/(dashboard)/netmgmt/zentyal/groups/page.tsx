@@ -3,6 +3,7 @@ import { RouterOSSearchBar } from "@/components/netmgmt/routeros-search-bar";
 import { RouterOSPaginationBar } from "@/components/netmgmt/routeros-pagination-bar";
 import { RouterOSSortableHeader } from "@/components/netmgmt/routeros-sortable-header";
 import { ManageMembersButton } from "@/components/netmgmt/manage-members-button";
+import { AddZentyalGroupDialog } from "@/components/netmgmt/add-zentyal-group-dialog";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -46,6 +47,7 @@ export default async function ZentyalGroupsPage({ searchParams }: PageProps) {
             </span>
           </>
         }
+        action={<AddZentyalGroupDialog />}
       />
       <Card>
         <div className="flex items-center justify-between border-b border-border p-3">

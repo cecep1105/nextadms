@@ -3,6 +3,7 @@ import { RouterOSSearchBar } from "@/components/netmgmt/routeros-search-bar";
 import { RouterOSPaginationBar } from "@/components/netmgmt/routeros-pagination-bar";
 import { RouterOSSortableHeader } from "@/components/netmgmt/routeros-sortable-header";
 import { ResetPasswordButton } from "@/components/netmgmt/reset-password-button";
+import { AddZentyalUserDialog } from "@/components/netmgmt/add-zentyal-user-dialog";
 import { Card } from "@/components/ui/card";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
@@ -34,7 +35,7 @@ export default async function ZentyalUsersPage({ searchParams }: PageProps) {
 
   return (
     <div>
-      <PageHeader title="NetMgmt / Zentyal / Users" description="Daftar user mail server Zentyal (LDAP)" />
+      <PageHeader title="NetMgmt / Zentyal / Users" description="Daftar user mail server Zentyal (LDAP)" action={<AddZentyalUserDialog />} />
       <Card>
         <div className="flex items-center justify-between border-b border-border p-3">
           <RouterOSSearchBar placeholder="Cari username / nama / email" />

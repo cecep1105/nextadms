@@ -4,6 +4,7 @@ import { RouterOSPaginationBar } from "@/components/netmgmt/routeros-pagination-
 import { RouterOSSortableHeader } from "@/components/netmgmt/routeros-sortable-header";
 import { ResetPasswordButton } from "@/components/netmgmt/reset-password-button";
 import { ToggleUserStatusButton } from "@/components/netmgmt/toggle-user-status-button";
+import { AddAdUserDialog } from "@/components/netmgmt/add-ad-user-dialog";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -40,7 +41,7 @@ export default async function ActiveDirectoryUsersPage({ searchParams }: PagePro
 
   return (
     <div>
-      <PageHeader title="NetMgmt / Active Directory / Users" description="Daftar user Active Directory" />
+      <PageHeader title="NetMgmt / Active Directory / Users" description="Daftar user Active Directory" action={<AddAdUserDialog />} />
       <Card>
         <div className="flex items-center justify-between border-b border-border p-3">
           <RouterOSSearchBar placeholder="Cari username / nama / email" />

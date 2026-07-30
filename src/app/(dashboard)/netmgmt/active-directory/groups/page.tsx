@@ -3,6 +3,7 @@ import { RouterOSSearchBar } from "@/components/netmgmt/routeros-search-bar";
 import { RouterOSPaginationBar } from "@/components/netmgmt/routeros-pagination-bar";
 import { RouterOSSortableHeader } from "@/components/netmgmt/routeros-sortable-header";
 import { ManageMembersButton } from "@/components/netmgmt/manage-members-button";
+import { AddAdGroupDialog } from "@/components/netmgmt/add-ad-group-dialog";
 import { Card } from "@/components/ui/card";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
@@ -34,7 +35,7 @@ export default async function ActiveDirectoryGroupsPage({ searchParams }: PagePr
 
   return (
     <div>
-      <PageHeader title="NetMgmt / Active Directory / Groups" description="Daftar group Active Directory & kelola keanggotaannya" />
+      <PageHeader title="NetMgmt / Active Directory / Groups" description="Daftar group Active Directory & kelola keanggotaannya" action={<AddAdGroupDialog />} />
       <Card>
         <div className="flex items-center justify-between border-b border-border p-3">
           <RouterOSSearchBar placeholder="Cari nama / deskripsi group" />
