@@ -34,7 +34,25 @@ export interface PaginatedResult<T> {
   previous: number | null;
 }
 
-/** Baca param `_page`/`_limit`/`_sort_by`/`_order`/`_q`/`_search_fields` dari searchParams Next.js (Server Component), dgn default yang wajar -- setara Django::parse_list_params(). */
+/**
+ * ⚠️ KOREKSI PENTING dari versi sebelumnya: fungsi ini SEBELUMNYA baca
+ * param `_q`/`_page`/`_limit`/`_sort_by`/`_order` (meniru konvensi
+ * INTERNAL yang dipakai Django::parse_list_params() saat MEMANGGIL API,
+ * lihat netmgmt/list_utils.py) -- TERNYATA itu BUKAN nama param yang
+ * ditulis komponen UI (RouterOSSearchBar/PaginationBar/SortableHeader/
+ * PageSizeSelect) ke URL BROWSER. Komponen itu pakai nama BEDA:
+ * `q`, `page`, `page_size`, `sortBy`, `sortDir` (TANPA underscore,
+ * camelCase utk sort) -- akibatnya fungsi ini SEBELUMNYA SELALU balik ke
+ * nilai default (klik apa pun di UI tidak berefek, krn param yg
+ * di-baca TIDAK PERNAH match apa yg sungguh ada di URL) -- KETAHUAN
+ * LANGSUNG dari laporan produksi ("search bar cuma loading, tidak
+ * terfilter"), bukan asumsi. Halaman netmgmt LAIN yang datanya lewat
+ * Django TIDAK kena bug ini krn PAGE.TSX-nya (bukan fungsi generik ini)
+ * yang MELAKUKAN TERJEMAHAN param `q`/`page`/dst (dari URL) -> `_q`/
+ * `_page`/dst (ke Django) secara manual -- fungsi INI (dipakai VMware,
+ * TANPA Django di tengah) sekarang baca LANGSUNG nama param URL yg
+ * BENAR, tidak perlu terjemahan krn tidak ada API Django yg dipanggil.
+ */
 export function parseListParams(
   searchParams: Record<string, string | string[] | undefined>,
   defaultSortBy = "name"
@@ -44,11 +62,11 @@ export function parseListParams(
     return Array.isArray(v) ? (v[0] ?? "") : (v ?? "");
   };
   return {
-    page: parseInt(get("_page"), 10) || 1,
-    limit: parseInt(get("_limit"), 10) || 10,
-    sortBy: get("_sort_by") || defaultSortBy,
-    order: get("_order") === "desc" ? "desc" : "asc",
-    searchQuery: get("_q").trim().toLowerCase(),
+    page: parseInt(get("page"), 10) || 1,
+    limit: parseInt(get("page_size"), 10) || 10,
+    sortBy: get("sortBy") || defaultSortBy,
+    order: get("sortDir") === "desc" ? "desc" : "asc",
+    searchQuery: get("q").trim().toLowerCase(),
     searchFields: get("_search_fields").split(",").map((f) => f.trim()).filter(Boolean),
   };
 }
