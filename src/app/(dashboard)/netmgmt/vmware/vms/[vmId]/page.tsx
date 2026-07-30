@@ -8,6 +8,8 @@ import {
 } from "@/components/ui/table";
 import { apiServerFetch } from "@/lib/api-server";
 import type { VmwareVmDetail } from "@/types/api";
+import { RemoteGuestButton } from "./_components/remote-guest-button";
+import { RebootButton } from "./_components/reboot-button";
 
 // PENTING: halaman ini panggil DJANGO (apiServerFetch, SOAP API via
 // pyVmomi -- lihat netmgmt/vmware_view.py), BUKAN vsphere-client.ts
@@ -45,6 +47,12 @@ export default async function VmwareVmDetailPage({ params }: PageProps) {
           <Link href="/netmgmt/vmware/vms" className="inline-flex items-center gap-1 text-primary hover:underline">
             <ArrowLeft className="h-3 w-3" /> Kembali ke Daftar VM
           </Link>
+        }
+        action={
+          <div className="flex items-center gap-2">
+            <RemoteGuestButton vmId={vm.vm} />
+            <RebootButton vmId={vm.vm} />
+          </div>
         }
       />
 
