@@ -483,3 +483,26 @@ export interface MailIpViaEmailRow {
   user: string;
   ip: string;
 }
+
+// --- VMware vSphere (vCenter 7.0 REST API lama, /rest/vcenter/...) --
+// lihat src/lib/vsphere-client.ts & src/app/api/vsphere/[...path]/route.ts.
+// Response asli vCenter dibungkus {"value": [...]} -- SUDAH DIBONGKAR di
+// halaman Server Component (page.tsx), jadi tipe di sini cukup array isinya.
+
+export type VsphereConnectionState = "CONNECTED" | "DISCONNECTED" | "NOT_RESPONDING";
+export type VspherePowerState = "POWERED_ON" | "POWERED_OFF" | "SUSPENDED";
+
+export interface VsphereHost {
+  host: string; // id internal vCenter (mis. "host-21")
+  name: string;
+  connection_state: VsphereConnectionState;
+  power_state: VspherePowerState;
+}
+
+export interface VsphereVm {
+  vm: string; // id internal vCenter (mis. "vm-100")
+  name: string;
+  power_state: VspherePowerState;
+  cpu_count: number;
+  memory_size_MiB: number;
+}
