@@ -2,9 +2,10 @@ import { PageHeader } from "@/components/shared/page-header";
 import { RouterOSSearchBar } from "@/components/netmgmt/routeros-search-bar";
 import { RouterOSPaginationBar } from "@/components/netmgmt/routeros-pagination-bar";
 import { RouterOSSortableHeader } from "@/components/netmgmt/routeros-sortable-header";
-import { ResetPasswordButton } from "@/components/netmgmt/reset-password-button";
+import { ZentyalUserActionsMenu } from "@/components/netmgmt/zentyal-user-actions-menu";
 import { AddZentyalUserDialog } from "@/components/netmgmt/add-zentyal-user-dialog";
 import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
@@ -48,12 +49,13 @@ export default async function ZentyalUsersPage({ searchParams }: PageProps) {
               <TableHead><RouterOSSortableHeader columnKey="email" label="Email" /></TableHead>
               <TableHead><RouterOSSortableHeader columnKey="uid_number" label="UID" /></TableHead>
               <TableHead>Home Directory</TableHead>
+              <TableHead>Status</TableHead>
               <TableHead className="text-right">Aksi</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {data.results.length === 0 ? (
-              <TableRow><TableCell colSpan={6} className="py-8 text-center text-muted-foreground">Tidak ada user ditemukan.</TableCell></TableRow>
+              <TableRow><TableCell colSpan={7} className="py-8 text-center text-muted-foreground">Tidak ada user ditemukan.</TableCell></TableRow>
             ) : (
               data.results.map((user) => (
                 <TableRow key={user.dn}>
@@ -63,8 +65,11 @@ export default async function ZentyalUsersPage({ searchParams }: PageProps) {
                   <TableCell className="font-mono text-muted-foreground">{user.uid_number}</TableCell>
                   <TableCell className="font-mono text-muted-foreground">{user.home_directory || "-"}</TableCell>
                   <TableCell>
+                    {user.is_enabled ? <Badge variant="success">Aktif</Badge> : <Badge variant="destructive">Nonaktif</Badge>}
+                  </TableCell>
+                  <TableCell>
                     <div className="flex justify-end">
-                      <ResetPasswordButton source="zentyal" userDn={user.dn} userLabel={user.display_name || user.username} />
+                      <ZentyalUserActionsMenu userDn={user.dn} userLabel={user.display_name || user.username} isEnabled={user.is_enabled ?? true} />
                     </div>
                   </TableCell>
                 </TableRow>

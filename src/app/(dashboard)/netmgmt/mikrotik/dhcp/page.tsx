@@ -2,28 +2,27 @@ import { PageHeader } from "@/components/shared/page-header";
 import { RouterOSSearchBar } from "@/components/netmgmt/routeros-search-bar";
 import { RouterOSPaginationBar } from "@/components/netmgmt/routeros-pagination-bar";
 import { RouterOSSortableHeader } from "@/components/netmgmt/routeros-sortable-header";
+import { RouterSelector } from "@/components/netmgmt/router-selector";
 import { Card } from "@/components/ui/card";
 import { DhcpActionsMenu } from "./_components/dhcp-actions-menu";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import { apiServerFetch } from "@/lib/api-server";
+import { resolveRouterIp } from "@/lib/resolve-router-ip";
 import type { Paginated, MikrotikDhcpLease } from "@/types/api";
 
 const PAGE_SIZE = 10;
-// Env var SERVER-ONLY (bukan NEXT_PUBLIC_, ini cuma dipakai fetch di
-// Server Component/apiServerFetch, tidak pernah sampai ke browser) --
-// default PERSIS nilai yang sebelumnya hardcode, jadi TIDAK mengubah
-// perilaku existing kalau env var belum diisi. Isi MIKROTIK_DHCP_ROUTER_IP
-// di .env kalau router DHCP-nya beda dari default ini.
-const ROUTER_IP = process.env.MIKROTIK_DHCP_ROUTER_IP || "10.100.202.254";
-const BASE_PATH = `/netmgmt/routeros/${ROUTER_IP}/ip-dhcp_server-lease`;
+// Fallback PALING AKHIR (env var lama) -- dipakai HANYA kalau admin
+// belum set default baru lewat Django Admin (NetmgmtRouterDefault) DAN
+// user belum pilih router lain lewat dropdown -- lihat resolveRouterIp().
+const ENV_FALLBACK_ROUTER_IP = process.env.MIKROTIK_DHCP_ROUTER_IP || "10.100.202.254";
 
 interface PageProps {
-  searchParams: Promise<{ sortBy?: string; sortDir?: string; page?: string; q?: string; page_size?: string }>;
+  searchParams: Promise<{ sortBy?: string; sortDir?: string; page?: string; q?: string; page_size?: string; router?: string }>;
 }
 
-async function getDhcpLease(sortBy?: string, sortDir?: string, page?: string, q?: string, page_size?: string): Promise<Paginated<MikrotikDhcpLease>> {
+async function getDhcpLease(basePath: string, sortBy?: string, sortDir?: string, page?: string, q?: string, page_size?: string): Promise<Paginated<MikrotikDhcpLease>> {
   const queryParams = new URLSearchParams();
   if (sortBy) queryParams.set("_sort_by", sortBy);
   if (sortDir) queryParams.set("_order", sortDir);
@@ -32,20 +31,25 @@ async function getDhcpLease(sortBy?: string, sortDir?: string, page?: string, q?
   if (page_size) queryParams.set("_limit", page_size);
   queryParams.set("_search_fields", "address,mac-address,host-name");
 
-  return apiServerFetch<Paginated<MikrotikDhcpLease>>(`${BASE_PATH}/?${queryParams.toString()}`);
+  return apiServerFetch<Paginated<MikrotikDhcpLease>>(`${basePath}/?${queryParams.toString()}`);
 }
 
 export default async function MikrotikDhcpPage({ searchParams }: PageProps) {
   const resolvedParams = await searchParams;
   const pageSize = Number(resolvedParams.page_size ?? PAGE_SIZE);
-  const data = await getDhcpLease(resolvedParams.sortBy, resolvedParams.sortDir, resolvedParams.page, resolvedParams.q, resolvedParams.page_size);
+
+  const routerIp = await resolveRouterIp("dhcp", resolvedParams.router, ENV_FALLBACK_ROUTER_IP);
+  const basePath = `/netmgmt/routeros/${routerIp}/ip-dhcp_server-lease`;
+
+  const data = await getDhcpLease(basePath, resolvedParams.sortBy, resolvedParams.sortDir, resolvedParams.page, resolvedParams.q, resolvedParams.page_size);
 
   return (
     <div>
       <PageHeader title="NetMgmt / Mikrotik DHCP" description="Daftar lease dhcp-server" />
       <Card>
-        <div className="flex items-center justify-between border-b border-border p-3">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border p-3">
           <RouterOSSearchBar placeholder="Cari IP Address / MAC / Hostname" />
+          <RouterSelector currentRouterIp={routerIp} />
         </div>
         <Table>
           <TableHeader>
@@ -73,7 +77,7 @@ export default async function MikrotikDhcpPage({ searchParams }: PageProps) {
                   <TableCell className="text-muted-foreground">{dhcp.dynamic ?? "-"}</TableCell>
                   <TableCell>
                     <div className="flex justify-end gap-0.5">
-                      <DhcpActionsMenu hostdata={dhcp} basepath={BASE_PATH} />
+                      <DhcpActionsMenu hostdata={dhcp} basepath={basePath} />
                     </div>
                   </TableCell>
                 </TableRow>

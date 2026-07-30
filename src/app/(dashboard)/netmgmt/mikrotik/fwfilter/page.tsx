@@ -2,6 +2,7 @@ import { PageHeader } from "@/components/shared/page-header";
 import { RouterOSSearchBar } from "@/components/netmgmt/routeros-search-bar";
 import { RouterOSPaginationBar } from "@/components/netmgmt/routeros-pagination-bar";
 import { RouterOSSortableHeader } from "@/components/netmgmt/routeros-sortable-header";
+import { RouterSelector } from "@/components/netmgmt/router-selector";
 import { Card } from "@/components/ui/card";
 import { FwFilterActionsMenu } from "./_components/fwfilter-actions-menu";
 import { GrantAccessDialog } from "./_components/grant-access-dialog";
@@ -9,19 +10,19 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import { apiServerFetch } from "@/lib/api-server";
+import { resolveRouterIp } from "@/lib/resolve-router-ip";
 import type { Paginated, MikrotikFirewallFilterRule } from "@/types/api";
 import { cn } from "@/lib/utils";
 
 const PAGE_SIZE = 10;
-// Sama seperti dhcp/page.tsx -- env var server-only, default = nilai lama.
-const ROUTER_IP = process.env.MIKROTIK_FWFILTER_ROUTER_IP || "10.100.202.254";
-const BASE_PATH = `/netmgmt/routeros/${ROUTER_IP}/ip-firewall-filter`;
+// Fallback PALING AKHIR (env var lama) -- lihat catatan sama di dhcp/page.tsx.
+const ENV_FALLBACK_ROUTER_IP = process.env.MIKROTIK_FWFILTER_ROUTER_IP || "10.100.202.254";
 
 interface PageProps {
-  searchParams: Promise<{ sortBy?: string; sortDir?: string; page?: string; q?: string; page_size?: string }>;
+  searchParams: Promise<{ sortBy?: string; sortDir?: string; page?: string; q?: string; page_size?: string; router?: string }>;
 }
 
-async function getFwFilter(sortBy?: string, sortDir?: string, page?: string, q?: string, page_size?: string): Promise<Paginated<MikrotikFirewallFilterRule>> {
+async function getFwFilter(basePath: string, sortBy?: string, sortDir?: string, page?: string, q?: string, page_size?: string): Promise<Paginated<MikrotikFirewallFilterRule>> {
   const queryParams = new URLSearchParams();
   if (sortBy) queryParams.set("_sort_by", sortBy);
   if (sortDir) queryParams.set("_order", sortDir);
@@ -30,24 +31,29 @@ async function getFwFilter(sortBy?: string, sortDir?: string, page?: string, q?:
   if (page_size) queryParams.set("_limit", page_size);
   queryParams.set("_search_fields", "src-mac-address,comment");
 
-  return apiServerFetch<Paginated<MikrotikFirewallFilterRule>>(`${BASE_PATH}/?${queryParams.toString()}`);
+  return apiServerFetch<Paginated<MikrotikFirewallFilterRule>>(`${basePath}/?${queryParams.toString()}`);
 }
 
 export default async function MikrotikFwFilterPage({ searchParams }: PageProps) {
   const resolvedParams = await searchParams;
   const pageSize = Number(resolvedParams.page_size ?? PAGE_SIZE);
-  const data = await getFwFilter(resolvedParams.sortBy, resolvedParams.sortDir, resolvedParams.page, resolvedParams.q, resolvedParams.page_size);
+
+  const routerIp = await resolveRouterIp("fwfilter", resolvedParams.router, ENV_FALLBACK_ROUTER_IP);
+  const basePath = `/netmgmt/routeros/${routerIp}/ip-firewall-filter`;
+
+  const data = await getFwFilter(basePath, resolvedParams.sortBy, resolvedParams.sortDir, resolvedParams.page, resolvedParams.q, resolvedParams.page_size);
 
   return (
     <div>
       <PageHeader
         title="NetMgmt / Mikrotik Firewall Filter"
         description="Daftar firewall filter"
-        action={<GrantAccessDialog routerHost={ROUTER_IP} />}
+        action={<GrantAccessDialog routerHost={routerIp} />}
       />
       <Card>
-        <div className="flex items-center justify-between border-b border-border p-3">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border p-3">
           <RouterOSSearchBar placeholder="Cari MAC / Comment" />
+          <RouterSelector currentRouterIp={routerIp} />
         </div>
         <Table>
           <TableHeader>
@@ -79,7 +85,7 @@ export default async function MikrotikFwFilterPage({ searchParams }: PageProps) 
                   <TableCell className={cn("text-muted-foreground", { "text-destructive": fwfilter["disabled"] === "true" })}>{fwfilter["comment"] ?? "-"}</TableCell>
                   <TableCell>
                     <div className="flex justify-end gap-0.5">
-                      <FwFilterActionsMenu hostdata={fwfilter} basepath={BASE_PATH} />
+                      <FwFilterActionsMenu hostdata={fwfilter} basepath={basePath} />
                     </div>
                   </TableCell>
                 </TableRow>
