@@ -540,3 +540,25 @@ export interface VmwareVmDetail {
   disks: VmwareDisk[];
   datastores: VmwareDatastore[];
 }
+
+// --- Cloudflare DNS -- lihat netmgmt/cloudflare_view.py
+
+export interface CloudflareZone {
+  id: string;
+  name: string;
+  status: string;
+  paused: boolean;
+}
+
+export type CloudflareRecordType = "A" | "AAAA" | "CNAME" | "MX" | "TXT" | "NS";
+
+export interface CloudflareDnsRecord {
+  id: string;
+  type: string;
+  name: string;
+  content: string;
+  ttl: number;
+  proxied: boolean;
+  proxiable: boolean;
+  priority: number | null;
+}

@@ -109,6 +109,7 @@ export const navGroups: NavGroup[] = [
           { title: "VM Guest", href: "/netmgmt/vmware/vms", icon: Monitor },
         ],
       },
+      { title: "Cloudflare DNS", href: "/netmgmt/cloudflare/zones", icon: Globe },
     ],
   },
 ];
