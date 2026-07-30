@@ -1,6 +1,8 @@
+import Link from "next/link";
 import { PageHeader } from "@/components/shared/page-header";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { ChevronRight } from "lucide-react";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
@@ -35,11 +37,12 @@ export default async function VmwareVmsPage() {
               <TableHead>Power State</TableHead>
               <TableHead>CPU</TableHead>
               <TableHead>Memory</TableHead>
+              <TableHead className="text-right">Detail</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {vms.length === 0 ? (
-              <TableRow><TableCell colSpan={4} className="py-8 text-center text-muted-foreground">Tidak ada VM ditemukan.</TableCell></TableRow>
+              <TableRow><TableCell colSpan={5} className="py-8 text-center text-muted-foreground">Tidak ada VM ditemukan.</TableCell></TableRow>
             ) : (
               vms.map((vm) => (
                 <TableRow key={vm.vm}>
@@ -49,6 +52,13 @@ export default async function VmwareVmsPage() {
                   </TableCell>
                   <TableCell className="text-muted-foreground">{vm.cpu_count} vCPU</TableCell>
                   <TableCell className="text-muted-foreground">{formatMemory(vm.memory_size_MiB)}</TableCell>
+                  <TableCell>
+                    <div className="flex justify-end">
+                      <Link href={`/netmgmt/vmware/vms/${vm.vm}`} className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline">
+                        Detail <ChevronRight className="h-3 w-3" />
+                      </Link>
+                    </div>
+                  </TableCell>
                 </TableRow>
               ))
             )}

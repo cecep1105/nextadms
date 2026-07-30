@@ -506,3 +506,37 @@ export interface VsphereVm {
   cpu_count: number;
   memory_size_MiB: number;
 }
+
+// --- Detail per-VM -- BEDA SUMBER dari VsphereVm di atas (yang dari
+// REST API vCenter langsung, dipanggil Next.js). Detail ini dari Django
+// (SOAP API/pyVmomi, lihat netmgmt/vmware_view.py) -- REST API vCenter
+// perlu request TERPISAH per jenis detail (N+1), SOAP PropertyCollector
+// bisa ambil semua field ini dlm 1 round-trip.
+export interface VmwareDisk {
+  label: string;
+  capacity_gb: number;
+  thin_provisioned: boolean | null;
+  datastore_name: string | null;
+}
+
+export interface VmwareDatastore {
+  name: string;
+  type: string;
+  capacity_gb: number;
+  free_space_gb: number;
+}
+
+export interface VmwareVmDetail {
+  vm: string;
+  name: string;
+  power_state: string;
+  guest_full_name: string | null;
+  guest_hostname: string | null;
+  guest_ip_address: string | null;
+  tools_status: string | null;
+  tools_running_status: string | null;
+  num_cpu: number | null;
+  memory_mb: number | null;
+  disks: VmwareDisk[];
+  datastores: VmwareDatastore[];
+}

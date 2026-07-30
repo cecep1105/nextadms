@@ -6,6 +6,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
+import FlashCell  from "@/components/ui/flashcell";
 import { SortableHeader } from "@/components/shared/sortable-header";
 import { useIclockWsMessage, type IclockWsMessage } from "@/lib/iclock-ws-context";
 import type { ActiveDevice, Department } from "@/types/api";
@@ -138,12 +139,16 @@ export function LiveDeviceTable({
                       <span className="text-muted-foreground">Tidak</span>
                     )}
                   </TableCell>
-                  <TableCell className="font-tabular text-muted-foreground">
-                    {device.LastActivity ? new Date(device.LastActivity).toLocaleString("id-ID") : "-"}
-                  </TableCell>
-                  <TableCell className="font-tabular text-muted-foreground">
-                    {device.LastData ? new Date(device.LastData).toLocaleString("id-ID") : "-"}
-                  </TableCell>
+                  <FlashCell
+                    value={device.LastActivity ? new Date(device.LastActivity).toLocaleString("id-ID") : "-"}
+                    className="font-tabular text-muted-foreground"
+                    flashClassName="bg-yellow-100 text-black"
+                  />
+                  <FlashCell
+                    value={device.LastData ? new Date(device.LastData).toLocaleString("id-ID") : "-"}
+                    className="font-tabular text-muted-foreground"
+                    flashClassName="bg-yellow-100 text-black"
+                  />
                   <TableCell>
                     <div className="flex justify-end gap-0.5">
                       <DeviceFormDialog mode="edit" device={device} departments={departments} />
