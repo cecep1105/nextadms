@@ -29,7 +29,10 @@ export function KeyValueEditor({ rows, onChange }: { rows: KeyValueRow[]; onChan
   }
 
   function addRow() {
-    onChange([...rows, { key: "", value: "" }]);
+    if (rows.at(-1)?.key || rows.length === 0) {
+      onChange([...rows, { key: "", value: "" }]);
+    }
+
   }
 
   function toggleReveal(index: number) {
@@ -52,36 +55,40 @@ export function KeyValueEditor({ rows, onChange }: { rows: KeyValueRow[]; onChan
   return (
     <div className="space-y-2">
       <Label>Data (field bebas)</Label>
-      {rows.length === 0 && <p className="text-xs text-muted-foreground">Belum ada field -- klik &quot;Tambah Field&quot; di bawah.</p>}
-      {rows.map((row, i) => {
-        const sensitive = isSensitive(row.key);
-        const isRevealed = revealed.has(i);
-        return (
-          <div key={i} className="flex items-center gap-1.5">
-            <Input
-              value={row.key}
-              onChange={(e) => updateRow(i, { key: e.target.value })}
-              placeholder="nama field, mis. username"
-              className="w-40 font-mono text-xs"
-            />
-            <Input
-              value={row.value}
-              onChange={(e) => updateRow(i, { value: e.target.value })}
-              placeholder="isi"
-              type={sensitive && !isRevealed ? "password" : "text"}
-              className="flex-1 font-mono text-xs"
-            />
-            {sensitive && (
-              <Button type="button" variant="ghost" size="icon" onClick={() => toggleReveal(i)} aria-label="Tampilkan/sembunyikan">
-                {isRevealed ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+      <div className="max-h-40 overflow-y-auto">
+        {rows.length === 0 && <p className="text-xs text-muted-foreground">Belum ada field -- klik &quot;Tambah Field&quot; di bawah.</p>}
+        {rows.map((row, i) => {
+          const sensitive = isSensitive(row.key);
+          const isRevealed = revealed.has(i);
+          return (
+            <div key={i} className="flex items-center gap-1.5">
+              <Input
+                value={row.key}
+                onChange={(e) => updateRow(i, { key: e.target.value })}
+                placeholder="nama field, mis. username"
+                className="w-40 font-mono text-xs"
+              />
+              <Input
+                value={row.value}
+                onChange={(e) => updateRow(i, { value: e.target.value })}
+                placeholder="isi"
+                type={sensitive && !isRevealed ? "password" : "text"}
+                className="flex-1 font-mono text-xs"
+              />
+              {sensitive && (
+                <Button type="button" variant="ghost" size="icon" onClick={() => toggleReveal(i)} aria-label="Tampilkan/sembunyikan">
+                  {isRevealed ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+                </Button>
+              )}
+              <Button type="button" variant="ghost" size="icon" className="text-destructive hover:text-destructive" onClick={() => removeRow(i)} aria-label="Hapus field">
+                <Trash2 className="h-3.5 w-3.5" />
               </Button>
-            )}
-            <Button type="button" variant="ghost" size="icon" className="text-destructive hover:text-destructive" onClick={() => removeRow(i)} aria-label="Hapus field">
-              <Trash2 className="h-3.5 w-3.5" />
-            </Button>
-          </div>
-        );
-      })}
+            </div>
+          );
+        })}
+
+      </div>
+
       <Button type="button" variant="outline" size="sm" onClick={addRow}>
         <Plus className="h-3.5 w-3.5" /> Tambah Field
       </Button>
