@@ -275,6 +275,8 @@ export interface DjangoApiUser {
   // ketahuan saat build gagal di halaman portal -- sudah dikembalikan.
   can_transfer_finger: boolean;
   can_view_attendance_recap: boolean;
+  can_view_attendance_recap_kantin: boolean;
+  can_view_attendance_recap_driver: boolean;
 }
 
 export interface MikrotikDhcpLease {

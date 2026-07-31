@@ -6,10 +6,14 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import { apiServerFetch } from "@/lib/api-server";
+import { auth } from "@/lib/auth";
 import type { AttendanceRecapResponse, Paginated, Department, ActiveDevice } from "@/types/api";
 import { RecapFilterBar } from "./_components/recap-filter-bar";
+import { RecapTypeTabs } from "./_components/recap-type-tabs";
 
 const PAGE_SIZE = 20;
+
+const RECAP_TYPE_LABEL: Record<string, string> = { all: "All", kantin: "Kantin", driver: "Driver" };
 
 function formatTime(iso: string | null): string {
   if (!iso) return "-";
@@ -20,10 +24,37 @@ export default async function AttendanceRecapPage({
   searchParams,
 }: {
   searchParams: {
-    pin?: string; function?: string; pool?: string; device?: string;
+    recap_type?: string; pin?: string; function?: string; pool?: string; device?: string;
     date_from?: string; date_to?: string; page?: string; page_size?: string;
   };
 }) {
+  const session = await auth();
+  const permissions = {
+    can_view_attendance_recap: session?.user?.can_view_attendance_recap ?? false,
+    can_view_attendance_recap_kantin: session?.user?.can_view_attendance_recap_kantin ?? false,
+    can_view_attendance_recap_driver: session?.user?.can_view_attendance_recap_driver ?? false,
+  };
+
+  // Kalau recap_type di URL TIDAK diizinkan (atau tidak diisi), jatuh ke
+  // jenis PERTAMA yang user PUNYA izinnya (urutan prioritas: All -> Kantin
+  // -> Driver) -- BUKAN sekadar default 'all' begitu saja, krn user yang
+  // CUMA diizinkan Kantin/Driver (tanpa 'all') harus tetap dapat tampilan
+  // yang RELEVAN begitu buka halaman ini, bukan layar kosong/ditolak.
+  const requestedType = searchParams.recap_type;
+  const allowedTypes = (["all", "kantin", "driver"] as const).filter((t) => permissions[`can_view_attendance_recap${t === "all" ? "" : `_${t}`}` as keyof typeof permissions]);
+  const recapType = requestedType && allowedTypes.includes(requestedType as "all" | "kantin" | "driver") ? requestedType : (allowedTypes[0] ?? "all");
+
+  if (allowedTypes.length === 0) {
+    return (
+      <div>
+        <PageHeader title="Attendance Recap" description="Anda belum memiliki izin untuk melihat Rekap Absensi jenis apa pun." />
+        <Card className="p-8 text-center text-sm text-muted-foreground">
+          Hubungi admin untuk meminta akses lewat halaman &quot;Kelola Izin User&quot;.
+        </Card>
+      </div>
+    );
+  }
+
   const pageSize = Number(searchParams.page_size ?? PAGE_SIZE);
   const [departmentsData, devicesData] = await Promise.all([
     apiServerFetch<Paginated<Department>>("/iclock/department/?page_size=200"),
@@ -35,13 +66,14 @@ export default async function AttendanceRecapPage({
 
   if (queried) {
     const query = new URLSearchParams({
+      recap_type: recapType,
       date_from: searchParams.date_from!,
       date_to: searchParams.date_to!,
       page: searchParams.page ?? "1",
       page_size: String(pageSize),
     });
     if (searchParams.pin) query.set("pin", searchParams.pin);
-    if (searchParams.function) query.set("function", searchParams.function);
+    if (searchParams.function && recapType === "all") query.set("function", searchParams.function);
     if (searchParams.pool) query.set("pool", searchParams.pool);
     if (searchParams.device) query.set("device", searchParams.device);
     recap = await apiServerFetch<AttendanceRecapResponse>(`/iclock/attendance-recap/?${query.toString()}`);
@@ -50,11 +82,12 @@ export default async function AttendanceRecapPage({
   return (
     <div>
       <PageHeader
-        title="Attendance Recap"
+        title={`Attendance Recap - ${RECAP_TYPE_LABEL[recapType]}`}
         description="Matrix jam check-in pertama & check-out terakhir per hari, per employee. Klik hasil pencarian PIN untuk lihat kartu bulanan lengkap."
       />
 
-      <RecapFilterBar departments={departmentsData.results} devices={devicesData.results} />
+      <RecapTypeTabs current={recapType} permissions={permissions} />
+      <RecapFilterBar departments={departmentsData.results} devices={devicesData.results} recapType={recapType} />
 
       <div className="mt-4">
         {!queried ? (
@@ -114,7 +147,7 @@ export default async function AttendanceRecapPage({
               currentPage={recap!.page}
               basePath="/iclock/attendance-recap"
               searchParams={{
-                pin: searchParams.pin, function: searchParams.function, pool: searchParams.pool,
+                recap_type: recapType, pin: searchParams.pin, function: searchParams.function, pool: searchParams.pool,
                 device: searchParams.device, date_from: searchParams.date_from, date_to: searchParams.date_to,
               }}
             />

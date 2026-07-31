@@ -21,6 +21,8 @@ export interface DjangoUser {
   // & dashboard Django "Kelola Izin User") -- staff/superuser SELALU true.
   can_transfer_finger: boolean;
   can_view_attendance_recap: boolean;
+  can_view_attendance_recap_kantin: boolean;
+  can_view_attendance_recap_driver: boolean;
 }
 
 declare module "next-auth" {

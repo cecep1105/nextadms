@@ -11,6 +11,7 @@ import {
 import { PinAutocomplete } from "./pin-autocomplete";
 import { useDeviceFunctionChoices } from "@/lib/use-device-function-choices";
 import type { Department, ActiveDevice } from "@/types/api";
+import { cn } from "@/lib/utils";
 
 function todayIso() {
   return new Date().toISOString().slice(0, 10);
@@ -22,10 +23,11 @@ function daysAgoIso(n: number) {
 }
 
 export function RecapFilterBar({
-  departments, devices,
+  departments, devices, recapType,
 }: {
   departments: Department[];
   devices: ActiveDevice[];
+  recapType: string;
 }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -42,8 +44,9 @@ export function RecapFilterBar({
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     const params = new URLSearchParams();
+    params.set("recap_type", recapType);
     if (pin) params.set("pin", pin);
-    if (func) params.set("function", func);
+    if (func && recapType === "all") params.set("function", func); // Function code CUMA relevan/dikirim utk "Rekap All" -- utk Kantin/Driver, jenis fungsinya SUDAH ditentukan oleh tab yg dipilih
     if (pool) params.set("pool", pool);
     if (device) params.set("device", device);
     params.set("date_from", dateFrom);
@@ -53,21 +56,23 @@ export function RecapFilterBar({
 
   return (
     <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-3 rounded-lg border border-border bg-card p-3 sm:grid-cols-2 lg:grid-cols-4">
-      <div className="space-y-1.5 lg:col-span-2">
+      <div className={cn("space-y-1.5", recapType === "all" ? "lg:col-span-2" : "lg:col-span-3")}>
         <Label>PIN / Nama</Label>
         <PinAutocomplete value={pin} onChange={setPin} />
       </div>
-      <div className="space-y-1.5">
-        <Label>Function Code</Label>
-        <Select value={func} onValueChange={setFunc}>
-          <SelectTrigger><SelectValue placeholder="Semua Function" /></SelectTrigger>
-          <SelectContent>
-            {functionChoices.map((c) => (
-              <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+      {recapType === "all" && (
+        <div className="space-y-1.5">
+          <Label>Function Code</Label>
+          <Select value={func} onValueChange={setFunc}>
+            <SelectTrigger><SelectValue placeholder="Semua Function" /></SelectTrigger>
+            <SelectContent>
+              {functionChoices.map((c) => (
+                <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      )}
       <div className="space-y-1.5">
         <Label>Pool</Label>
         <Select value={pool} onValueChange={setPool}>
