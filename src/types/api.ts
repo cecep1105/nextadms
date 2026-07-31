@@ -588,3 +588,21 @@ export interface ITInfraEntrySummary {
 export interface ITInfraEntryDetail extends ITInfraEntrySummary {
   data: Record<string, string>;
 }
+
+// --- Mobile Attendance (mclock) -- 5 submenu (Karyawan/Driver/Mitra/
+// Kantin/Kantin Mitra Mobile), 1 API generik -- lihat
+// mclock/mobile_attendance_api_view.py & mclock/sources.py.
+
+export interface MobileAttendanceSource {
+  slug: string;
+  title: string;
+}
+
+export interface MobileAttendanceRow {
+  Id: number;
+  sn: string;
+  nik: string;
+  ttime: string;
+  ctype: string;
+  bProses: number;
+}

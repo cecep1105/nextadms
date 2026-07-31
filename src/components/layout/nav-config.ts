@@ -61,6 +61,7 @@ export const navGroups: NavGroup[] = [
       { title: "Pool Device Function", href: "/mclock/pool-device-functions", icon: ToggleLeft },
       { title: "Log Absensi GPS", href: "/mattendance/logs", icon: Smartphone },
       { title: "Face Profile", href: "/mattendance/face-profiles", icon: ScanFace },
+      { title: "Data Mobile Attendance", href: "/mclock/mobile-attendance", icon: FileClock },
     ],
   },
   {
