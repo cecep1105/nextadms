@@ -608,3 +608,18 @@ export interface MobileAttendanceRow {
   ctype: string;
   bProses: number;
 }
+
+// --- Kelola Izin (Feature Permissions) -- lihat accounts/services.py::
+// FEATURE_PERMISSIONS & api/views.py::UserViewSet.feature_permissions/manage_permissions.
+
+export interface FeaturePermissionItem {
+  codename: string;
+  label: string;
+  granted: boolean;
+}
+
+export interface FeaturePermissionsResponse {
+  user_id: number;
+  username?: string;
+  permissions: FeaturePermissionItem[];
+}

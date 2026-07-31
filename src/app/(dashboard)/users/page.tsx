@@ -14,6 +14,7 @@ import type { UserListPaginated, DjangoApiUser } from "@/types/api";
 import { UserFormDialog } from "./_components/user-form-dialog";
 import { ResetPasswordDialog } from "./_components/reset-password-dialog";
 import { ToggleActiveButton, SetStaffButton } from "./_components/user-actions";
+import { ManagePermissionsDialog } from "./_components/manage-permissions-dialog";
 
 const PAGE_SIZE = 20;
 const BASE_PATH = "/users";
@@ -92,6 +93,7 @@ export default async function UsersPage({
                         userId={u.id} isActive={u.is_active}
                         disabled={isSelf} disabledReason={isSelf ? "Tidak dapat mengubah status akun sendiri" : undefined}
                       />
+                      <ManagePermissionsDialog userId={u.id} username={u.username} isStaff={u.is_staff} />
                       {isSuperuser && (
                         <SetStaffButton
                           userId={u.id} isStaff={u.is_staff}

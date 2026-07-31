@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { UserCircle, KeyRound, Fingerprint, CalendarClock, type LucideIcon } from "lucide-react";
+import { UserCircle, KeyRound, Fingerprint, CalendarClock, UtensilsCrossed, Truck, type LucideIcon } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { apiServerFetch } from "@/lib/api-server";
 import type { DjangoApiUser } from "@/types/api";
@@ -66,10 +66,26 @@ export default async function PortalHomePage() {
         )}
         {user.can_view_attendance_recap && (
           <ActionCard
-            href="/portal/attendance-recap"
+            href="/portal/attendance-recap?recap_type=all"
             icon={CalendarClock}
-            title="Rekap Absensi"
-            description="Lihat rekap kehadiran karyawan per tanggal."
+            title="Rekap Absensi - All"
+            description="Lihat rekap kehadiran seluruh karyawan per tanggal."
+          />
+        )}
+        {user.can_view_attendance_recap_kantin && (
+          <ActionCard
+            href="/portal/attendance-recap?recap_type=kantin"
+            icon={UtensilsCrossed}
+            title="Rekap Absensi - Kantin"
+            description="Rekap kehadiran khusus device/lokasi ber-function KANTIN."
+          />
+        )}
+        {user.can_view_attendance_recap_driver && (
+          <ActionCard
+            href="/portal/attendance-recap?recap_type=driver"
+            icon={Truck}
+            title="Rekap Absensi - Driver"
+            description="Rekap kehadiran khusus karyawan berkode function Driver."
           />
         )}
       </div>

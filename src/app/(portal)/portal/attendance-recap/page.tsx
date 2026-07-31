@@ -7,11 +7,14 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import { apiServerFetch } from "@/lib/api-server";
+import { auth } from "@/lib/auth";
 import type { AttendanceRecapResponse } from "@/types/api";
 import { PortalRecapFilterBar } from "./_components/portal-recap-filter-bar";
+import { PortalRecapTypeTabs } from "./_components/portal-recap-type-tabs";
 
 const PAGE_SIZE = 20;
 const BASE_PATH = "/portal/attendance-recap";
+const RECAP_TYPE_LABEL: Record<string, string> = { all: "All", kantin: "Kantin", driver: "Driver" };
 
 function formatTime(iso: string | null): string {
   if (!iso) return "-";
@@ -21,27 +24,59 @@ function formatTime(iso: string | null): string {
 export default async function PortalAttendanceRecapPage({
   searchParams,
 }: {
-  searchParams: { pin?: string; date_from?: string; date_to?: string; page?: string; page_size?: string };
+  searchParams: { recap_type?: string; pin?: string; pool?: string; device?: string; date_from?: string; date_to?: string; page?: string; page_size?: string };
 }) {
+  const session = await auth();
+  const permissions = {
+    can_view_attendance_recap: session?.user?.can_view_attendance_recap ?? false,
+    can_view_attendance_recap_kantin: session?.user?.can_view_attendance_recap_kantin ?? false,
+    can_view_attendance_recap_driver: session?.user?.can_view_attendance_recap_driver ?? false,
+  };
+
+  const requestedType = searchParams.recap_type;
+  const allowedTypes = (["all", "kantin", "driver"] as const).filter((t) => permissions[`can_view_attendance_recap${t === "all" ? "" : `_${t}`}` as keyof typeof permissions]);
+  const recapType = requestedType && allowedTypes.includes(requestedType as "all" | "kantin" | "driver") ? requestedType : (allowedTypes[0] ?? "all");
+
+  if (allowedTypes.length === 0) {
+    return (
+      <div>
+        <PageHeader
+          title="Rekap Absensi"
+          description={
+            <Link href="/portal" className="inline-flex items-center gap-1 text-primary hover:underline">
+              <ArrowLeft className="h-3 w-3" /> Kembali ke Menu
+            </Link>
+          }
+        />
+        <Card className="p-8 text-center text-sm text-muted-foreground">
+          Anda belum memiliki izin untuk melihat Rekap Absensi. Hubungi admin.
+        </Card>
+      </div>
+    );
+  }
+
   const pageSize = Number(searchParams.page_size ?? PAGE_SIZE);
   const queried = Boolean(searchParams.date_from && searchParams.date_to);
   let recap: AttendanceRecapResponse | null = null;
 
   if (queried) {
     const query = new URLSearchParams({
+      recap_type: recapType,
       date_from: searchParams.date_from!,
       date_to: searchParams.date_to!,
       page: searchParams.page ?? "1",
       page_size: String(pageSize),
     });
     if (searchParams.pin) query.set("pin", searchParams.pin);
+    if (searchParams.pool) query.set("pool", searchParams.pool);
+    if (searchParams.device) query.set("device", searchParams.device);
     recap = await apiServerFetch<AttendanceRecapResponse>(`/iclock/attendance-recap/?${query.toString()}`);
   }
 
   return (
     <div>
       <PageHeader
-        title="Rekap Absensi"
+        title={`Rekap Absensi - ${RECAP_TYPE_LABEL[recapType]}`}
         description={
           <Link href="/portal" className="inline-flex items-center gap-1 text-primary hover:underline">
             <ArrowLeft className="h-3 w-3" /> Kembali ke Menu
@@ -49,7 +84,8 @@ export default async function PortalAttendanceRecapPage({
         }
       />
 
-      <PortalRecapFilterBar />
+      <PortalRecapTypeTabs current={recapType} permissions={permissions} />
+      <PortalRecapFilterBar recapType={recapType} />
 
       <div className="mt-4">
         {!queried ? (
@@ -106,7 +142,7 @@ export default async function PortalAttendanceRecapPage({
               pageSize={pageSize}
               currentPage={recap!.page}
               basePath={BASE_PATH}
-              searchParams={{ pin: searchParams.pin, date_from: searchParams.date_from, date_to: searchParams.date_to }}
+              searchParams={{ recap_type: recapType, pin: searchParams.pin, pool: searchParams.pool, device: searchParams.device, date_from: searchParams.date_from, date_to: searchParams.date_to }}
             />
           </Card>
         )}
