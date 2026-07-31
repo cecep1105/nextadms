@@ -3,7 +3,7 @@ import type { LucideProps } from "lucide-react";
 import {
   LayoutDashboard, Users, Building2, Cpu, ClipboardList, Fingerprint,
   ScrollText, FileClock, Terminal, CalendarClock, MapPinned, Route,
-  ToggleLeft, ScanFace, Smartphone, History, UserCircle, KeyRound, Network, Server, Router, Shield, Globe, Lock, HardDrive, Monitor,
+  ToggleLeft, ScanFace, Smartphone, History, UserCircle, KeyRound, Network, Server, Router, Shield, Globe, Lock, HardDrive, Monitor, Database,
 } from "lucide-react";
 
 import MailQueueIcon from "../icons/mailqueue";
@@ -110,6 +110,7 @@ export const navGroups: NavGroup[] = [
         ],
       },
       { title: "Cloudflare DNS", href: "/netmgmt/cloudflare/zones", icon: Globe },
+      { title: "Data IT-Infra", href: "/netmgmt/itinfra", icon: Database },
     ],
   },
 ];
