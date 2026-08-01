@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { UserCircle, KeyRound, Fingerprint, CalendarClock, UtensilsCrossed, Truck, type LucideIcon } from "lucide-react";
+import { UserCircle, KeyRound, Fingerprint, CalendarClock, UtensilsCrossed, Truck, Router, ShieldCheck, Radar, type LucideIcon } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { apiServerFetch } from "@/lib/api-server";
 import type { DjangoApiUser } from "@/types/api";
@@ -86,6 +86,30 @@ export default async function PortalHomePage() {
             icon={Truck}
             title="Rekap Absensi - Driver"
             description="Rekap kehadiran khusus karyawan berkode function Driver."
+          />
+        )}
+        {user.can_view_dhcp_lease && (
+          <ActionCard
+            href="/portal/dhcp-lease"
+            icon={Router}
+            title="DHCP Lease"
+            description="Lihat daftar IP yang sedang disewa device di jaringan."
+          />
+        )}
+        {user.can_view_fwfilter && (
+          <ActionCard
+            href="/portal/fwfilter"
+            icon={ShieldCheck}
+            title="Firewall Filter"
+            description="Lihat rule firewall & berikan akses internet untuk device baru."
+          />
+        )}
+        {user.can_view_netwatch && (
+          <ActionCard
+            href="/portal/netwatch"
+            icon={Radar}
+            title="Netwatch"
+            description="Pantau status host & kelola host yang dipantau."
           />
         )}
       </div>

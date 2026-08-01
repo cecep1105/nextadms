@@ -290,6 +290,9 @@ export interface DjangoApiUser {
   can_view_attendance_recap: boolean;
   can_view_attendance_recap_kantin: boolean;
   can_view_attendance_recap_driver: boolean;
+  can_view_dhcp_lease: boolean;
+  can_view_fwfilter: boolean;
+  can_view_netwatch: boolean;
 }
 
 export interface MikrotikDhcpLease {
