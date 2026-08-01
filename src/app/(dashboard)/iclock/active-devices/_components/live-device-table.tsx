@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Wifi, WifiOff, Radio } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
@@ -57,6 +57,24 @@ export function LiveDeviceTable({
   search: string;
 }) {
   const [devices, setDevices] = useState(initialDevices);
+
+  // ⚠️ FIX BUG PRODUKSI: `useState(initialDevices)` cuma jalan SEKALI
+  // saat komponen ini pertama mount -- kalau Server Component induk
+  // (page.tsx) re-render dgn `initialDevices` BARU (mis. user
+  // cari/sort -- URL berubah, Next.js re-fetch data server-side; atau
+  // setelah edit device -- DeviceFormDialog panggil router.refresh()),
+  // React TIDAK OTOMATIS re-inisialisasi state ini dari prop baru --
+  // instance komponennya TETAP SAMA (posisinya di tree tidak berubah),
+  // jadi `devices` di state TETAP data LAMA dari mount pertama, PADAHAL
+  // `initialDevices` yang diterima SUDAH baru. Efeknya PERSIS gejala yg
+  // dilaporkan: search/sort seolah "tidak bekerja" (request sebenarnya
+  // BERHASIL, cuma hasilnya tidak pernah ditampilkan), & setelah edit
+  // data harus refresh manual. `useEffect` ini SINKRONKAN ulang state
+  // setiap kali `initialDevices` (referensi array BARU tiap render
+  // Server Component, meski isinya kebetulan sama) berubah.
+  useEffect(() => {
+    setDevices(initialDevices);
+  }, [initialDevices]);
 
   const handleMessage = useCallback((msg: IclockWsMessage) => {
     const sn = msg.message?.sn as string | undefined;
