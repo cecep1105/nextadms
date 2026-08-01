@@ -32,16 +32,31 @@ function daysAgoIso(n: number) {
 }
 
 export function RecapFilterBar({
-  departments, devices, recapType,
+  departments, devices, recapType, permissions,
 }: {
   departments: Department[];
   devices: ActiveDevice[];
   recapType: string;
+  permissions: { can_view_attendance_recap_kantin: boolean; can_view_attendance_recap_driver: boolean };
 }) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const { choices: functionChoices } = useDeviceFunctionChoices();
+
+  // Kode Function KANTIN/DRIVER-* disembunyikan dari dropdown ini kalau
+  // user TIDAK punya izin granular yang sesuai (can_view_attendance_recap_kantin/
+  // _driver) -- MESKI dia punya akses ke tab "All" itu sendiri. Kode LAIN
+  // (KARYAWAN/YAYASAN/BHL/TESTING/dst) SELALU tampil, tidak terkait izin
+  // granular Kantin/Driver sama sekali. Staff/superuser TIDAK PERNAH
+  // kefilter (permissions.can_view_attendance_recap_kantin/_driver SUDAH
+  // otomatis `true` utk mereka, lihat api/serializers.py::UserSerializer).
+  const visibleFunctionChoices = functionChoices.filter((c) => {
+    const desc = c.label.split(" — ")[1] ?? "";
+    if (desc === "KANTIN") return permissions.can_view_attendance_recap_kantin;
+    if (desc.startsWith("DRIVER")) return permissions.can_view_attendance_recap_driver;
+    return true;
+  });
 
   const [pin, setPin] = useState(searchParams.get("pin") ?? "");
   const [func, setFunc] = useState(searchParams.get("function") ?? "");
@@ -76,7 +91,7 @@ export function RecapFilterBar({
             <SelectTrigger><SelectValue placeholder="Semua Function" /></SelectTrigger>
             <SelectContent>
               <SelectItem value={ALL_VALUE}>Semua Function</SelectItem>
-              {functionChoices.map((c) => (
+              {visibleFunctionChoices.map((c) => (
                 <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>
               ))}
             </SelectContent>

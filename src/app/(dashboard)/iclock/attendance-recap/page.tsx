@@ -87,7 +87,7 @@ export default async function AttendanceRecapPage({
       />
 
       <RecapTypeTabs current={recapType} permissions={permissions} />
-      <RecapFilterBar departments={departmentsData.results} devices={devicesData.results} recapType={recapType} />
+      <RecapFilterBar departments={departmentsData.results} devices={devicesData.results} recapType={recapType} permissions={permissions} />
 
       <div className="mt-4">
         {!queried ? (
