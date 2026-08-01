@@ -99,6 +99,8 @@ export function LiveDeviceTable({
             <TableHead>Status</TableHead>
             <TableHead><SortableHeader label="SN" sortKey="SN" currentSort={ordering} basePath={BASE_PATH} searchParams={{ q: search }} /></TableHead>
             <TableHead><SortableHeader label="Alias" sortKey="Alias" currentSort={ordering} basePath={BASE_PATH} searchParams={{ q: search }} /></TableHead>
+            <TableHead><SortableHeader label="Device Name" sortKey="DeviceName" currentSort={ordering} basePath={BASE_PATH} searchParams={{ q: search }} /></TableHead>
+
             <TableHead>Pool</TableHead>
             <TableHead><SortableHeader label="IP Address" sortKey="IPAddress" currentSort={ordering} basePath={BASE_PATH} searchParams={{ q: search }} /></TableHead>
             <TableHead>Push Ver</TableHead>
@@ -129,6 +131,7 @@ export function LiveDeviceTable({
                   </TableCell>
                   <TableCell className="font-mono">{device.SN}</TableCell>
                   <TableCell className="font-medium">{device.Alias}</TableCell>
+                  <TableCell className="font-medium">{device.DeviceName ?? "-"}</TableCell>
                   <TableCell className="text-muted-foreground">{device.DeptName ?? "-"}</TableCell>
                   <TableCell className="font-mono text-muted-foreground">{device.IPAddress ?? "-"}</TableCell>
                   <TableCell className="text-muted-foreground">{device.PushVersion ?? "-"}</TableCell>

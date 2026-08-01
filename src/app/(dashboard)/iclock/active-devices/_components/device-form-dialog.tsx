@@ -18,7 +18,7 @@ import { useDeviceFunctionChoices } from "@/lib/use-device-function-choices";
 import type { ActiveDevice, Department } from "@/types/api";
 
 const emptyForm = {
-  SN: "", Alias: "", DeptID: "", Function: "0", IPAddress: "", MAC: "", TZAdj: "7",
+  SN: "", Alias: "", DeviceName: "", DeptID: "", Function: "0", IPAddress: "", MAC: "", TZAdj: "7",
   ErrorDelay: "60", Delay: "30", TransTimes: "00:00;14:05", TransInterval: "1",
   UpdateDB: "1111111100", Realtime: true, Encrypt: false,
   LogStamp: "", OpLogStamp: "", PhotoStamp: "",
@@ -43,14 +43,14 @@ export function DeviceFormDialog({
     if (!open) return;
     if (mode === "edit" && device) {
       setForm({
-        SN: device.SN, Alias: device.Alias, DeptID: device.DeptID ? String(device.DeptID) : "",
+        SN: device.SN, Alias: device.Alias ?? "", DeviceName: device.DeviceName ?? "", DeptID: device.DeptID ? String(device.DeptID) : "",
         Function: device.Function ?? "0", IPAddress: device.IPAddress ?? "", MAC: device.MAC ?? "",
         TZAdj: device.TZAdj !== null ? String(device.TZAdj) : "7",
         ErrorDelay: String(device.ErrorDelay), Delay: String(device.Delay),
         TransTimes: device.TransTimes ?? "00:00;14:05", TransInterval: String(device.TransInterval),
         UpdateDB: device.UpdateDB, Realtime: device.Realtime, Encrypt: device.Encrypt,
         LogStamp: device.LogStamp ?? "", OpLogStamp: device.OpLogStamp ?? "", PhotoStamp: device.PhotoStamp ?? "",
-      });
+      } as typeof form);
     } else {
       setForm(emptyForm);
     }
@@ -123,9 +123,9 @@ export function DeviceFormDialog({
                 onChange={(e) => setForm((f) => ({ ...f, SN: e.target.value }))} />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="alias">Alias</Label>
-              <Input id="alias" value={form.Alias} required
-                onChange={(e) => setForm((f) => ({ ...f, Alias: e.target.value }))} />
+              <Label htmlFor="devicename">Device Name</Label>
+              <Input id="devicename" value={form.DeviceName} required
+                onChange={(e) => setForm((f) => ({ ...f, DeviceName: e.target.value }))} />
             </div>
           </div>
 

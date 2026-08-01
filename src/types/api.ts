@@ -25,6 +25,7 @@ export interface DeviceLiveUser {
 export interface ActiveDevice {
   SN: string;
   Alias: string;
+  DeviceName: string | null;
   DeptID: number | null;
   DeptName: string | null;
   Function: string | null;
