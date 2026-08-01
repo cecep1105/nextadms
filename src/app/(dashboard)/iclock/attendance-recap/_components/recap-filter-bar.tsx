@@ -13,6 +13,15 @@ import { useDeviceFunctionChoices } from "@/lib/use-device-function-choices";
 import type { Department, ActiveDevice } from "@/types/api";
 import { cn } from "@/lib/utils";
 
+// Radix Select TIDAK MENGIZINKAN SelectItem dgn value="" (dipakai internal
+// utk representasi "belum ada pilihan"/placeholder) -- sentinel value INI
+// dipakai sbg opsi "Semua X" yang BISA DIKLIK utk reset filter balik ke
+// kosong (state React `pool`/`device`/`func` TETAP "" secara internal,
+// cuma Select-nya butuh value NON-KOSONG buat direpresentasikan). Tanpa
+// ini, setelah pilih 1 Pool, TIDAK ADA CARA balik ke "Semua Pool" lagi
+// lewat dropdown (bug yg dilaporkan).
+const ALL_VALUE = "__all__";
+
 function todayIso() {
   return new Date().toISOString().slice(0, 10);
 }
@@ -63,9 +72,10 @@ export function RecapFilterBar({
       {recapType === "all" && (
         <div className="space-y-1.5">
           <Label>Function Code</Label>
-          <Select value={func} onValueChange={setFunc}>
+          <Select value={func || ALL_VALUE} onValueChange={(v) => setFunc(v === ALL_VALUE ? "" : v)}>
             <SelectTrigger><SelectValue placeholder="Semua Function" /></SelectTrigger>
             <SelectContent>
+              <SelectItem value={ALL_VALUE}>Semua Function</SelectItem>
               {functionChoices.map((c) => (
                 <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>
               ))}
@@ -75,9 +85,10 @@ export function RecapFilterBar({
       )}
       <div className="space-y-1.5">
         <Label>Pool</Label>
-        <Select value={pool} onValueChange={setPool}>
+        <Select value={pool || ALL_VALUE} onValueChange={(v) => setPool(v === ALL_VALUE ? "" : v)}>
           <SelectTrigger><SelectValue placeholder="Semua Pool" /></SelectTrigger>
           <SelectContent>
+            <SelectItem value={ALL_VALUE}>Semua Pool</SelectItem>
             {departments.map((d) => (
               <SelectItem key={d.DeptID} value={String(d.DeptID)}>{d.DeptName}</SelectItem>
             ))}
@@ -86,9 +97,10 @@ export function RecapFilterBar({
       </div>
       <div className="space-y-1.5">
         <Label>Device</Label>
-        <Select value={device} onValueChange={setDevice}>
+        <Select value={device || ALL_VALUE} onValueChange={(v) => setDevice(v === ALL_VALUE ? "" : v)}>
           <SelectTrigger><SelectValue placeholder="Semua Device" /></SelectTrigger>
           <SelectContent>
+            <SelectItem value={ALL_VALUE}>Semua Device</SelectItem>
             {devices.map((d) => (
               <SelectItem key={d.SN} value={d.SN}>{d.Alias}</SelectItem>
             ))}

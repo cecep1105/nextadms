@@ -11,6 +11,11 @@ import {
 import { useApiClient } from "@/lib/api-client";
 import type { PoolDeviceChoicesResponse } from "@/types/api";
 
+// Lihat catatan lengkap di recap-filter-bar.tsx (versi staff) -- Radix
+// Select tidak mengizinkan value="", sentinel ini jadi opsi "Semua X"
+// yang bisa diklik utk reset filter.
+const ALL_VALUE = "__all__";
+
 function todayIso() {
   return new Date().toISOString().slice(0, 10);
 }
@@ -80,9 +85,10 @@ export function PortalRecapFilterBar({ recapType }: { recapType: string }) {
       </div>
       <div className="space-y-1.5">
         <Label>Pool</Label>
-        <Select value={pool} onValueChange={(v) => { setPool(v); setDevice(""); }}>
+        <Select value={pool || ALL_VALUE} onValueChange={(v) => { setPool(v === ALL_VALUE ? "" : v); setDevice(""); }}>
           <SelectTrigger><SelectValue placeholder="Semua Pool" /></SelectTrigger>
           <SelectContent>
+            <SelectItem value={ALL_VALUE}>Semua Pool</SelectItem>
             {pools.map((p) => (
               <SelectItem key={p.id} value={String(p.id)}>{p.name}</SelectItem>
             ))}
@@ -91,9 +97,10 @@ export function PortalRecapFilterBar({ recapType }: { recapType: string }) {
       </div>
       <div className="space-y-1.5">
         <Label>Device</Label>
-        <Select value={device} onValueChange={setDevice} disabled={!pool}>
+        <Select value={device || ALL_VALUE} onValueChange={(v) => setDevice(v === ALL_VALUE ? "" : v)} disabled={!pool}>
           <SelectTrigger><SelectValue placeholder={pool ? "Semua Device" : "Pilih Pool dulu"} /></SelectTrigger>
           <SelectContent>
+            <SelectItem value={ALL_VALUE}>Semua Device</SelectItem>
             {devices.map((d) => (
               <SelectItem key={d.sn} value={d.sn}>{d.name}</SelectItem>
             ))}
