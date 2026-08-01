@@ -11,6 +11,7 @@ import { auth } from "@/lib/auth";
 import type { AttendanceRecapResponse } from "@/types/api";
 import { PortalRecapFilterBar } from "./_components/portal-recap-filter-bar";
 import { PortalRecapTypeTabs } from "./_components/portal-recap-type-tabs";
+import { ExportXlsxButton } from "@/components/shared/export-xlsx-button";
 
 const PAGE_SIZE = 20;
 const BASE_PATH = "/portal/attendance-recap";
@@ -83,6 +84,7 @@ export default async function PortalAttendanceRecapPage({
             <ArrowLeft className="h-3 w-3" /> Kembali ke Menu
           </Link>
         }
+        action={queried ? <ExportXlsxButton apiPath="/iclock/attendance-recap/export/" /> : undefined}
       />
 
       <PortalRecapTypeTabs current={recapType} permissions={permissions} />

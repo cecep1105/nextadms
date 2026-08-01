@@ -10,6 +10,7 @@ import { auth } from "@/lib/auth";
 import type { AttendanceRecapResponse, Paginated, Department, ActiveDevice } from "@/types/api";
 import { RecapFilterBar } from "./_components/recap-filter-bar";
 import { RecapTypeTabs } from "./_components/recap-type-tabs";
+import { ExportXlsxButton } from "@/components/shared/export-xlsx-button";
 
 const PAGE_SIZE = 20;
 
@@ -84,6 +85,7 @@ export default async function AttendanceRecapPage({
       <PageHeader
         title={`Attendance Recap - ${RECAP_TYPE_LABEL[recapType]}`}
         description="Matrix jam check-in pertama & check-out terakhir per hari, per employee. Klik hasil pencarian PIN untuk lihat kartu bulanan lengkap."
+        action={queried ? <ExportXlsxButton apiPath="/iclock/attendance-recap/export/" /> : undefined}
       />
 
       <RecapTypeTabs current={recapType} permissions={permissions} />
