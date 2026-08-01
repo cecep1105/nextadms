@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   MoreVertical, Power, Clock, HardDriveDownload, Users, Loader2,
-  Network, Settings2, Fingerprint,
+  Network, Settings2, Fingerprint, ScrollText,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,6 +17,7 @@ import { useApiClient } from "@/lib/api-client";
 import { extractErrorMessage } from "@/lib/error-utils";
 import { BackupFingerprintsDialog } from "./backup-fingerprints-dialog";
 import { LiveUsersDialog } from "./live-users-dialog";
+import { LiveLogsDialog } from "./live-logs-dialog";
 import { NetworkParamsDialog } from "./network-params-dialog";
 import { GenericParamDialog } from "./generic-param-dialog";
 import { DeviceTransferFingerDialog } from "./device-transfer-finger-dialog";
@@ -39,6 +40,7 @@ export function DeviceActionsMenu({
   const [actionResult, setActionResult] = useState<{ success: boolean; message: string } | null>(null);
   const [backupOpen, setBackupOpen] = useState(false);
   const [liveUsersOpen, setLiveUsersOpen] = useState(false);
+  const [liveLogsOpen, setLiveLogsOpen] = useState(false);
   const [networkParamsOpen, setNetworkParamsOpen] = useState(false);
   const [genericParamOpen, setGenericParamOpen] = useState(false);
   const [transferFingerOpen, setTransferFingerOpen] = useState(false);
@@ -88,6 +90,9 @@ export function DeviceActionsMenu({
               <DropdownMenuItem onClick={() => setLiveUsersOpen(true)}>
                 <Users className="h-3.5 w-3.5" /> Lihat Live Users
               </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setLiveLogsOpen(true)}>
+                <ScrollText className="h-3.5 w-3.5" /> Lihat Live Logs
+              </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setBackupOpen(true)}>
                 <HardDriveDownload className="h-3.5 w-3.5" /> Backup Fingerprint
               </DropdownMenuItem>
@@ -135,6 +140,7 @@ export function DeviceActionsMenu({
 
       <BackupFingerprintsDialog sn={sn} alias={alias} open={backupOpen} onOpenChange={setBackupOpen} />
       <LiveUsersDialog sn={sn} alias={alias} open={liveUsersOpen} onOpenChange={setLiveUsersOpen} />
+      <LiveLogsDialog sn={sn} alias={alias} open={liveLogsOpen} onOpenChange={setLiveLogsOpen} />
       <NetworkParamsDialog sn={sn} alias={alias} open={networkParamsOpen} onOpenChange={setNetworkParamsOpen} />
       <GenericParamDialog sn={sn} alias={alias} open={genericParamOpen} onOpenChange={setGenericParamOpen} />
       <DeviceTransferFingerDialog

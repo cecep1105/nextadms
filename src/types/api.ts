@@ -22,6 +22,18 @@ export interface DeviceLiveUser {
   card?: number;
 }
 
+// Log absensi yang MASIH TERSIMPAN DI MEMORI DEVICE (koneksi langsung
+// via pyzk, BEDA dari tabel `transaction` di database) -- lihat
+// iclock/zk_client.py::fetch_device_logs & api_views.py::live_logs.
+export interface DeviceLiveLog {
+  user_id: string;
+  timestamp: string | null;
+  status: number | null;
+  status_label: string;
+  punch: number | null;
+  punch_label: string;
+}
+
 export interface ActiveDevice {
   SN: string;
   Alias: string;
