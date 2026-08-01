@@ -24,7 +24,7 @@ function formatTime(iso: string | null): string {
 export default async function PortalAttendanceRecapPage({
   searchParams,
 }: {
-  searchParams: { recap_type?: string; pin?: string; pool?: string; device?: string; date_from?: string; date_to?: string; page?: string; page_size?: string };
+  searchParams: { recap_type?: string; pin?: string; function?: string; pool?: string; device?: string; date_from?: string; date_to?: string; page?: string; page_size?: string };
 }) {
   const session = await auth();
   const permissions = {
@@ -68,6 +68,7 @@ export default async function PortalAttendanceRecapPage({
       page_size: String(pageSize),
     });
     if (searchParams.pin) query.set("pin", searchParams.pin);
+    if (searchParams.function && recapType === "all") query.set("function", searchParams.function);
     if (searchParams.pool) query.set("pool", searchParams.pool);
     if (searchParams.device) query.set("device", searchParams.device);
     recap = await apiServerFetch<AttendanceRecapResponse>(`/iclock/attendance-recap/?${query.toString()}`);
@@ -85,7 +86,7 @@ export default async function PortalAttendanceRecapPage({
       />
 
       <PortalRecapTypeTabs current={recapType} permissions={permissions} />
-      <PortalRecapFilterBar recapType={recapType} />
+      <PortalRecapFilterBar recapType={recapType} permissions={permissions} />
 
       <div className="mt-4">
         {!queried ? (
@@ -142,7 +143,7 @@ export default async function PortalAttendanceRecapPage({
               pageSize={pageSize}
               currentPage={recap!.page}
               basePath={BASE_PATH}
-              searchParams={{ recap_type: recapType, pin: searchParams.pin, pool: searchParams.pool, device: searchParams.device, date_from: searchParams.date_from, date_to: searchParams.date_to }}
+              searchParams={{ recap_type: recapType, pin: searchParams.pin, function: searchParams.function, pool: searchParams.pool, device: searchParams.device, date_from: searchParams.date_from, date_to: searchParams.date_to }}
             />
           </Card>
         )}

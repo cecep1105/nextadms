@@ -9,6 +9,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { useApiClient } from "@/lib/api-client";
+import { useDeviceFunctionChoices } from "@/lib/use-device-function-choices";
 import type { PoolDeviceChoicesResponse } from "@/types/api";
 
 // Lihat catatan lengkap di recap-filter-bar.tsx (versi staff) -- Radix
@@ -26,22 +27,39 @@ function daysAgoIso(n: number) {
 }
 
 /**
- * Versi portal dari RecapFilterBar (dashboard staff) -- PIN + Pool +
- * Device + rentang tanggal (TANPA Function Code, itu cuma relevan utk
- * "Rekap All" & di portal jenis rekap SUDAH ditentukan lewat tab, lihat
- * PortalRecapTypeTabs). Pool/Device diambil dari endpoint RINGAN &
- * READ-ONLY (/iclock/pool-device-choices/, lihat
- * iclock/api_views.py::PoolDeviceChoicesAPIView) -- BUKAN endpoint
+ * Versi portal dari RecapFilterBar (dashboard staff) -- PIN + Function
+ * (KHUSUS tab "All", lihat catatan di bawah) + Pool + Device + rentang
+ * tanggal. Pool/Device & Function diambil dari endpoint RINGAN &
+ * READ-ONLY (iclock/api_views.py::PoolDeviceChoicesAPIView/
+ * DeviceFunctionChoicesAPIView, KEDUANYA diperluas izin aksesnya utk
+ * non-staff dgn izin recap, BUKAN staff-only lagi) -- BUKAN endpoint
  * Department/ActiveDevice biasa yang staff-only & expose detail
  * device selengkapnya (IP/MAC/dst), tidak cocok utk user portal.
  */
-export function PortalRecapFilterBar({ recapType }: { recapType: string }) {
+export function PortalRecapFilterBar({
+  recapType, permissions,
+}: {
+  recapType: string;
+  permissions: { can_view_attendance_recap_kantin: boolean; can_view_attendance_recap_driver: boolean };
+}) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const { request } = useApiClient();
+  const { choices: functionChoices } = useDeviceFunctionChoices();
+
+  // Kode Function KANTIN/DRIVER-* disembunyikan dari dropdown ini kalau
+  // user TIDAK punya izin granular yang sesuai -- SAMA PERSIS logic dgn
+  // versi staff (recap-filter-bar.tsx), lihat catatan lengkap di sana.
+  const visibleFunctionChoices = functionChoices.filter((c) => {
+    const desc = c.label.split(" — ")[1] ?? "";
+    if (desc === "KANTIN") return permissions.can_view_attendance_recap_kantin;
+    if (desc.startsWith("DRIVER")) return permissions.can_view_attendance_recap_driver;
+    return true;
+  });
 
   const [pin, setPin] = useState(searchParams.get("pin") ?? "");
+  const [func, setFunc] = useState(searchParams.get("function") ?? "");
   const [pool, setPool] = useState(searchParams.get("pool") ?? "");
   const [device, setDevice] = useState(searchParams.get("device") ?? "");
   const [dateFrom, setDateFrom] = useState(searchParams.get("date_from") ?? daysAgoIso(6));
@@ -70,6 +88,7 @@ export function PortalRecapFilterBar({ recapType }: { recapType: string }) {
     const params = new URLSearchParams();
     params.set("recap_type", recapType);
     if (pin) params.set("pin", pin);
+    if (func && recapType === "all") params.set("function", func); // Function CUMA relevan/dikirim utk "Rekap All" -- sama pola dgn versi staff
     if (pool) params.set("pool", pool);
     if (device) params.set("device", device);
     params.set("date_from", dateFrom);
@@ -78,11 +97,25 @@ export function PortalRecapFilterBar({ recapType }: { recapType: string }) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-3 rounded-lg border border-border bg-card p-3 sm:grid-cols-2 lg:grid-cols-5">
+    <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-3 rounded-lg border border-border bg-card p-3 sm:grid-cols-2 lg:grid-cols-6">
       <div className="space-y-1.5 lg:col-span-2">
         <Label>PIN / Nama</Label>
         <Input value={pin} onChange={(e) => setPin(e.target.value)} placeholder="Kosongkan utk semua" />
       </div>
+      {recapType === "all" && (
+        <div className="space-y-1.5">
+          <Label>Function Code</Label>
+          <Select value={func || ALL_VALUE} onValueChange={(v) => setFunc(v === ALL_VALUE ? "" : v)}>
+            <SelectTrigger><SelectValue placeholder="Semua Function" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value={ALL_VALUE}>Semua Function</SelectItem>
+              {visibleFunctionChoices.map((c) => (
+                <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      )}
       <div className="space-y-1.5">
         <Label>Pool</Label>
         <Select value={pool || ALL_VALUE} onValueChange={(v) => { setPool(v === ALL_VALUE ? "" : v); setDevice(""); }}>
@@ -117,7 +150,7 @@ export function PortalRecapFilterBar({ recapType }: { recapType: string }) {
           <Input type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} />
         </div>
       </div>
-      <div className="flex items-end lg:col-span-5">
+      <div className="flex items-end lg:col-span-6">
         <Button type="submit" size="sm">
           <Search className="h-3.5 w-3.5" /> Terapkan Filter
         </Button>
