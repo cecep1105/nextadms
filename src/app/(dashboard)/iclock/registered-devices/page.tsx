@@ -49,7 +49,8 @@ export default async function RegisteredDevicesPage({
               <TableHead><SortableHeader label="SN" sortKey="SN" currentSort={ordering} basePath={BASE_PATH} searchParams={{ q: search }} /></TableHead>
               <TableHead>Alias</TableHead>
               <TableHead><SortableHeader label="Nama Device" sortKey="DeviceName" currentSort={ordering} basePath={BASE_PATH} searchParams={{ q: search }} /></TableHead>
-              <TableHead>Pool</TableHead>
+              <TableHead><SortableHeader label="Pool" sortKey="DeptID" currentSort={ordering} basePath={BASE_PATH} searchParams={{ q: search }} /></TableHead>
+              {/* <TableHead>Pool</TableHead> */}
               <TableHead>IP Address</TableHead>
               <TableHead><SortableHeader label="Last Activity" sortKey="LastActivity" currentSort={ordering} basePath={BASE_PATH} searchParams={{ q: search }} /></TableHead>
               <TableHead className="text-right">Aksi</TableHead>

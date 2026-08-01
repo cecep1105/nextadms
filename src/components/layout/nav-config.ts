@@ -70,7 +70,7 @@ export const navGroups: NavGroup[] = [
     // masing2 (Mikrotik/Mail Server/Active Directory) jadi SUB-MENU
     // bertingkat DI DALAMNYA (item tanpa href, py children -- lihat
     // NavItem.children di atas).
-    label: "Network Management",
+    label: "Infrastructure Management",
     icon: Router,
     items: [
       {

@@ -12,6 +12,7 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
 } from "@/components/ui/dialog";
 import { useApiClient, ApiError } from "@/lib/api-client";
+import { useDeviceFunctionChoices } from "@/lib/use-device-function-choices";
 import type { RegisteredDevice, Department } from "@/types/api";
 
 export function RegisteredDeviceFormDialog({
@@ -22,6 +23,7 @@ export function RegisteredDeviceFormDialog({
 }) {
   const router = useRouter();
   const { request } = useApiClient();
+  const { choices: functionChoices } = useDeviceFunctionChoices();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -111,8 +113,14 @@ export function RegisteredDeviceFormDialog({
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="function">Function Code</Label>
-              <Input id="function" value={form.Function}
-                onChange={(e) => setForm((f) => ({ ...f, Function: e.target.value }))} />
+              <Select value={form.Function} onValueChange={(v) => setForm((f) => ({ ...f, Function: v }))}>
+                <SelectTrigger id="function"><SelectValue placeholder="Pilih function" /></SelectTrigger>
+                <SelectContent>
+                  {functionChoices.map((c) => (
+                    <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
           <div className="space-y-1.5">
