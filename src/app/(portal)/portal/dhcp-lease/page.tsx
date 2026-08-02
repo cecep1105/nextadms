@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
+import { RouterSelector } from "@/components/netmgmt/router-selector";
 import { RouterOSSearchBar } from "@/components/netmgmt/routeros-search-bar";
 import { RouterOSPaginationBar } from "@/components/netmgmt/routeros-pagination-bar";
 import { RouterOSSortableHeader } from "@/components/netmgmt/routeros-sortable-header";
@@ -15,25 +16,24 @@ import type { Paginated, MikrotikDhcpLease } from "@/types/api";
 export const dynamic = "force-dynamic";
 const PAGE_SIZE = 10;
 
-
-
-async function getDhcpLease(sortBy?: string, sortDir?: string, page?: string, q?: string, page_size?: string): Promise<Paginated<MikrotikDhcpLease>> {
+async function getDhcpLease(router?: string, sortBy?: string, sortDir?: string, page?: string, q?: string, page_size?: string): Promise<Paginated<MikrotikDhcpLease> & { router_ip: string }> {
   const params = new URLSearchParams();
+  if (router) params.set("router", router);
   if (sortBy) params.set("_sort_by", sortBy);
   if (sortDir) params.set("_order", sortDir);
   if (q) params.set("_q", q);
   if (page) params.set("_page", page);
   if (page_size) params.set("_limit", page_size);
-  return apiServerFetch<Paginated<MikrotikDhcpLease>>(`/netmgmt/portal/dhcp-lease/?${params.toString()}`);
+  return apiServerFetch<Paginated<MikrotikDhcpLease> & { router_ip: string }>(`/netmgmt/portal/dhcp-lease/?${params.toString()}`);
 }
 
 export default async function PortalDhcpLeasePage({
   searchParams,
 }: {
-  searchParams: { sortBy?: string; sortDir?: string; page?: string; q?: string; page_size?: string };
+  searchParams: { router?: string; sortBy?: string; sortDir?: string; page?: string; q?: string; page_size?: string };
 }) {
   const pageSize = Number(searchParams.page_size ?? PAGE_SIZE);
-  const data = await getDhcpLease(searchParams.sortBy, searchParams.sortDir, searchParams.page, searchParams.q, searchParams.page_size);
+  const data = await getDhcpLease(searchParams.router, searchParams.sortBy, searchParams.sortDir, searchParams.page, searchParams.q, searchParams.page_size);
 
   return (
     <div>
@@ -44,11 +44,11 @@ export default async function PortalDhcpLeasePage({
             <ArrowLeft className="h-3 w-3" /> Kembali ke Menu
           </Link>
         }
-
       />
       <Card>
-        <div className="border-b border-border p-3">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border p-3">
           <RouterOSSearchBar placeholder="Cari IP Address / MAC / Hostname" />
+          <RouterSelector currentRouterIp={data.router_ip} />
         </div>
         <Table>
           <TableHeader>
