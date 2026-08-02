@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
+import { RouterSelector } from "@/components/netmgmt/router-selector";
 import { RouterOSSearchBar } from "@/components/netmgmt/routeros-search-bar";
 import { RouterOSPaginationBar } from "@/components/netmgmt/routeros-pagination-bar";
 import { RouterOSSortableHeader } from "@/components/netmgmt/routeros-sortable-header";
@@ -15,22 +16,28 @@ import { cn } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 const PAGE_SIZE = 10;
+const ENV_FALLBACK_ROUTER_IP = process.env.MIKROTIK_FWFILTER_ROUTER_IP || "10.100.202.254";
 
 async function getFwFilter(sortBy?: string, sortDir?: string, page?: string, q?: string, page_size?: string): Promise<Paginated<MikrotikFirewallFilterRule> & { router_ip: string }> {
   const params = new URLSearchParams();
+
+  params.set("router_ip", "src-mac-address,comment");
   if (sortBy) params.set("_sort_by", sortBy);
   if (sortDir) params.set("_order", sortDir);
   if (q) params.set("_q", q);
   if (page) params.set("_page", page);
   if (page_size) params.set("_limit", page_size);
   return apiServerFetch<Paginated<MikrotikFirewallFilterRule> & { router_ip: string }>(`/netmgmt/portal/fwfilter/?${params.toString()}`);
+
 }
 
 export default async function PortalFwFilterPage({
   searchParams,
 }: {
-  searchParams: { sortBy?: string; sortDir?: string; page?: string; q?: string; page_size?: string };
+  searchParams: { sortBy?: string; sortDir?: string; page?: string; q?: string; page_size?: string};
 }) {
+
+
   const pageSize = Number(searchParams.page_size ?? PAGE_SIZE);
   const data = await getFwFilter(searchParams.sortBy, searchParams.sortDir, searchParams.page, searchParams.q, searchParams.page_size);
 
@@ -46,8 +53,9 @@ export default async function PortalFwFilterPage({
         action={<PortalGrantAccessDialog routerHost={data.router_ip} />}
       />
       <Card>
-        <div className="border-b border-border p-3">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border p-3">
           <RouterOSSearchBar placeholder="Cari MAC / Comment" />
+          <RouterSelector currentRouterIp={data.router_ip} />
         </div>
         <Table>
           <TableHeader>
