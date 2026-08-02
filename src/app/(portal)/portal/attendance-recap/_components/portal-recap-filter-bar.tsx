@@ -98,12 +98,12 @@ export function PortalRecapFilterBar({
 
   return (
     <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-3 rounded-lg border border-border bg-card p-3 sm:grid-cols-2 lg:grid-cols-6">
-      <div className="space-y-1.5 lg:col-span-2">
+      <div className="space-y-1.5 lg:col-span-1.5">
         <Label>PIN / Nama</Label>
-        <Input value={pin} onChange={(e) => setPin(e.target.value)} placeholder="Kosongkan utk semua" />
+        <Input value={pin} onChange={(e) => setPin(e.target.value)} placeholder="Semua PIN" />
       </div>
       {recapType === "all" && (
-        <div className="space-y-1.5">
+        <div className="space-y-1.5 lg:col-span-1.5">
           <Label>Function Code</Label>
           <Select value={func || ALL_VALUE} onValueChange={(v) => setFunc(v === ALL_VALUE ? "" : v)}>
             <SelectTrigger><SelectValue placeholder="Semua Function" /></SelectTrigger>
@@ -140,7 +140,7 @@ export function PortalRecapFilterBar({
           </SelectContent>
         </Select>
       </div>
-      <div className="grid grid-cols-2 gap-2">
+      <div className="grid grid-cols-2 gap-2 lg:col-span-2">
         <div className="space-y-1.5">
           <Label>Dari</Label>
           <Input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} />

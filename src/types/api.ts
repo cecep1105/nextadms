@@ -301,6 +301,7 @@ export interface DjangoApiUser {
   can_view_zentyal_groups: boolean;
   can_view_cloudflare: boolean;
   can_view_itinfra: boolean;
+  has_employee_link: boolean;
 }
 
 export interface MikrotikDhcpLease {

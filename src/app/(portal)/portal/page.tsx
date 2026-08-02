@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { UserCircle, KeyRound, Fingerprint, CalendarClock, UtensilsCrossed, Truck, Router, ShieldCheck, Radar, Users, LockKeyhole, Globe, UsersRound, Mail, Database, type LucideIcon } from "lucide-react";
+import { UserCircle, KeyRound, Fingerprint, CalendarClock, UtensilsCrossed, Truck, Router, ShieldCheck, Radar, Users, LockKeyhole, Globe, UsersRound, Mail, Database, CalendarDays, type LucideIcon } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { apiServerFetch } from "@/lib/api-server";
 import type { DjangoApiUser } from "@/types/api";
@@ -44,6 +44,14 @@ export default async function PortalHomePage() {
       </div>
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+        {user.has_employee_link && (
+          <ActionCard
+            href="/portal/my-attendance"
+            icon={CalendarDays}
+            title="My Attendance"
+            description="Lihat riwayat absensi Anda sendiri, per bulan."
+          />
+        )}
         <ActionCard
           href="/portal/profile"
           icon={UserCircle}
