@@ -16,30 +16,34 @@ import { cn } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 const PAGE_SIZE = 10;
-const ENV_FALLBACK_ROUTER_IP = process.env.MIKROTIK_FWFILTER_ROUTER_IP || "10.100.202.254";
 
-async function getFwFilter(sortBy?: string, sortDir?: string, page?: string, q?: string, page_size?: string): Promise<Paginated<MikrotikFirewallFilterRule> & { router_ip: string }> {
+async function getFwFilter(router?: string, sortBy?: string, sortDir?: string, page?: string, q?: string, page_size?: string): Promise<Paginated<MikrotikFirewallFilterRule> & { router_ip: string }> {
   const params = new URLSearchParams();
-
-  params.set("router_ip", "src-mac-address,comment");
+  // ⚠️ KOREKSI: SEBELUMNYA baris ini salah tulis `params.set("router_ip",
+  // "src-mac-address,comment")` -- itu sisa eksperimen yang KELIRU
+  // (isinya malah daftar search field, BUKAN IP router), akibatnya
+  // pilihan dropdown RouterSelector TIDAK PERNAH sungguh dikirim ke
+  // backend (searchParams.router bahkan tidak dibaca sama sekali) --
+  // dropdown-nya TAMPIL tapi TIDAK ADA EFEKNYA. Sekarang param `router`
+  // diteruskan dgn BENAR ke ?router= (dibaca netmgmt/portal_views.py::
+  // _resolve_router_ip sbg prioritas TERTINGGI, di atas default
+  // NetmgmtRouterDefault/env fallback).
+  if (router) params.set("router", router);
   if (sortBy) params.set("_sort_by", sortBy);
   if (sortDir) params.set("_order", sortDir);
   if (q) params.set("_q", q);
   if (page) params.set("_page", page);
   if (page_size) params.set("_limit", page_size);
   return apiServerFetch<Paginated<MikrotikFirewallFilterRule> & { router_ip: string }>(`/netmgmt/portal/fwfilter/?${params.toString()}`);
-
 }
 
 export default async function PortalFwFilterPage({
   searchParams,
 }: {
-  searchParams: { sortBy?: string; sortDir?: string; page?: string; q?: string; page_size?: string};
+  searchParams: { router?: string; sortBy?: string; sortDir?: string; page?: string; q?: string; page_size?: string };
 }) {
-
-
   const pageSize = Number(searchParams.page_size ?? PAGE_SIZE);
-  const data = await getFwFilter(searchParams.sortBy, searchParams.sortDir, searchParams.page, searchParams.q, searchParams.page_size);
+  const data = await getFwFilter(searchParams.router, searchParams.sortBy, searchParams.sortDir, searchParams.page, searchParams.q, searchParams.page_size);
 
   return (
     <div>
