@@ -71,7 +71,7 @@ export default async function ActiveDirectoryUsersPage({ searchParams }: PagePro
                   </TableCell>
                   <TableCell>
                     <div className="flex justify-end">
-                      <ToggleUserStatusButton userDn={user.dn} userLabel={user.display_name || user.username} isEnabled={user.is_enabled ?? true} />
+                      <ToggleUserStatusButton source="ad" userDn={user.dn} userLabel={user.display_name || user.username} isEnabled={user.is_enabled ?? true} />
                       <ResetPasswordButton source="ad" userDn={user.dn} userLabel={user.display_name || user.username} />
                     </div>
                   </TableCell>

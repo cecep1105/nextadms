@@ -10,14 +10,20 @@ import { useApiClient } from "@/lib/api-client";
 import { extractErrorMessage } from "@/lib/error-utils";
 
 /**
- * Toggle enable/disable akun AD -- BEDA dari "unlock" (lihat
- * unlock-user-button.tsx di halaman Locked Users): ini status yang
- * diubah MANUAL oleh admin (nonaktifkan/aktifkan akun), bukan status
- * lockout OTOMATIS krn salah password berkali-kali.
+ * Toggle enable/disable akun -- BEDA dari "unlock" (lihat
+ * unlock-user-button.tsx di halaman Locked Users, KHUSUS AD): ini
+ * status yang diubah MANUAL oleh admin (nonaktifkan/aktifkan akun),
+ * bukan status lockout OTOMATIS krn salah password berkali-kali.
+ *
+ * `source` menentukan endpoint yang dipanggil -- SAMA pola dgn
+ * ResetPasswordButton (dipakai bareng AD & Zentyal, PERILAKU beda di
+ * backend: AD pakai bit userAccountControl, Zentyal pakai prefix '!'
+ * di userPassword -- lihat masing2 view utk detail).
  */
 export function ToggleUserStatusButton({
-  userDn, userLabel, isEnabled,
+  source, userDn, userLabel, isEnabled,
 }: {
+  source: "ad" | "zentyal";
   userDn: string;
   userLabel: string;
   isEnabled: boolean;
@@ -29,12 +35,13 @@ export function ToggleUserStatusButton({
   const [error, setError] = useState<string | null>(null);
 
   const action = isEnabled ? "disable" : "enable";
+  const endpoint = source === "ad" ? "/netmgmt/ad/users/toggle-status/" : "/netmgmt/zentyal/users/toggle-status/";
 
   async function handleConfirm() {
     setLoading(true);
     setError(null);
     try {
-      await request("/netmgmt/ad/users/toggle-status/", {
+      await request(endpoint, {
         method: "POST",
         body: JSON.stringify({ user_dn: userDn, action }),
       });

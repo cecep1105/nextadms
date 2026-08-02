@@ -297,6 +297,8 @@ export interface DjangoApiUser {
   can_view_ad_locked_users: boolean;
   can_view_ad_dns: boolean;
   can_view_ad_groups: boolean;
+  can_view_zentyal_users: boolean;
+  can_view_zentyal_groups: boolean;
 }
 
 export interface MikrotikDhcpLease {

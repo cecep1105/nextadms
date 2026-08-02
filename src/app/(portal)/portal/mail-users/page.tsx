@@ -14,14 +14,16 @@ import {
 import { apiServerFetch } from "@/lib/api-server";
 import type { Paginated, DirectoryUser } from "@/types/api";
 
-// TIDAK ada AddAdUserDialog di sini (SENGAJA, beda dari halaman staff) --
-// membuat user AD baru sengaja dikecualikan dari cakupan izin portal
-// can_view_ad_users (lihat netmgmt/active_directory_view.py::ADUserCreateView,
+// TIDAK ada AddZentyalUserDialog / tombol Hapus di sini (SENGAJA, beda
+// dari halaman staff yang pakai ZentyalUserActionsMenu -- menu itu ADA
+// opsi Hapus) -- tambah user baru & hapus user SENGAJA dikecualikan
+// dari cakupan izin portal can_view_zentyal_users (lihat
+// netmgmt/zentyal_view.py::ZentyalUserCreateView/ZentyalUserDeleteView,
 // permission-nya TETAP staff-only, TIDAK diperluas).
 export const dynamic = "force-dynamic";
 const PAGE_SIZE = 20;
 
-async function getAdUsers(sortBy?: string, sortDir?: string, page?: string, q?: string, page_size?: string): Promise<Paginated<DirectoryUser>> {
+async function getZentyalUsers(sortBy?: string, sortDir?: string, page?: string, q?: string, page_size?: string): Promise<Paginated<DirectoryUser>> {
   const params = new URLSearchParams();
   if (sortBy) params.set("_sort_by", sortBy);
   if (sortDir) params.set("_order", sortDir);
@@ -29,21 +31,21 @@ async function getAdUsers(sortBy?: string, sortDir?: string, page?: string, q?: 
   if (page) params.set("_page", page);
   if (page_size) params.set("_limit", page_size);
   params.set("_search_fields", "username,display_name,email");
-  return apiServerFetch<Paginated<DirectoryUser>>(`/netmgmt/ad/users/?${params.toString()}`);
+  return apiServerFetch<Paginated<DirectoryUser>>(`/netmgmt/zentyal/users/?${params.toString()}`);
 }
 
-export default async function PortalAdUsersPage({
+export default async function PortalMailUsersPage({
   searchParams,
 }: {
   searchParams: { sortBy?: string; sortDir?: string; page?: string; q?: string; page_size?: string };
 }) {
   const pageSize = Number(searchParams.page_size ?? PAGE_SIZE);
-  const data = await getAdUsers(searchParams.sortBy, searchParams.sortDir, searchParams.page, searchParams.q, searchParams.page_size);
+  const data = await getZentyalUsers(searchParams.sortBy, searchParams.sortDir, searchParams.page, searchParams.q, searchParams.page_size);
 
   return (
     <div>
       <PageHeader
-        title="Active Directory - Users"
+        title="Mail Server - Users"
         description={
           <Link href="/portal" className="inline-flex items-center gap-1 text-primary hover:underline">
             <ArrowLeft className="h-3 w-3" /> Kembali ke Menu
@@ -78,8 +80,8 @@ export default async function PortalAdUsersPage({
                   </TableCell>
                   <TableCell>
                     <div className="flex justify-end">
-                      <ToggleUserStatusButton source="ad" userDn={user.dn} userLabel={user.display_name || user.username} isEnabled={user.is_enabled ?? true} />
-                      <ResetPasswordButton source="ad" userDn={user.dn} userLabel={user.display_name || user.username} />
+                      <ToggleUserStatusButton source="zentyal" userDn={user.dn} userLabel={user.display_name || user.username} isEnabled={user.is_enabled ?? true} />
+                      <ResetPasswordButton source="zentyal" userDn={user.dn} userLabel={user.display_name || user.username} />
                     </div>
                   </TableCell>
                 </TableRow>

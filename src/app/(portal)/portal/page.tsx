@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { UserCircle, KeyRound, Fingerprint, CalendarClock, UtensilsCrossed, Truck, Router, ShieldCheck, Radar, Users, LockKeyhole, Globe, UsersRound, type LucideIcon } from "lucide-react";
+import { UserCircle, KeyRound, Fingerprint, CalendarClock, UtensilsCrossed, Truck, Router, ShieldCheck, Radar, Users, LockKeyhole, Globe, UsersRound, Mail, type LucideIcon } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { apiServerFetch } from "@/lib/api-server";
 import type { DjangoApiUser } from "@/types/api";
@@ -142,6 +142,22 @@ export default async function PortalHomePage() {
             icon={UsersRound}
             title="Active Directory - Groups"
             description="Lihat daftar group & jumlah anggotanya."
+          />
+        )}
+        {user.can_view_zentyal_users && (
+          <ActionCard
+            href="/portal/mail-users"
+            icon={Mail}
+            title="Mail Server - Users"
+            description="Lihat daftar user email, aktif/nonaktifkan akun, reset password."
+          />
+        )}
+        {user.can_view_zentyal_groups && (
+          <ActionCard
+            href="/portal/mail-groups"
+            icon={UsersRound}
+            title="Mail Server - Groups"
+            description="Lihat daftar group email & jumlah anggotanya."
           />
         )}
       </div>
