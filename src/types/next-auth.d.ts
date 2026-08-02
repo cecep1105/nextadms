@@ -26,6 +26,10 @@ export interface DjangoUser {
   can_view_dhcp_lease: boolean;
   can_view_fwfilter: boolean;
   can_view_netwatch: boolean;
+  can_view_ad_users: boolean;
+  can_view_ad_locked_users: boolean;
+  can_view_ad_dns: boolean;
+  can_view_ad_groups: boolean;
 }
 
 declare module "next-auth" {

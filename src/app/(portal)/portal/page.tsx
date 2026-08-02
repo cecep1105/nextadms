@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { UserCircle, KeyRound, Fingerprint, CalendarClock, UtensilsCrossed, Truck, Router, ShieldCheck, Radar, type LucideIcon } from "lucide-react";
+import { UserCircle, KeyRound, Fingerprint, CalendarClock, UtensilsCrossed, Truck, Router, ShieldCheck, Radar, Users, LockKeyhole, Globe, UsersRound, type LucideIcon } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { apiServerFetch } from "@/lib/api-server";
 import type { DjangoApiUser } from "@/types/api";
@@ -43,7 +43,7 @@ export default async function PortalHomePage() {
         <p className="mt-1 text-sm text-muted-foreground">Pilih menu di bawah untuk melanjutkan.</p>
       </div>
 
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
         <ActionCard
           href="/portal/profile"
           icon={UserCircle}
@@ -110,6 +110,38 @@ export default async function PortalHomePage() {
             icon={Radar}
             title="Netwatch"
             description="Pantau status host & kelola host yang dipantau."
+          />
+        )}
+        {user.can_view_ad_users && (
+          <ActionCard
+            href="/portal/ad-users"
+            icon={Users}
+            title="Active Directory - Users"
+            description="Lihat daftar user, aktif/nonaktifkan akun, reset password."
+          />
+        )}
+        {user.can_view_ad_locked_users && (
+          <ActionCard
+            href="/portal/ad-locked-users"
+            icon={LockKeyhole}
+            title="Active Directory - Locked Users"
+            description="Lihat & buka kunci akun yang terkunci otomatis."
+          />
+        )}
+        {user.can_view_ad_dns && (
+          <ActionCard
+            href="/portal/ad-dns"
+            icon={Globe}
+            title="Active Directory - DNS"
+            description="Lihat zone & record DNS yang terdaftar."
+          />
+        )}
+        {user.can_view_ad_groups && (
+          <ActionCard
+            href="/portal/ad-groups"
+            icon={UsersRound}
+            title="Active Directory - Groups"
+            description="Lihat daftar group & jumlah anggotanya."
           />
         )}
       </div>

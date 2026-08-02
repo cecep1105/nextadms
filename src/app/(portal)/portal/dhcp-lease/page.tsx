@@ -15,6 +15,8 @@ import type { Paginated, MikrotikDhcpLease } from "@/types/api";
 export const dynamic = "force-dynamic";
 const PAGE_SIZE = 10;
 
+
+
 async function getDhcpLease(sortBy?: string, sortDir?: string, page?: string, q?: string, page_size?: string): Promise<Paginated<MikrotikDhcpLease>> {
   const params = new URLSearchParams();
   if (sortBy) params.set("_sort_by", sortBy);
@@ -42,6 +44,7 @@ export default async function PortalDhcpLeasePage({
             <ArrowLeft className="h-3 w-3" /> Kembali ke Menu
           </Link>
         }
+
       />
       <Card>
         <div className="border-b border-border p-3">
