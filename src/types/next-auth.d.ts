@@ -32,6 +32,8 @@ export interface DjangoUser {
   can_view_ad_groups: boolean;
   can_view_zentyal_users: boolean;
   can_view_zentyal_groups: boolean;
+  can_view_cloudflare: boolean;
+  can_view_itinfra: boolean;
 }
 
 declare module "next-auth" {

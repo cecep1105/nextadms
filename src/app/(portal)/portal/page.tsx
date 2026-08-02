@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { UserCircle, KeyRound, Fingerprint, CalendarClock, UtensilsCrossed, Truck, Router, ShieldCheck, Radar, Users, LockKeyhole, Globe, UsersRound, Mail, type LucideIcon } from "lucide-react";
+import { UserCircle, KeyRound, Fingerprint, CalendarClock, UtensilsCrossed, Truck, Router, ShieldCheck, Radar, Users, LockKeyhole, Globe, UsersRound, Mail, Database, type LucideIcon } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { apiServerFetch } from "@/lib/api-server";
 import type { DjangoApiUser } from "@/types/api";
@@ -158,6 +158,22 @@ export default async function PortalHomePage() {
             icon={UsersRound}
             title="Mail Server - Groups"
             description="Lihat daftar group email & jumlah anggotanya."
+          />
+        )}
+        {user.can_view_cloudflare && (
+          <ActionCard
+            href="/portal/cloudflare/zones"
+            icon={Globe}
+            title="Cloudflare"
+            description="Lihat & kelola DNS record (tambah/edit, tanpa hapus)."
+          />
+        )}
+        {user.can_view_itinfra && (
+          <ActionCard
+            href="/portal/it-infra"
+            icon={Database}
+            title="Data IT-Infra"
+            description="Lihat data infrastruktur (langganan internet, VPS, domain, dll)."
           />
         )}
       </div>

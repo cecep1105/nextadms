@@ -5,6 +5,7 @@ import { Loader2, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
@@ -36,6 +37,7 @@ export function ItInfraFormDialog({
   const [categoryId, setCategoryId] = useState<string>("");
   const [name, setName] = useState("");
   const [notes, setNotes] = useState("");
+  const [isStaffOnly, setIsStaffOnly] = useState(false);
   const [rows, setRows] = useState<KeyValueRow[]>([]);
 
   useEffect(() => {
@@ -49,6 +51,7 @@ export function ItInfraFormDialog({
           setCategoryId(String(detail.category_id));
           setName(detail.name);
           setNotes(detail.notes);
+          setIsStaffOnly(detail.is_staff_only);
           setRows(Object.entries(detail.data).map(([key, value]) => ({ key, value: String(value) })));
         })
         .catch((err) => setError(extractErrorMessage(err, "Gagal mengambil detail data.")))
@@ -57,6 +60,7 @@ export function ItInfraFormDialog({
       setCategoryId(categories[0] ? String(categories[0].id) : "");
       setName("");
       setNotes("");
+      setIsStaffOnly(false);
       setRows([]);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -72,7 +76,7 @@ export function ItInfraFormDialog({
         if (row.key.trim()) dataObj[row.key.trim()] = row.value;
       }
 
-      const body: Record<string, unknown> = { category_id: Number(categoryId), name, data: dataObj, notes };
+      const body: Record<string, unknown> = { category_id: Number(categoryId), name, data: dataObj, notes, is_staff_only: isStaffOnly };
       if (mode === "add") {
         await request("/netmgmt/itinfra/entries/action/", { method: "POST", body: JSON.stringify({ ...body, action: "add" }) });
       } else {
@@ -117,6 +121,14 @@ export function ItInfraFormDialog({
             </div>
 
             <KeyValueEditor rows={rows} onChange={setRows} />
+
+            <label className="flex cursor-pointer items-start gap-2 rounded-md border border-border bg-secondary/50 px-3 py-2 text-sm">
+              <Checkbox checked={isStaffOnly} onCheckedChange={(v) => setIsStaffOnly(v === true)} className="mt-0.5" />
+              <span>
+                <span className="font-medium">Staff Only</span>
+                <span className="block text-xs text-muted-foreground">Kalau dicentang, entry ini HANYA bisa dilihat staff/admin -- tersembunyi dari user portal non-staff meski mereka punya izin akses fitur ini.</span>
+              </span>
+            </label>
 
             <div className="space-y-1.5">
               <Label htmlFor="itinfra-notes">Catatan (opsional)</Label>

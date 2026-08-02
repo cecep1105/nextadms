@@ -97,7 +97,12 @@ export default async function ItInfraPage({ searchParams }: PageProps) {
               data.results.map((entry) => (
                 <TableRow key={entry.id}>
                   <TableCell><Badge variant="secondary">{entry.category_name}</Badge></TableCell>
-                  <TableCell className="font-medium">{entry.name}</TableCell>
+                  <TableCell className="font-medium">
+                    <span className="flex items-center gap-1.5">
+                      {entry.name}
+                      {entry.is_staff_only && <Badge variant="warning" className="text-[10px]">Staff Only</Badge>}
+                    </span>
+                  </TableCell>
                   <TableCell className="max-w-xs truncate text-muted-foreground" title={entry.notes}>{entry.notes || "-"}</TableCell>
                   <TableCell className="text-muted-foreground">{new Date(entry.updated_at).toLocaleString("id-ID")}</TableCell>
                   <TableCell><ItInfraActionsMenu entry={entry} categories={categories} /></TableCell>

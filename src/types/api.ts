@@ -299,6 +299,8 @@ export interface DjangoApiUser {
   can_view_ad_groups: boolean;
   can_view_zentyal_users: boolean;
   can_view_zentyal_groups: boolean;
+  can_view_cloudflare: boolean;
+  can_view_itinfra: boolean;
 }
 
 export interface MikrotikDhcpLease {
@@ -605,6 +607,7 @@ export interface ITInfraEntrySummary {
   category_name: string;
   name: string;
   notes: string;
+  is_staff_only: boolean;
   updated_at: string;
 }
 
