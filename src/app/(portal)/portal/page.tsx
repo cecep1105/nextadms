@@ -14,13 +14,13 @@ function ActionCard({
 }) {
   return (
     <Link href={href}>
-      <Card className="h-full transition-colors hover:border-primary/40 hover:bg-primary/5">
+      <Card className="h-full transition-colors hover:border-primary/40">
         <CardHeader className="flex-row items-center gap-3 space-y-0">
           <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
             <Icon className="h-4 w-4" />
           </div>
           <div>
-            <CardTitle>{title}</CardTitle>
+            <CardTitle >{title}</CardTitle>
           </div>
         </CardHeader>
         <CardContent>

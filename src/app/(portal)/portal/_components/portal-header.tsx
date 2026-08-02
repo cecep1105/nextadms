@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { signOut, useSession } from "next-auth/react";
-import { Fingerprint, LogOut } from "lucide-react";
+import { Fingerprint, LogOut, UserIcon, KeyRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
@@ -13,6 +13,9 @@ import { ThemeToggle } from "@/components/layout/theme-toggle";
 function initials(name: string) {
   return name.split(" ").map((p) => p[0]).slice(0, 2).join("").toUpperCase();
 }
+
+
+
 
 export function PortalHeader() {
   const { data: session } = useSession();
