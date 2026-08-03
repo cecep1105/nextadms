@@ -8,6 +8,7 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import { apiServerFetch } from "@/lib/api-server";
+import { resolveMediaUrl } from "@/lib/media-url";
 import type { IDCardListItem, IDCardStatus } from "@/types/api";
 import { DeleteCardRowButton } from "./_components/delete-card-row-button";
 
@@ -64,7 +65,7 @@ export default async function IdCardListPage({
                   <TableCell>
                     <Link href={`/idcard/cards/${card.id}`}>
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={card.card_image} alt={card.holder_name} className="h-16 w-11 rounded border border-border object-cover" />
+                      <img src={resolveMediaUrl(card.card_image)} alt={card.holder_name} className="h-16 w-11 rounded border border-border object-cover" />
                     </Link>
                   </TableCell>
                   <TableCell><Badge variant="secondary">{card.card_type_label}</Badge></TableCell>

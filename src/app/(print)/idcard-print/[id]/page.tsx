@@ -4,6 +4,7 @@ import { useParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useApiClient } from "@/lib/api-client";
 import { extractErrorMessage } from "@/lib/error-utils";
+import { resolveMediaUrl } from "@/lib/media-url";
 import type { IDCardDetail } from "@/types/api";
 import styles from "./print.module.css";
 
@@ -55,7 +56,7 @@ export default function PrintIdCardPage() {
       {card && (
         <>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img className={styles.printCardImg} src={card.card_image} alt={card.holder_name} onLoad={handleImageLoad} />
+          <img className={styles.printCardImg} src={resolveMediaUrl(card.card_image)} alt={card.holder_name} onLoad={handleImageLoad} />
           <p className={`${styles.noPrint} ${styles.hint}`}>
             Dialog cetak akan muncul otomatis. Untuk printer kartu ID khusus (Fargo/Zebra/dll), unduh gambar ini (klik kanan → Save Image As) dan buka lewat software printer tersebut untuk hasil terbaik.
           </p>

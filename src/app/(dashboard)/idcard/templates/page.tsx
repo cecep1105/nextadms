@@ -5,6 +5,7 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import { apiServerFetch } from "@/lib/api-server";
+import { resolveMediaUrl } from "@/lib/media-url";
 import type { IDCardTemplate } from "@/types/api";
 import { AddTemplateButton } from "./_components/add-template-button";
 import { TemplateActionsMenu } from "./_components/template-actions-menu";
@@ -44,7 +45,7 @@ export default async function IdCardTemplatesPage() {
                 <TableRow key={tmpl.id}>
                   <TableCell>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={tmpl.background_image} alt={tmpl.name} className="h-20 w-14 rounded border border-border object-cover" />
+                    <img src={resolveMediaUrl(tmpl.background_image)} alt={tmpl.name} className="h-20 w-14 rounded border border-border object-cover" />
                   </TableCell>
                   <TableCell><Badge variant="secondary">{CARD_TYPE_LABEL[tmpl.card_type] ?? tmpl.card_type}</Badge></TableCell>
                   <TableCell className="font-medium">{tmpl.name}</TableCell>
@@ -53,6 +54,7 @@ export default async function IdCardTemplatesPage() {
                   </TableCell>
                   <TableCell>
                     <div className="flex justify-end">
+                      {resolveMediaUrl(tmpl.background_image)}
                       <TemplateActionsMenu template={tmpl} />
                     </div>
                   </TableCell>

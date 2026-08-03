@@ -6,6 +6,7 @@ import { RouterOSPaginationBar } from "@/components/netmgmt/routeros-pagination-
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { apiServerFetch } from "@/lib/api-server";
+import { resolveMediaUrl } from "@/lib/media-url";
 import type { IDCardListItem, IDCardStatus } from "@/types/api";
 
 // TAMPILAN GRID VISUAL (bukan tabel spt versi staff) -- SENGAJA, krn
@@ -59,7 +60,7 @@ export default async function PortalIdCardListPage({
             <Link key={card.id} href={`/portal/idcard-cards/${card.id}`}>
               <Card className="overflow-hidden transition-shadow hover:shadow-md">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={card.card_image} alt={card.holder_name} className="aspect-[54/86] w-full object-cover" />
+                <img src={resolveMediaUrl(card.card_image)} alt={card.holder_name} className="aspect-[54/86] w-full object-cover" />
                 <div className="space-y-1 p-2.5">
                   <p className="truncate text-sm font-medium">{card.holder_name}</p>
                   <p className="truncate font-mono text-xs text-muted-foreground">{card.holder_identifier || "-"}</p>

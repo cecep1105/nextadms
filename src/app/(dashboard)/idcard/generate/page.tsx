@@ -13,6 +13,7 @@ import {
 import { WebcamCapture } from "@/components/shared/webcam-capture";
 import { useApiClient } from "@/lib/api-client";
 import { extractErrorMessage } from "@/lib/error-utils";
+import { resolveMediaUrl } from "@/lib/media-url";
 import type {
   IDCardType, IDCardTemplate, IDCardHolder, IDCardPhotoCandidate, IDCardDetail,
 } from "@/types/api";
@@ -175,7 +176,7 @@ export default function GenerateIdCardPage() {
             <p className="text-sm text-muted-foreground">Status: {result.status_label}</p>
           </div>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={result.card_image} alt="Hasil kartu" className="w-48 rounded-md border border-border shadow-sm" />
+          <img src={resolveMediaUrl(result.card_image)} alt="Hasil kartu" className="w-48 rounded-md border border-border shadow-sm" />
           <div className="flex gap-2">
             <Button variant="outline" onClick={() => router.push(`/idcard/cards/${result.id}`)}>Lihat Detail</Button>
             <Button onClick={() => setResult(null)}>Generate Kartu Lain</Button>

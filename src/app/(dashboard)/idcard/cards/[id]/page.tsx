@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { apiServerFetch } from "@/lib/api-server";
+import { resolveMediaUrl } from "@/lib/media-url";
 import type { IDCardDetail, IDCardStatus } from "@/types/api";
 import { ChangeStatusButton } from "./_components/change-status-button";
 import { DeleteCardButton } from "./_components/delete-card-button";
@@ -43,7 +44,7 @@ export default async function IdCardDetailPage({ params }: { params: { id: strin
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         <Card className="flex flex-col items-center gap-3 p-4 lg:col-span-1">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={card.card_image} alt={card.holder_name} className="w-full max-w-[220px] rounded-md border border-border shadow-sm" />
+          <img src={resolveMediaUrl(card.card_image)} alt={card.holder_name} className="w-full max-w-[220px] rounded-md border border-border shadow-sm" />
           <div className="w-full space-y-1.5 text-sm">
             <div className="flex justify-between"><span className="text-muted-foreground">Jenis</span><Badge variant="secondary">{card.card_type_label}</Badge></div>
             <div className="flex justify-between"><span className="text-muted-foreground">PIN/No. Identitas</span><span className="font-mono">{card.holder_identifier || "-"}</span></div>
