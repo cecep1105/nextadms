@@ -1,40 +1,47 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { useApiClient } from "@/lib/api-client";
+import { extractErrorMessage } from "@/lib/error-utils";
 import type { IDCardDetail } from "@/types/api";
 
 /**
- * Halaman print bersama (dipakai staff MAUPUN portal, tidak perlu
- * versi terpisah -- backend yang tentukan boleh/tidaknya akses lewat
- * permission can_view_idcard, halaman ini sendiri cuma nampilkan
- * apa pun yang dibalikin API). CSS @page diset PRESIS ukuran kartu
- * (CR80: 54mm x 85.6mm, SAMA dgn CARD_SIZE di idcard/card_generator.py)
- * supaya kalau dicetak ke printer biasa dgn kertas PVC/card-stock siap
- * potong, hasilnya PAS -- bukan ke-scale otomatis mengikuti kertas A4.
+ * Halaman print bersama (dipakai staff MAUPUN portal). CSS @page diset
+ * PRESIS ukuran kartu (CR80: 54mm x 85.6mm, SAMA dgn CARD_SIZE di
+ * idcard/card_generator.py).
  *
- * CATATAN: utk printer KARTU ID KHUSUS (Fargo/Zebra/Evolis dkk), print
- * via browser mungkin TIDAK optimal (printer2 itu biasanya py
- * software/driver SENDIRI yg menangani feed kartu fisik) -- utk kasus
- * itu, unduh gambar kartu (klik kanan > Save Image) & buka lewat
- * software printer tsb.
+ * BUG YANG SUDAH DIPERBAIKI: percobaan pertama halaman ini memanggil
+ * request() di dalam useEffect dgn dependency array HANYA [params.id]
+ * -- TIDAK menyertakan `request` itu sendiri. Karena useApiClient()
+ * butuh sesi NextAuth (useSession()) buat lampirkan Bearer token, & sesi
+ * itu BARU selesai dimuat SETELAH render pertama (asynchronous),
+ * `request` yang di-capture closure effect itu MASIH versi TANPA token
+ * -- API call SELALU gagal (401/403) & effect TIDAK PERNAH dicoba ulang
+ * stlh token sungguh tersedia. Pola ini BARU muncul di sini -- di
+ * tempat lain, useApiClient() SELALU dipanggil dari handler klik
+ * (submit form, dst), yaitu SETELAH halaman sudah lama termuat, jadi
+ * masalah race condition ini tidak pernah ketahuan sebelumnya.
+
+ * FIX: tunggu status === 'authenticated' dulu SEBELUM fetch, & sertakan
+ * `request` di dependency array supaya effect dicoba ulang begitu
+ * token sungguh tersedia.
  */
 export default function PrintIdCardPage() {
   const params = useParams();
+  const { status } = useSession();
   const { request } = useApiClient();
   const [card, setCard] = useState<IDCardDetail | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (status !== "authenticated") return; // tunggu sesi selesai dimuat -- JANGAN fetch dgn token yg belum ada
     request<IDCardDetail>(`/idcard/cards/${params.id}/`)
       .then(setCard)
-      .catch(() => setError("Gagal memuat kartu."));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [params.id]);
+      .catch((err) => setError(extractErrorMessage(err, "Gagal memuat kartu.")));
+  }, [params.id, status, request]);
 
   function handleImageLoad() {
-    // Beri jeda sedikit supaya browser SELESAI render gambar sebelum
-    // dialog print muncul (kalau langsung, kadang gambar blank di preview print).
     setTimeout(() => window.print(), 150);
   }
 
@@ -49,7 +56,8 @@ export default function PrintIdCardPage() {
         }
       `}</style>
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "100vh", background: "#e5e5e5", padding: 16 }}>
-        {error && <p className="no-print" style={{ color: "red" }}>{error}</p>}
+        {status !== "authenticated" && !error && <p className="no-print" style={{ color: "#555" }}>Memuat sesi...</p>}
+        {error && <p className="no-print" style={{ color: "red", maxWidth: 320, textAlign: "center" }}>{error}</p>}
         {card && (
           <>
             {/* eslint-disable-next-line @next/next/no-img-element */}

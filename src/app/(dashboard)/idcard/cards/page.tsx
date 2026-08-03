@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/table";
 import { apiServerFetch } from "@/lib/api-server";
 import type { IDCardListItem, IDCardStatus } from "@/types/api";
+import { DeleteCardRowButton } from "./_components/delete-card-row-button";
 
 export const dynamic = "force-dynamic";
 const PAGE_SIZE = 20;
@@ -51,11 +52,12 @@ export default async function IdCardListPage({
               <TableHead>Template</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Dibuat</TableHead>
+              <TableHead className="text-right">Aksi</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {data.results.length === 0 ? (
-              <TableRow><TableCell colSpan={7} className="py-8 text-center text-muted-foreground">Belum ada kartu.</TableCell></TableRow>
+              <TableRow><TableCell colSpan={8} className="py-8 text-center text-muted-foreground">Belum ada kartu.</TableCell></TableRow>
             ) : (
               data.results.map((card) => (
                 <TableRow key={card.id}>
@@ -73,6 +75,11 @@ export default async function IdCardListPage({
                   <TableCell className="text-muted-foreground">{card.template_name}</TableCell>
                   <TableCell><Badge variant={STATUS_VARIANT[card.status]}>{card.status_label}</Badge></TableCell>
                   <TableCell className="text-muted-foreground">{new Date(card.generated_at).toLocaleDateString("id-ID")}</TableCell>
+                  <TableCell>
+                    <div className="flex justify-end">
+                      <DeleteCardRowButton cardId={card.id} holderName={card.holder_name} />
+                    </div>
+                  </TableCell>
                 </TableRow>
               ))
             )}

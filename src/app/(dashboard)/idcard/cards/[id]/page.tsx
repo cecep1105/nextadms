@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { apiServerFetch } from "@/lib/api-server";
 import type { IDCardDetail, IDCardStatus } from "@/types/api";
 import { ChangeStatusButton } from "./_components/change-status-button";
+import { DeleteCardButton } from "./_components/delete-card-button";
 
 export const dynamic = "force-dynamic";
 
@@ -34,6 +35,7 @@ export default async function IdCardDetailPage({ params }: { params: { id: strin
               </a>
             </Button>
             <ChangeStatusButton cardId={card.id} currentStatus={card.status} />
+            <DeleteCardButton cardId={card.id} holderName={card.holder_name} />
           </div>
         }
       />

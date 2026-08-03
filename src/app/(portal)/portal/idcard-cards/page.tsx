@@ -5,14 +5,15 @@ import { RouterOSSearchBar } from "@/components/netmgmt/routeros-search-bar";
 import { RouterOSPaginationBar } from "@/components/netmgmt/routeros-pagination-bar";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import {
-  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
-} from "@/components/ui/table";
 import { apiServerFetch } from "@/lib/api-server";
 import type { IDCardListItem, IDCardStatus } from "@/types/api";
 
+// TAMPILAN GRID VISUAL (bukan tabel spt versi staff) -- SENGAJA, krn
+// user yang akses menu portal ini yang akan MEMANAGE kartu2 tersebut
+// sehari-hari (lebih intuitif lihat kartu sbg GAMBAR yg dikenali
+// sekilas, drpd baris data teknis).
 export const dynamic = "force-dynamic";
-const PAGE_SIZE = 20;
+const PAGE_SIZE = 24;
 
 const STATUS_VARIANT: Record<IDCardStatus, "success" | "secondary" | "destructive" | "warning"> = {
   belum_cetak: "secondary", sudah_cetak: "success", hilang: "destructive", cetak_ulang: "warning",
@@ -45,49 +46,37 @@ export default async function PortalIdCardListPage({
           </Link>
         }
       />
-      <Card>
-        <div className="border-b border-border p-3">
-          <RouterOSSearchBar placeholder="Cari nama / PIN / no. identitas" />
+
+      <div className="mb-4">
+        <RouterOSSearchBar placeholder="Cari nama / PIN / no. identitas" />
+      </div>
+
+      {data.results.length === 0 ? (
+        <Card className="py-12 text-center text-sm text-muted-foreground">Belum ada kartu.</Card>
+      ) : (
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+          {data.results.map((card) => (
+            <Link key={card.id} href={`/portal/idcard-cards/${card.id}`}>
+              <Card className="overflow-hidden transition-shadow hover:shadow-md">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={card.card_image} alt={card.holder_name} className="aspect-[54/86] w-full object-cover" />
+                <div className="space-y-1 p-2.5">
+                  <p className="truncate text-sm font-medium">{card.holder_name}</p>
+                  <p className="truncate font-mono text-xs text-muted-foreground">{card.holder_identifier || "-"}</p>
+                  <div className="flex items-center justify-between gap-1 pt-0.5">
+                    <Badge variant="secondary" className="text-[10px]">{card.card_type_label}</Badge>
+                    <Badge variant={STATUS_VARIANT[card.status]} className="text-[10px]">{card.status_label}</Badge>
+                  </div>
+                </div>
+              </Card>
+            </Link>
+          ))}
         </div>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Preview</TableHead>
-              <TableHead>Jenis</TableHead>
-              <TableHead>Nama</TableHead>
-              <TableHead>PIN/No. Identitas</TableHead>
-              <TableHead>Template</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Dibuat</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {data.results.length === 0 ? (
-              <TableRow><TableCell colSpan={7} className="py-8 text-center text-muted-foreground">Belum ada kartu.</TableCell></TableRow>
-            ) : (
-              data.results.map((card) => (
-                <TableRow key={card.id}>
-                  <TableCell>
-                    <Link href={`/portal/idcard-cards/${card.id}`}>
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={card.card_image} alt={card.holder_name} className="h-16 w-11 rounded border border-border object-cover" />
-                    </Link>
-                  </TableCell>
-                  <TableCell><Badge variant="secondary">{card.card_type_label}</Badge></TableCell>
-                  <TableCell>
-                    <Link href={`/portal/idcard-cards/${card.id}`} className="font-medium hover:text-primary hover:underline">{card.holder_name}</Link>
-                  </TableCell>
-                  <TableCell className="font-mono text-muted-foreground">{card.holder_identifier || "-"}</TableCell>
-                  <TableCell className="text-muted-foreground">{card.template_name}</TableCell>
-                  <TableCell><Badge variant={STATUS_VARIANT[card.status]}>{card.status_label}</Badge></TableCell>
-                  <TableCell className="text-muted-foreground">{new Date(card.generated_at).toLocaleDateString("id-ID")}</TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
+      )}
+
+      <div className="mt-4">
         <RouterOSPaginationBar count={data.count} pageSize={PAGE_SIZE} currentPage={Number(searchParams.page ?? "1")} />
-      </Card>
+      </div>
     </div>
   );
 }
