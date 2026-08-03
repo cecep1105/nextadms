@@ -302,6 +302,8 @@ export interface DjangoApiUser {
   can_view_cloudflare: boolean;
   can_view_itinfra: boolean;
   has_employee_link: boolean;
+  emp_pin: string | null;
+  emp_name: string | null;
 }
 
 export interface MikrotikDhcpLease {

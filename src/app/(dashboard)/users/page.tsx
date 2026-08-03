@@ -71,7 +71,12 @@ export default async function UsersPage({
                 return (
                 <TableRow key={u.id}>
                   <TableCell className="font-mono font-medium">{u.username}</TableCell>
-                  <TableCell>{u.full_name || "-"}</TableCell>
+                  <TableCell>
+                    <span className="flex items-center gap-1.5">
+                      {u.full_name || "-"}
+                      {u.emp_pin && <Badge variant="secondary" className="font-mono text-[10px]" title={u.emp_name ?? undefined}>PIN {u.emp_pin}</Badge>}
+                    </span>
+                  </TableCell>
                   <TableCell className="text-muted-foreground">{u.email || "-"}</TableCell>
                   <TableCell>
                     <Badge variant={u.auth_source === "ldap" ? "default" : "secondary"}>{u.auth_source}</Badge>

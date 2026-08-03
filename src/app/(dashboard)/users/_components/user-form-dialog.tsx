@@ -12,6 +12,7 @@ import {
 import { useApiClient } from "@/lib/api-client";
 import { extractErrorMessage } from "@/lib/error-utils";
 import type { DjangoApiUser } from "@/types/api";
+import { EmpPinAutocomplete } from "./emp-pin-autocomplete";
 
 export function UserFormDialog({ mode, user, isSuperuser }: { mode: "create" | "edit"; user?: DjangoApiUser; isSuperuser?: boolean }) {
   const router = useRouter();
@@ -21,7 +22,7 @@ export function UserFormDialog({ mode, user, isSuperuser }: { mode: "create" | "
   const [error, setError] = useState<string | null>(null);
   const [form, setForm] = useState({
     username: "", email: "", first_name: "", last_name: "",
-    phone_number: "", department: "", title: "", password: "", is_staff: false,
+    phone_number: "", department: "", title: "", password: "", is_staff: false, emp_id: "",
   });
 
   useEffect(() => {
@@ -30,10 +31,10 @@ export function UserFormDialog({ mode, user, isSuperuser }: { mode: "create" | "
       setForm({
         username: user.username, email: user.email, first_name: user.first_name, last_name: user.last_name,
         phone_number: user.phone_number ?? "", department: user.department ?? "", title: user.title ?? "",
-        password: "", is_staff: user.is_staff,
+        password: "", is_staff: user.is_staff, emp_id: user.emp_pin ?? "",
       });
     } else {
-      setForm({ username: "", email: "", first_name: "", last_name: "", phone_number: "", department: "", title: "", password: "", is_staff: false });
+      setForm({ username: "", email: "", first_name: "", last_name: "", phone_number: "", department: "", title: "", password: "", is_staff: false, emp_id: "" });
     }
     setError(null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -49,7 +50,7 @@ export function UserFormDialog({ mode, user, isSuperuser }: { mode: "create" | "
           method: "POST",
           body: JSON.stringify({
             username: form.username, email: form.email, first_name: form.first_name,
-            last_name: form.last_name, password: form.password, is_staff: form.is_staff,
+            last_name: form.last_name, password: form.password, is_staff: form.is_staff, emp_id: form.emp_id,
           }),
         });
       } else {
@@ -57,7 +58,7 @@ export function UserFormDialog({ mode, user, isSuperuser }: { mode: "create" | "
           method: "PATCH",
           body: JSON.stringify({
             email: form.email, first_name: form.first_name, last_name: form.last_name,
-            phone_number: form.phone_number, department: form.department, title: form.title,
+            phone_number: form.phone_number, department: form.department, title: form.title, emp_id: form.emp_id,
           }),
         });
       }
@@ -121,6 +122,14 @@ export function UserFormDialog({ mode, user, isSuperuser }: { mode: "create" | "
             <Label htmlFor="email">Email</Label>
             <Input id="email" type="email" value={form.email}
               onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))} />
+          </div>
+
+          <div className="space-y-1.5">
+            <Label>Kaitkan ke PIN Employee (opsional)</Label>
+            <EmpPinAutocomplete value={form.emp_id} onChange={(pin) => setForm((f) => ({ ...f, emp_id: pin }))} />
+            <p className="text-[11px] text-muted-foreground">
+              Menautkan akun ini ke data karyawan (PIN absensi) -- dipakai fitur &quot;My Attendance&quot; di portal. Kosongkan untuk melepas tautan.
+            </p>
           </div>
 
           {mode === "edit" && (
