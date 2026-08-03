@@ -1,0 +1,75 @@
+/*
+ * CSS Module (BUKAN raw <style> string di JSX) -- dikompilasi Next.js
+ * saat BUILD jadi file .css statis, BUKAN string JS yang dirender
+ * ulang ke DOM tiap render seperti <style>{`...`}</style> sebelumnya.
+ *
+ * BUG YANG SUDAH DIPERBAIKI: versi sebelumnya menaruh semua CSS ini
+ * lewat template literal JS (<style>{`...`}</style>) langsung di body
+ * halaman -- ini menyebabkan React Hydration Error (Text content does
+ * not match server-rendered HTML), karena Next.js App Router SSR
+ * me-render tag <style> itu sbg teks biasa di HTML awal, tapi begitu
+ * browser pertama kali parse HTML itu, browser langsung memperlakukan
+ * sbg elemen <style> sungguhan & bisa menormalisasi isi teksnya
+ * sebelum React sempat hydrate & membandingkan -- hasilnya dianggap
+ * mismatch. CSS Module tidak pernah jadi teks di dalam DOM (dikompilasi
+ * jadi file .css terpisah, di-link lewat <link>), masalah sejenis ini
+ * tidak bisa terjadi sama sekali.
+ */
+
+.printWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: #e5e5e5;
+  padding: 16px;
+}
+
+.printCardImg {
+  max-width: 320px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.hint {
+  margin-top: 12px;
+  font-size: 12px;
+  color: #555;
+  text-align: center;
+  max-width: 320px;
+}
+
+.statusText {
+  color: #555;
+}
+
+.errorText {
+  color: red;
+  max-width: 320px;
+  text-align: center;
+}
+
+@page {
+  size: 54mm 85.6mm;
+  margin: 0;
+}
+
+@media print {
+  .printWrapper {
+    display: block;
+    min-height: 0;
+    height: auto;
+    padding: 0;
+    background: none;
+  }
+  .printCardImg {
+    width: 54mm;
+    height: 85.6mm;
+    max-width: none;
+    box-shadow: none;
+    display: block;
+  }
+  .noPrint {
+    display: none;
+  }
+}

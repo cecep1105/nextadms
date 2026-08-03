@@ -5,6 +5,14 @@ import { auth } from "@/lib/auth";
 // -- portal khusus non-staff (card button, BUKAN sidebar dashboard admin).
 // Staff BOLEH juga buka ini manual kalau mau, tapi tidak di-redirect ke sini.
 const PORTAL_PREFIX = "/portal";
+// Halaman print ID Card (route group (print), SENGAJA DI LUAR /idcard/...
+// staff & /portal/... -- dipakai BERSAMA staff MAUPUN portal, wewenang
+// akses SESUNGGUHNYA ditentukan backend lewat permission can_view_idcard
+// per API call, BUKAN di middleware ini) -- TANPA baris ini, user portal
+// yang klik tombol Cetak Kartu akan KETOLAK di sini (bukan '/portal' atau
+// turunannya) & di-redirect balik ke /portal, gagal sebelum sempat lihat
+// halaman print-nya sama sekali.
+const IDCARD_PRINT_PREFIX = "/idcard-print";
 
 /**
  * Bangun URL ABSOLUT (utk NextResponse.redirect) dari HEADER REQUEST YANG
@@ -43,6 +51,7 @@ export default auth((req) => {
   const isLoginPage = req.nextUrl.pathname === "/login";
   const isStaff = req.auth?.user?.is_staff || req.auth?.user?.is_superuser;
   const isPortalPath = req.nextUrl.pathname === PORTAL_PREFIX || req.nextUrl.pathname.startsWith(`${PORTAL_PREFIX}/`);
+  const isIdCardPrintPath = req.nextUrl.pathname.startsWith(IDCARD_PRINT_PREFIX);
 
   if (!isLoggedIn && !isLoginPage) {
     const loginUrl = buildAbsoluteUrl(req, "/login");
@@ -63,7 +72,7 @@ export default auth((req) => {
   // sub-halamannya) TETAP boleh -- akses granular per-fitur (Transfer
   // Finger/Attendance Recap) diatur backend (HasFeaturePermission), bukan
   // di middleware ini.
-  if (isLoggedIn && !isStaff && !isPortalPath) {
+  if (isLoggedIn && !isStaff && !isPortalPath && !isIdCardPrintPath) {
     return NextResponse.redirect(buildAbsoluteUrl(req, PORTAL_PREFIX));
   }
 
