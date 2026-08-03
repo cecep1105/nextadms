@@ -43,10 +43,25 @@ export function resolveMediaUrl1(url: string | null | undefined): string {
 
 
 export function resolveMediaUrl(url: string | null | undefined): string {
+  // if (!url) return "";
+  // if (!MEDIA_BASE_URL) return url;
+  // const _url = new URL(url);
+  // const mediaUrl = `${process.env.NEXT_PUBLIC_MEDIA_URL}${_url.pathname}`;
+  // const path = mediaUrl.replace(/\/media/, "");
+  // return path;
+
+
+
   if (!url) return "";
-  if (!MEDIA_BASE_URL) return url;
-  const _url = new URL(url);
-  const mediaUrl = `${process.env.NEXT_PUBLIC_MEDIA_URL}${_url.pathname}`;
-  const path = mediaUrl.replace(/\/media/, "");
-  return path;
+
+  const pathname = new URL(url).pathname;
+  return `${process.env.NEXT_PUBLIC_BACKEND_URL}${pathname}`;
+
+
+
+
+
+
+
+
 }
