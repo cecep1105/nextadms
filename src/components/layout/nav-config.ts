@@ -4,6 +4,7 @@ import {
   LayoutDashboard, Users, Building2, Cpu, ClipboardList, Fingerprint,
   ScrollText, FileClock, Terminal, CalendarClock, MapPinned, Route,
   ToggleLeft, ScanFace, Smartphone, History, UserCircle, KeyRound, Network, Server, Router, Shield, Globe, Lock, HardDrive, Monitor, Database,
+  CreditCard, Camera, UserPlus, LayoutList,
 } from "lucide-react";
 
 import MailQueueIcon from "../icons/mailqueue";
@@ -112,6 +113,16 @@ export const navGroups: NavGroup[] = [
       },
       { title: "Cloudflare DNS", href: "/netmgmt/cloudflare/zones", icon: Globe },
       { title: "Data IT-Infra", href: "/netmgmt/itinfra", icon: Database },
+    ],
+  },
+  {
+    label: "ID Card",
+    icon: CreditCard,
+    items: [
+      { title: "Generate Kartu", href: "/idcard/generate", icon: Camera },
+      { title: "Daftar Kartu", href: "/idcard/cards", icon: LayoutList },
+      { title: "Data Visitor/BHL", href: "/idcard/holders", icon: UserPlus },
+      { title: "Template", href: "/idcard/templates", icon: CreditCard },
     ],
   },
 ];
