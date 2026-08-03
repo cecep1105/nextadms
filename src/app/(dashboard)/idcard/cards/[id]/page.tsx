@@ -1,8 +1,9 @@
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Printer } from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { apiServerFetch } from "@/lib/api-server";
 import type { IDCardDetail, IDCardStatus } from "@/types/api";
 import { ChangeStatusButton } from "./_components/change-status-button";
@@ -25,7 +26,16 @@ export default async function IdCardDetailPage({ params }: { params: { id: strin
             <ArrowLeft className="h-3 w-3" /> Kembali ke Daftar Kartu
           </Link>
         }
-        action={<ChangeStatusButton cardId={card.id} currentStatus={card.status} />}
+        action={
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" asChild>
+              <a href={`/idcard-print/${card.id}`} target="_blank" rel="noopener noreferrer">
+                <Printer className="h-3.5 w-3.5" /> Cetak Kartu
+              </a>
+            </Button>
+            <ChangeStatusButton cardId={card.id} currentStatus={card.status} />
+          </div>
+        }
       />
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
