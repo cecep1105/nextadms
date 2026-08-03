@@ -301,6 +301,7 @@ export interface DjangoApiUser {
   can_view_zentyal_groups: boolean;
   can_view_cloudflare: boolean;
   can_view_itinfra: boolean;
+  can_view_idcard: boolean;
   has_employee_link: boolean;
   emp_pin: string | null;
   emp_name: string | null;

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { UserCircle, KeyRound, Fingerprint, CalendarClock, UtensilsCrossed, Truck, Router, ShieldCheck, Radar, Users, LockKeyhole, Globe, UsersRound, Mail, Database, CalendarDays, type LucideIcon } from "lucide-react";
+import { UserCircle, KeyRound, Fingerprint, CalendarClock, UtensilsCrossed, Truck, Router, ShieldCheck, Radar, Users, LockKeyhole, Globe, UsersRound, Mail, Database, CalendarDays, CreditCard, type LucideIcon } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { apiServerFetch } from "@/lib/api-server";
 import type { DjangoApiUser } from "@/types/api";
@@ -182,6 +182,14 @@ export default async function PortalHomePage() {
             icon={Database}
             title="Data IT-Infra"
             description="Lihat data infrastruktur (langganan internet, VPS, domain, dll)."
+          />
+        )}
+        {user.can_view_idcard && (
+          <ActionCard
+            href="/portal/idcard-generate"
+            icon={CreditCard}
+            title="ID Card"
+            description="Generate kartu ID (Karyawan/Driver/Visitor/BHL) & lihat daftar kartu."
           />
         )}
       </div>
