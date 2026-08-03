@@ -10,7 +10,7 @@ import type { EmployeeSearchResult } from "@/types/api";
  * -- BEDA dari PinAutocomplete di halaman Attendance Recap (yang
  * NAVIGASI ke kartu rekap saat diklik) -- di sini klik hasil cuma
  * MEMILIH PIN itu ke dalam form (tidak pindah halaman), reuse endpoint
- * pencarian yang SAMA (/iclock/attendance-recap/ajax-employee-search/,
+ * pencarian yang SAMA (/iclock/employee-search/,
  * staff yang buka halaman ini otomatis lolos permission-nya).
  */
 export function EmpPinAutocomplete({ value, onChange }: { value: string; onChange: (pin: string, name?: string) => void }) {
@@ -28,7 +28,7 @@ export function EmpPinAutocomplete({ value, onChange }: { value: string; onChang
       return;
     }
     const handle = setTimeout(() => {
-      request<{ employees: EmployeeSearchResult[] }>(`/iclock/attendance-recap/ajax-employee-search/?q=${encodeURIComponent(query)}`)
+      request<{ employees: EmployeeSearchResult[] }>(`/iclock/employee-search/?q=${encodeURIComponent(query)}`)
         .then((data) => { setResults(data.employees); setOpen(true); })
         .catch(() => setResults([]));
     }, 300);

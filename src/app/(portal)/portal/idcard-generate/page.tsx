@@ -91,7 +91,7 @@ export default function PortalGenerateIdCardPage() {
     setEmployeeFound(null);
     setFtpCandidates([]);
     try {
-      const data = await request<{ employees: { pin: string; name: string }[] }>(`/iclock/attendance-recap/ajax-employee-search/?q=${encodeURIComponent(pin)}`);
+      const data = await request<{ employees: { pin: string; name: string }[] }>(`/iclock/employee-search/?q=${encodeURIComponent(pin)}`);
       const exact = data.employees.find((e) => e.pin === pin.trim()) ?? data.employees[0];
       if (!exact) {
         setEmployeeError(`Employee dengan PIN '${pin}' tidak ditemukan.`);
