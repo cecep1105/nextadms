@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { UserCircle, KeyRound, Fingerprint, CalendarClock, UtensilsCrossed, Truck, Router, ShieldCheck, Radar, Users, LockKeyhole, Globe, UsersRound, Mail, Database, CalendarDays, CreditCard, type LucideIcon } from "lucide-react";
+import { UserCircle, KeyRound, Fingerprint, CalendarClock, UtensilsCrossed, Truck, Router, ShieldCheck, Radar, Users, LockKeyhole, Globe, UsersRound, Mail, Database, CalendarDays, CreditCard, HardDrive, type LucideIcon } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { apiServerFetch } from "@/lib/api-server";
 import type { DjangoApiUser } from "@/types/api";
@@ -190,6 +190,14 @@ export default async function PortalHomePage() {
             icon={CreditCard}
             title="ID Card"
             description="Generate kartu ID (Karyawan/Driver/Visitor/BHL) & lihat daftar kartu."
+          />
+        )}
+        {user.can_view_active_device && (
+          <ActionCard
+            href="/portal/active-device"
+            icon={HardDrive}
+            title="Active Device"
+            description="Lihat device fingerprint, sync jam, live log, & transfer finger dari device."
           />
         )}
       </div>
