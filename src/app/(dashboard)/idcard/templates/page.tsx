@@ -5,7 +5,7 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import { apiServerFetch } from "@/lib/api-server";
-import { resolveMediaUrl,resolveMediaUrl3,resolveMediaUrl4 } from "@/lib/media-url";
+import { resolveMediaUrl} from "@/lib/media-url";
 import type { IDCardTemplate } from "@/types/api";
 import { AddTemplateButton } from "./_components/add-template-button";
 import { TemplateActionsMenu } from "./_components/template-actions-menu";
