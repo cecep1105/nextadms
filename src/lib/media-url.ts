@@ -57,11 +57,30 @@ export function resolveMediaUrl(url: string | null | undefined): string {
   const pathname = new URL(url).pathname;
   return `${process.env.NEXT_PUBLIC_BACKEND_URL}${pathname}`;
 
+}
 
+export function resolveMediaUrl3(url: string | null | undefined): string {
+  // if (!url) return "";
+  // if (!MEDIA_BASE_URL) return url;
+  // const _url = new URL(url);
+  // const mediaUrl = `${process.env.NEXT_PUBLIC_MEDIA_URL}${_url.pathname}`;
+  // const path = mediaUrl.replace(/\/media/, "");
+  // return path;
 
+  if (!url) return "";
+  const pathname = new URL(url).pathname;
+  return `${process.env.NEXT_PUBLIC_BACKEND_URL}`;
+}
 
+export function resolveMediaUrl4(url: string | null | undefined): string {
+  // if (!url) return "";
+  // if (!MEDIA_BASE_URL) return url;
+  // const _url = new URL(url);
+  // const mediaUrl = `${process.env.NEXT_PUBLIC_MEDIA_URL}${_url.pathname}`;
+  // const path = mediaUrl.replace(/\/media/, "");
+  // return path;
 
-
-
-
+  if (!url) return "";
+  const pathname = new URL(url).pathname;
+  return pathname;
 }
