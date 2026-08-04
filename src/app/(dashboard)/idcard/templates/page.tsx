@@ -54,7 +54,6 @@ export default async function IdCardTemplatesPage() {
                   </TableCell>
                   <TableCell>
                     <div className="flex justify-end">
-                      {resolveMediaUrl(tmpl.background_image) }|{resolveMediaUrl3(tmpl.background_image)} |{resolveMediaUrl4(tmpl.background_image)}
                       <TemplateActionsMenu template={tmpl} />
                     </div>
                   </TableCell>

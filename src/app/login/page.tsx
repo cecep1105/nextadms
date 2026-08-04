@@ -63,7 +63,7 @@ function LoginForm() {
 
         <div className="relative z-10 max-w-sm">
           <p className="font-display text-xl font-semibold leading-snug tracking-tight text-foreground">
-            Satu konsol untuk seluruh infrastruktur absensi.
+            Satu konsol untuk seluruh infrastruktur IT.
           </p>
           <p className="mt-2 text-sm text-muted-foreground">
             Device fingerprint, employee, transaksi, dan mobile attendance — termonitor real-time
@@ -121,7 +121,7 @@ function LoginForm() {
           </form>
 
           <p className="mt-8 text-center text-[11px] text-muted-foreground">
-            © {new Date().getFullYear()} CCPADMS — Attendance & Device Console
+            © {new Date().getFullYear()} CCPADMS — IT Infrastruktur Management Console
           </p>
         </div>
       </div>

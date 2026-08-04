@@ -27,60 +27,23 @@
  * ini best-effort terakhir, LEBIH BAIK drpd melempar error/gambar
  * kosong).
  */
-const MEDIA_BASE_URL = (process.env.NEXT_PUBLIC_MEDIA_URL || "").replace(/\/+$/, "");
+const BACKEND_BASE_URL = (process.env.NEXT_PUBLIC_BACKEND_URL || "").replace(/\/+$/, "");
 
-export function resolveMediaUrl1(url: string | null | undefined): string {
-  if (!url) return "";
-  if (/^https?:\/\//i.test(url)) return url;
-  if (!MEDIA_BASE_URL) return url;
+// export function resolveMediaUrl1(url: string | null | undefined): string {
+//   if (!url) return "";
+//   if (/^https?:\/\//i.test(url)) return url;
+//   if (!MEDIA_BASE_URL) return url;
 
-  // NEXT_PUBLIC_MEDIA_URL SUDAH termasuk '/media' di ujungnya -- kalau
-  // `url` dari API JUGA diawali '/media/...' (bentuk relative standar
-  // Django MEDIA_URL), potong supaya TIDAK dobel jadi '.../media/media/...'.
-  const path = url.replace(/^\/media\//, "/");
-  return `${MEDIA_BASE_URL}${path.startsWith("/") ? path : `/${path}`}`;  
-}
+
+//   const path = url.replace(/^\/media\//, "/");
+//   return `${MEDIA_BASE_URL}${path.startsWith("/") ? path : `/${path}`}`;  
+// }
 
 
 export function resolveMediaUrl(url: string | null | undefined): string {
-  // if (!url) return "";
-  // if (!MEDIA_BASE_URL) return url;
-  // const _url = new URL(url);
-  // const mediaUrl = `${process.env.NEXT_PUBLIC_MEDIA_URL}${_url.pathname}`;
-  // const path = mediaUrl.replace(/\/media/, "");
-  // return path;
-
-
-
   if (!url) return "";
-
-  const pathname = new URL(url).pathname;
-  return `${process.env.NEXT_PUBLIC_BACKEND_URL}${pathname}`;
-
+  if (!BACKEND_BASE_URL) return url;
+  const path = new URL(url).pathname;
+  return `${BACKEND_BASE_URL}${path}`;
 }
 
-export function resolveMediaUrl3(url: string | null | undefined): string {
-  // if (!url) return "";
-  // if (!MEDIA_BASE_URL) return url;
-  // const _url = new URL(url);
-  // const mediaUrl = `${process.env.NEXT_PUBLIC_MEDIA_URL}${_url.pathname}`;
-  // const path = mediaUrl.replace(/\/media/, "");
-  // return path;
-
-  if (!url) return "";
-  const pathname = new URL(url).pathname;
-  return `${process.env.NEXT_PUBLIC_BACKEND_URL}`;
-}
-
-export function resolveMediaUrl4(url: string | null | undefined): string {
-  // if (!url) return "";
-  // if (!MEDIA_BASE_URL) return url;
-  // const _url = new URL(url);
-  // const mediaUrl = `${process.env.NEXT_PUBLIC_MEDIA_URL}${_url.pathname}`;
-  // const path = mediaUrl.replace(/\/media/, "");
-  // return path;
-
-  if (!url) return "";
-  const pathname = new URL(url).pathname;
-  return pathname;
-}
