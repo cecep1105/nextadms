@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { signOut, useSession } from "next-auth/react";
-import { Fingerprint, LogOut, UserIcon, KeyRound } from "lucide-react";
+import { Network, LogOut, UserIcon, KeyRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
@@ -22,12 +22,12 @@ export function PortalHeader() {
   const displayName = session?.user?.full_name || session?.user?.username || "";
 
   return (
-    <header className="sticky top-0 z-30 flex h-12 shrink-0 items-center gap-3 border-b border-border bg-background/95 px-4 backdrop-blur">
+    <header className="sticky top-0 z-30 flex h-12 shrink-0 items-center gap-3 border-b border-border bg-card/95 px-4 backdrop-blur">
       <Link href="/portal" className="flex items-center gap-2">
         <div className="flex h-7 w-7 items-center justify-center rounded-md bg-primary/15">
-          <Fingerprint className="h-3.5 w-3.5 text-primary" />
+          <Network className="h-3.5 w-3.5 text-primary" />
         </div>
-        <span className="font-display text-sm font-semibold tracking-tight">CCPADMS</span>
+        <span className="font-display text-sm font-semibold tracking-tight">NEXTADMS</span>
       </Link>
 
       <div className="flex-1" />
