@@ -3,7 +3,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { Fingerprint, ChevronsLeft, ChevronsRight, ChevronDown } from "lucide-react";
+import { Network, ChevronsLeft, ChevronsRight, ChevronDown } from "lucide-react";
 import { navGroups, nonStaffNavGroups, type NavGroup, type NavItem } from "./nav-config";
 import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -180,12 +180,12 @@ export function SidebarContent({
   }
 
   return (
-    <div className="flex h-full flex-col bg-card">
+    <div className="sidebar-shell flex h-full flex-col bg-card">
       <div className={cn("flex h-12 shrink-0 items-center gap-2 border-b border-border", collapsed ? "justify-center px-2" : "px-4")}>
         <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-primary/15">
-          <Fingerprint className="h-3.5 w-3.5 text-primary" />
+          <Network className="h-3.5 w-3.5 text-primary" />
         </div>
-        {!collapsed && <span className="truncate font-display text-sm font-semibold tracking-tight">CCPADMS</span>}
+        {!collapsed && <span className="truncate font-display text-sm font-semibold tracking-tight">NEXTADMS</span>}
       </div>
 
       <ScrollArea className="flex-1 px-2 py-3">
@@ -198,7 +198,7 @@ export function SidebarContent({
 
             // Grup 2+ item -- dropdown per-aplikasi, bisa di-collapse/expand.
             const isOpen = openGroups.has(group.label);
-            const GroupIcon = group.icon ?? Fingerprint;
+            const GroupIcon = group.icon ?? Network;
             const groupActive = groupContainsPath(group, pathname);
 
             if (collapsed) {
@@ -249,7 +249,7 @@ export function Sidebar() {
   return (
     <aside
       className={cn(
-        "hidden shrink-0 border-r border-border transition-[width] duration-200 lg:block",
+        "sidebar-shell hidden shrink-0 border-r border-border transition-[width] duration-200 lg:block",
         collapsed ? "w-14" : "w-60"
       )}
     >
@@ -257,7 +257,7 @@ export function Sidebar() {
         <div className="min-h-0 flex-1">
           <SidebarContent collapsed={collapsed} />
         </div>
-        <div className={cn("flex shrink-0 border-t border-border p-2", collapsed ? "justify-center" : "justify-end")}>
+        <div className={cn("flex shrink-0 border-t border-border bg-card p-2", collapsed ? "justify-center" : "justify-end")}>
           <Button variant="ghost" size="icon" onClick={toggle} aria-label={collapsed ? "Perluas sidebar" : "Ciutkan sidebar"}>
             {collapsed ? <ChevronsRight className="h-3.5 w-3.5" /> : <ChevronsLeft className="h-3.5 w-3.5" />}
           </Button>

@@ -2,7 +2,7 @@
 import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
-import { Fingerprint, ArrowRight, Loader2 } from "lucide-react";
+import { Network, ArrowRight, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -45,9 +45,9 @@ function LoginForm() {
         />
         <div className="relative z-10 flex items-center gap-2">
           <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary/15">
-            <Fingerprint className="h-4 w-4 text-primary" />
+            <Network className="h-4 w-4 text-primary" />
           </div>
-          <span className="font-display text-sm font-semibold tracking-tight">CCPADMS</span>
+          <span className="font-display text-sm font-semibold tracking-tight">NEXTADMS</span>
         </div>
 
         <div className="relative z-10 flex flex-1 items-center justify-center">
@@ -56,18 +56,18 @@ function LoginForm() {
             <span className="scan-ring" style={{ animationDelay: "0.7s" }} />
             <span className="scan-ring" style={{ animationDelay: "1.4s" }} />
             <div className="relative z-10 flex h-24 w-24 items-center justify-center rounded-full border border-primary/30 bg-primary/10">
-              <Fingerprint className="h-10 w-10 text-primary" strokeWidth={1.25} />
+              <Network className="h-10 w-10 text-primary" strokeWidth={1.25} />
             </div>
           </div>
         </div>
 
         <div className="relative z-10 max-w-sm">
           <p className="font-display text-xl font-semibold leading-snug tracking-tight text-foreground">
-            Satu konsol untuk seluruh infrastruktur IT.
+            IT Infrastructure Management, dalam satu konsol.
           </p>
           <p className="mt-2 text-sm text-muted-foreground">
-            Device fingerprint, employee, transaksi, dan mobile attendance — termonitor real-time
-            dalam satu tempat.
+            Active Directory, jaringan, mail server, device fingerprint, dan absensi mobile —
+            termonitor & terkelola real-time dalam satu tempat.
           </p>
         </div>
       </div>
@@ -77,9 +77,9 @@ function LoginForm() {
         <div className="w-full max-w-sm">
           <div className="mb-8 flex items-center gap-2 lg:hidden">
             <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary/15">
-              <Fingerprint className="h-4 w-4 text-primary" />
+              <Network className="h-4 w-4 text-primary" />
             </div>
-            <span className="font-display text-sm font-semibold tracking-tight">CCPADMS</span>
+            <span className="font-display text-sm font-semibold tracking-tight">NEXTADMS</span>
           </div>
 
           <h1 className="font-display text-2xl font-semibold tracking-tight">Masuk ke konsol</h1>
@@ -121,7 +121,7 @@ function LoginForm() {
           </form>
 
           <p className="mt-8 text-center text-[11px] text-muted-foreground">
-            © {new Date().getFullYear()} CCPADMS — IT Infrastruktur Management Console
+            © {new Date().getFullYear()} NEXTADMS — IT Infrastructure Management
           </p>
         </div>
       </div>

@@ -1,48 +1,36 @@
 "use client";
-import { useState } from "react";
+import Link from "next/link";
 import { signOut, useSession } from "next-auth/react";
-import { Menu, LogOut, User as UserIcon, KeyRound } from "lucide-react";
+import { Network, LogOut, UserIcon, KeyRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
   DropdownMenuSeparator, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ThemeToggle } from "./theme-toggle";
-import { SidebarContent } from "./sidebar";
-import { InteractiveBreadcrumb } from "./interactive-breadcrumb";
-import { GlobalNetmgmtIndicators } from "./global-netmgmt-indicators";
+import { ThemeToggle } from "@/components/layout/theme-toggle";
 
 function initials(name: string) {
-  return name
-    .split(" ")
-    .map((p) => p[0])
-    .slice(0, 2)
-    .join("")
-    .toUpperCase();
+  return name.split(" ").map((p) => p[0]).slice(0, 2).join("").toUpperCase();
 }
 
-export function Topbar() {
-  const [mobileOpen, setMobileOpen] = useState(false);
+
+
+
+export function PortalHeader() {
   const { data: session } = useSession();
   const displayName = session?.user?.full_name || session?.user?.username || "";
 
   return (
-    <header className="sticky top-0 z-30 flex h-12 shrink-0 items-center gap-3 border-b border-border bg-card/95 px-3 backdrop-blur supports-[backdrop-filter]:bg-card/80 sm:px-4">
-      <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
-        <SheetContent side="left" className="w-60 p-0">
-          <SheetTitle className="sr-only">Navigasi</SheetTitle>
-          <SidebarContent onNavigate={() => setMobileOpen(false)} />
-        </SheetContent>
-      </Sheet>
-      <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setMobileOpen(true)}>
-        <Menu className="h-4 w-4" />
-      </Button>
+    <header className="sticky top-0 z-30 flex h-12 shrink-0 items-center gap-3 border-b border-border bg-card/95 px-4 backdrop-blur">
+      <Link href="/portal" className="flex items-center gap-2">
+        <div className="flex h-7 w-7 items-center justify-center rounded-md bg-primary/15">
+          <Network className="h-3.5 w-3.5 text-primary" />
+        </div>
+        <span className="font-display text-sm font-semibold tracking-tight">NEXTADMS</span>
+      </Link>
 
-      <InteractiveBreadcrumb />
-
-      <GlobalNetmgmtIndicators />
+      <div className="flex-1" />
 
       <ThemeToggle />
 
@@ -62,17 +50,6 @@ export function Topbar() {
             <p className="text-xs font-medium text-foreground">{displayName}</p>
             <p className="text-[11px] text-muted-foreground">{session?.user?.email}</p>
           </DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem asChild>
-            <a href="/profile" className="cursor-pointer">
-              <UserIcon className="h-3.5 w-3.5" /> Profil Saya
-            </a>
-          </DropdownMenuItem>
-          <DropdownMenuItem asChild>
-            <a href="/profile/password" className="cursor-pointer">
-              <KeyRound className="h-3.5 w-3.5" /> Ganti Password
-            </a>
-          </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={() => signOut({ redirect: false }).then(() => { window.location.href = "/login"; })} className="cursor-pointer text-destructive focus:text-destructive">
             <LogOut className="h-3.5 w-3.5" /> Keluar

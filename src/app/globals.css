@@ -68,7 +68,34 @@
   }
 }
 
-/* Motif signature: "scan pulse" -- cincin konsentris dari titik fingerprint,
+/* Sidebar -- identitas "Void" TETAP (navy-gelap), TERLEPAS dari mode
+   terang/gelap keseluruhan situs -- panel kontrol/navigasi TIDAK perlu
+   ikut berubah saat konten di-toggle terang/gelap (analoginya spt
+   kokpit pesawat: panel instrumen py pencahayaan sendiri, tidak
+   ngikut lampu kabin). Dipakai lewat class .sidebar-shell yang
+   TIMPA token global secara LOKAL (scoped) -- semua className yang
+   SUDAH ADA di sidebar.tsx (bg-card, text-foreground, text-muted-foreground,
+   hover:bg-secondary, border-border) OTOMATIS ikut tema ini tanpa perlu
+   diubah satu per satu. Dipakai jg oleh Topbar versi mobile (Sheet yg
+   render ulang SidebarContent yang sama) -- lihat topbar.tsx. */
+@layer base {
+  .sidebar-shell {
+    --card: 222 45% 10%;
+    --card-foreground: 210 20% 88%;
+    --foreground: 210 20% 88%;
+    --muted-foreground: 215 15% 58%;
+    --secondary: 222 35% 17%;
+    --secondary-foreground: 210 20% 90%;
+    --border: 222 30% 20%;
+    --accent: 222 35% 17%;
+    --accent-foreground: 210 20% 90%;
+    --primary: 175 70% 48%;
+    --primary-foreground: 222 47% 6%;
+  }
+}
+
+/* Motif signature: "scan pulse" -- cincin konsentris menandakan platform
+   sbg pusat yang terhubung ke seluruh infrastruktur yang dikelolanya,
    dipakai di halaman login & indikator loading. Dibuat sbg utility class
    (bukan komponen) supaya bisa dipakai fleksibel di beberapa tempat. */
 @layer utilities {

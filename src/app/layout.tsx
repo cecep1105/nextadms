@@ -8,8 +8,8 @@ const spaceGrotesk = Space_Grotesk({ subsets: ["latin"], variable: "--font-space
 const jetbrainsMono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-jetbrains-mono", display: "swap" });
 
 export const metadata: Metadata = {
-  title: "CCPADMS — Attendance & Device Console",
-  description: "Konsol manajemen device fingerprint, employee, dan mobile attendance.",
+  title: "NEXTADMS — IT Infrastructure Management",
+  description: "Konsol manajemen infrastruktur IT: Active Directory, jaringan, mail server, ID card, device fingerprint, dan mobile attendance.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
