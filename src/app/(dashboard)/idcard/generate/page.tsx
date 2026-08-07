@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2, Search, User, Users, CheckCircle2 } from "lucide-react";
+import { Loader2, Search, User, Users, CheckCircle2, Wand2 } from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,6 +11,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { WebcamCapture } from "@/components/shared/webcam-capture";
+import { PhotoRetouchDialog } from "@/components/shared/photo-retouch-dialog";
 import { useApiClient } from "@/lib/api-client";
 import { extractErrorMessage } from "@/lib/error-utils";
 import { resolveMediaUrl } from "@/lib/media-url";
@@ -55,6 +56,7 @@ export default function GenerateIdCardPage() {
   // --- Foto & extra ---
   const [photoDataUri, setPhotoDataUri] = useState<string | null>(null);
   const [photoSource, setPhotoSource] = useState<"ftp" | "shoot" | "upload">("shoot");
+  const [retouchOpen, setRetouchOpen] = useState(false);
   const [extraText, setExtraText] = useState("");
 
   const [generating, setGenerating] = useState(false);
@@ -299,13 +301,27 @@ export default function GenerateIdCardPage() {
             </div>
           </div>
 
-          {photoDataUri && photoSource !== "ftp" && (
-            <div>
+          {photoDataUri && (
+            <div className="border-t border-border pt-3">
               <p className="mb-1 text-xs font-medium text-muted-foreground">Foto terpilih:</p>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={photoDataUri} alt="Foto terpilih" className="w-24 rounded-md border border-border" />
+              <div className="flex items-center gap-3">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={photoDataUri} alt="Foto terpilih" className="w-24 rounded-md border border-border" />
+                <Button type="button" variant="outline" size="sm" onClick={() => setRetouchOpen(true)}>
+                  <Wand2 className="h-3.5 w-3.5" /> Retouch
+                </Button>
+              </div>
+              <p className="mt-1 text-[11px] text-muted-foreground">Posisi kurang pas? Geser/zoom foto lewat Retouch sebelum generate kartu.</p>
             </div>
           )}
+
+          <PhotoRetouchDialog
+            open={retouchOpen}
+            onOpenChange={setRetouchOpen}
+            sourceImage={photoDataUri ?? ""}
+            pin={isEmployeeLinked ? employeeFound?.pin : undefined}
+            onRetouched={(dataUri) => setPhotoDataUri(dataUri)}
+          />
         </Card>
       </div>
 

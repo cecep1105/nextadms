@@ -724,3 +724,8 @@ export interface IDCardPhotoCandidate {
   source: string;
   label?: string;
 }
+
+export interface IDCardPhotoBoxConfig {
+  width: number;
+  height: number;
+}
