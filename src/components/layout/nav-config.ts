@@ -39,7 +39,7 @@ export const navGroups: NavGroup[] = [
     items: [{ title: "Manajemen User", href: "/users", icon: Users }],
   },
   {
-    label: "iClock — Device & Absensi",
+    label: "Finger Attendance",
     icon: Cpu,
     items: [
       { title: "Pool / Department", href: "/iclock/departments", icon: Building2 },
@@ -71,7 +71,7 @@ export const navGroups: NavGroup[] = [
     // masing2 (Mikrotik/Mail Server/Active Directory) jadi SUB-MENU
     // bertingkat DI DALAMNYA (item tanpa href, py children -- lihat
     // NavItem.children di atas).
-    label: "Infrastructure Management",
+    label: " IT Infrastructure",
     icon: Router,
     items: [
       {
