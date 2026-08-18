@@ -14,8 +14,8 @@ export function ManageMembersButton({
   const [open, setOpen] = useState(false);
   return (
     <>
-      <Button variant="ghost" size="sm" onClick={() => setOpen(true)}>
-        <Users className="h-3.5 w-3.5" /> Kelola Member
+      <Button variant="ghost" size="icon" onClick={() => setOpen(true)}>
+        <Users className="h-2.5 w-2.5" /> Kelola Member
       </Button>
       <GroupMembersDialog source={source} groupDn={groupDn} groupName={groupName} open={open} onOpenChange={setOpen} />
     </>

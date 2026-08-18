@@ -23,7 +23,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               selebar sidebar yang dilaporkan. */}
           <div className="flex min-w-0 flex-1 flex-col">
             <Topbar />
-            <main className="flex-1 p-3 sm:p-5">{children}</main>
+            <main className="flex-1 p-0 sm:px-5">{children}</main>
           </div>
         </div>
       </NetmgmtWsProvider>

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { apiServerFetch, ApiError } from "@/lib/api-server";
 import type { Paginated, ActiveDevice, Employee, Transaction, RegisteredDevice } from "@/types/api";
+import { PageHeader } from "@/components/shared/page-header";
 
 async function safeCount(path: string): Promise<number | null> {
   try {
@@ -60,12 +61,10 @@ export default async function DashboardHomePage() {
 
   return (
     <div>
-      <div className="mb-5">
-        <h1 className="font-display text-lg font-semibold tracking-tight">Dashboard</h1>
-        <p className="mt-0.5 text-xs text-muted-foreground">
-          Ringkasan infrastruktur device fingerprint dan aktivitas absensi.
-        </p>
-      </div>
+      <PageHeader
+        title="Dashboard"
+        description="Ringkasan infrastruktur device fingerprint dan aktivitas absensi."
+      />
 
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <StatCard title="Active Device" value={deviceCount} icon={Cpu} href="/iclock/active-devices" hint="Device fingerprint terhubung" />

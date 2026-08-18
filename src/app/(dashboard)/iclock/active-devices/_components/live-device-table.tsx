@@ -22,10 +22,16 @@ const BASE_PATH = "/iclock/active-devices";
 // Next.js utk device yang SAMA.
 const STALE_MS = 60 * 60 * 1000;
 
-function isRecentlyActive(lastActivity: string | null): boolean {
-  if (!lastActivity) return false;
-  const t = new Date(lastActivity).getTime();
-  return !Number.isNaN(t) && Date.now() - t < STALE_MS;
+function isRecentlyActive(lastActivity: string | null, lastData: string | null): boolean {
+  const timestamps = [lastActivity, lastData]
+    .filter((value): value is string => typeof value === "string" && value.trim().length > 0)
+    .map((value) => new Date(value).getTime())
+    .filter((time) => !Number.isNaN(time));
+
+  if (timestamps.length === 0) return false;
+
+  const latestTimestamp = Math.max(...timestamps);
+  return Date.now() - latestTimestamp < STALE_MS;
 }
 
 function ConnectionIndicator({ status }: { status: "connecting" | "connected" | "disconnected" }) {
@@ -137,7 +143,7 @@ export function LiveDeviceTable({
             </TableRow>
           ) : (
             devices.map((device) => {
-              const online = isRecentlyActive(device.LastActivity);
+              const online = isRecentlyActive(device.LastActivity,device.LastData);
               return (
                 <TableRow key={device.SN}>
                   <TableCell>

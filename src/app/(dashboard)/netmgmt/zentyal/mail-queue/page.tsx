@@ -12,6 +12,8 @@ import type { MailQueueResponse } from "@/types/api";
 import { QueueItemActions } from "./_components/queue-item-actions";
 import { DeleteBySenderButton } from "./_components/delete-by-sender-button";
 import { MailQueueLiveRefresher } from "./_components/mail-queue-live-refresher";
+import { MailHeaderView } from "./_components/mail-header-view";
+import { ListTooltip } from "@/components/shared/list-tooltip";
 
 const PAGE_SIZE = 20;
 // SAMA pola konvensi param dgn Mikrotik/AD/Zentyal LDAP (_page/_limit/
@@ -42,6 +44,50 @@ function QueueStatBadges({ total, active, deferred }: { total: number; active: n
     </div>
   );
 }
+
+
+type ErrorCode =
+  | 'DISABLED'
+  | 'HNF'
+  | 'DISK'
+  | 'NRH'
+  | 'T-OUT'
+  | 'REFUSED'
+  | 'UNREACH'
+  | 'INVALID'
+  | 'OTHER'
+  | '';
+
+const ERROR_RULES: readonly [keyword: string, code: ErrorCode][] = [
+  ['disabled', 'DISABLED'],
+  ['host not found', 'HNF'],
+  ['out of storage', 'DISK'],
+  ['no route to host', 'NRH'],
+  ['timed out', 'T-OUT'],
+  ['refused', 'REFUSED'],
+  ['unreachable', 'UNREACH'],
+  ['invalid', 'INVALID'],
+];
+
+function errorReason(reason: string): ErrorCode {
+  const normalized = reason.trim().toLowerCase();
+
+  if (!normalized) return '';
+
+  return (
+    ERROR_RULES.find(([keyword]) => normalized.includes(keyword))?.[1] ??
+    'OTHER'
+  );
+}
+
+
+
+
+
+
+
+
+
 
 export default async function ZentyalMailQueuePage({ searchParams }: PageProps) {
   const sp = await searchParams;
@@ -84,13 +130,14 @@ export default async function ZentyalMailQueuePage({ searchParams }: PageProps) 
                 <TableRow key={item.id}>
                   <TableCell className="font-mono">{item.id}</TableCell>
                   <TableCell>
-                    {item.status === "active" ? <Badge variant="success">Active</Badge> : <Badge variant="warning">Deferred</Badge>}
+                    {item.status === "active" ? <Badge variant="success">Active <MailHeaderView qid={item.id} /> </Badge> : <Badge variant="warning">Deferred</Badge>}
                   </TableCell>
                   <TableCell className="text-muted-foreground">{item.size}</TableCell>
                   <TableCell className="text-muted-foreground">{item.rawdate}</TableCell>
                   <TableCell className="text-muted-foreground">{item.sender}</TableCell>
-                  <TableCell className="max-w-xs truncate text-muted-foreground" title={item.recipient}>{item.recipient}</TableCell>
-                  <TableCell className="max-w-xs truncate text-muted-foreground" title={item.reason}>{item.reason || "-"}</TableCell>
+                  {/* <TableCell className="max-w-xs truncate text-muted-foreground" title={item.recipient}>{item.recipient}</TableCell> */}
+                  <TableCell className="max-w-xs truncate text-muted-foreground" title={item.recipient}><ListTooltip items ={item.recipient.split(' ')} /></TableCell>
+                  <TableCell className="max-w-xs truncate text-muted-foreground" title={item.reason}>{errorReason(item.reason)}</TableCell>
                   <TableCell><QueueItemActions qid={item.id} /></TableCell>
                 </TableRow>
               ))

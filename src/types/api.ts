@@ -427,6 +427,12 @@ export interface DnsRecordRow {
 // SEMUA hasil sekaligus), jadi halaman terkait TIDAK pakai
 // RouterOSPaginationBar spt Mikrotik/AD/Zentyal LDAP.
 
+export interface MailPostfixAlias {
+  uid: string
+  mail: string
+  maildrop: string[]
+}
+
 export interface MailQueueItem {
   id: string;
   size: string;

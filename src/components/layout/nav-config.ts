@@ -24,6 +24,7 @@ export interface NavItem {
 
 export interface NavGroup {
   label: string;
+  desc?: string;
   /** Ikon GRUP -- cuma dipakai kalau grup ini jadi dropdown collapsible (items.length > 1). */
   icon?: ComponentType<LucideProps>;
   items: NavItem[];
@@ -71,7 +72,8 @@ export const navGroups: NavGroup[] = [
     // masing2 (Mikrotik/Mail Server/Active Directory) jadi SUB-MENU
     // bertingkat DI DALAMNYA (item tanpa href, py children -- lihat
     // NavItem.children di atas).
-    label: " IT Infrastructure",
+    label: "Network Mgmt",
+    desc: "Network Management",
     icon: Router,
     items: [
       {
@@ -93,6 +95,7 @@ export const navGroups: NavGroup[] = [
           { title: "SASL Logs", href: "/netmgmt/zentyal/sasl-logs", icon: ScrollText },
           { title: "Users", href: "/netmgmt/zentyal/users", icon: Users },
           { title: "Groups", href: "/netmgmt/zentyal/groups", icon: Users },
+          { title: "Postfix Alias", href: "/netmgmt/zentyal/postfix-alias", icon: Users },          
         ],
       },
       {

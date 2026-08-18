@@ -40,7 +40,8 @@ export function Topbar() {
         <Menu className="h-4 w-4" />
       </Button>
 
-      <InteractiveBreadcrumb />
+      <InteractiveBreadcrumb topbar />
+      {/* <div className="bg-black w-full"></div> */}
 
       <GlobalNetmgmtIndicators />
 
