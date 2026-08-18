@@ -68,12 +68,12 @@ function findBreadcrumb(pathname: string): BreadcrumbSegment[] {
 }
 
 function BreadcrumbSegmentView({ segment, isLast, isFirst, topbar }: { segment: BreadcrumbSegment; isLast: boolean; isFirst: boolean; topbar: boolean }) {
-  const textClass = isFirst ? "text-2xl font-bold text-green-600" : "font-medium text-secondary-foreground";
+  const textClass = isFirst ? "text-xl font-bold text-green-600" : "font-medium text-secondary-foreground";
 
   if (segment.options.length === 0) {
     // Tidak ada sibling utk dipilih -- tampil sbg teks/link biasa, TANPA dropdown (percuma).
-    return segment.href ? (
-      <Link href={segment.href} className={`truncate hover:underline ${textClass}`}>{ segment.label}</Link>
+    return segment.href && topbar ? (
+      <Link href={segment.href} className={`truncate hover:underline ${textClass}`}>{segment.label}</Link>
     ) : (
       <span className={`truncate ${textClass}`}>{topbar? segment.label : ''}</span>
 
