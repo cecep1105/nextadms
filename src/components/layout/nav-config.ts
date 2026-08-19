@@ -41,6 +41,7 @@ export const navGroups: NavGroup[] = [
   },
   {
     label: "Finger Attendance",
+    desc: "Finger Attendance Management",
     icon: Cpu,
     items: [
       { title: "Pool / Department", href: "/iclock/departments", icon: Building2 },
@@ -56,6 +57,7 @@ export const navGroups: NavGroup[] = [
   },
   {
     label: "Mobile Attendance",
+    desc: "Mobile Attendance Management",
     icon: Smartphone,
     items: [
       { title: "Mobile Pool", href: "/mclock/mobile-pools", icon: MapPinned },

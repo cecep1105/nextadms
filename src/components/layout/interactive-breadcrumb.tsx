@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ChevronRight, ChevronDown, SeparatorVertical, Menu } from "lucide-react";
+import { ChevronRight, ChevronDown, SeparatorVertical, Menu, SquareArrowRight } from "lucide-react";
 import type { ComponentType } from "react";
 import type { icons, LucideProps } from "lucide-react";
 import { DynamicIcon } from 'lucide-react/dynamic';
@@ -68,7 +68,7 @@ function findBreadcrumb(pathname: string): BreadcrumbSegment[] {
 }
 
 function BreadcrumbSegmentView({ segment, isLast, isFirst, topbar }: { segment: BreadcrumbSegment; isLast: boolean; isFirst: boolean; topbar: boolean }) {
-  const textClass = isFirst ? "text-xl font-bold text-green-600" : "font-medium text-secondary-foreground";
+  const textClass = isFirst ? "text-xl font-bold text-green-600" : "text-muted-foreground";
 
   if (segment.options.length === 0) {
     // Tidak ada sibling utk dipilih -- tampil sbg teks/link biasa, TANPA dropdown (percuma).
@@ -121,7 +121,7 @@ export function InteractiveBreadcrumb({topbar}:{topbar: boolean}) {
       {segments.map((segment, i) => (
         <span key={`${segment.label}-${i}`} className="flex min-w-0 items-center gap-1.5">
           {i > 1 && !topbar && <span className="text-muted-foreground">|</span>}
-          {i === 1 && !topbar && <Menu className="-ml-2 pr-1 w-6 h-4" /> }
+          {i === 1 && !topbar && <SquareArrowRight className="-ml-2 w-6 h-4" /> }
           <BreadcrumbSegmentView segment={segment} isLast={i === segments.length - 1} isFirst={i === 0} topbar={topbar} />
         </span>
       ))}
